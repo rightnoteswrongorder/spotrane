@@ -42,7 +42,7 @@ export default function MenuBar() {
                             'aria-labelledby': 'basic-button',
                         }}
                     >
-                        <MenuItem component={Link} href='/library'>My Library</MenuItem>
+                        <MenuItem component={Link} href='/spotrane/library'>My Library</MenuItem>
                         <MenuItem onClick={handleLogout}>Logout</MenuItem>
                     </Menu>
                     <Typography component="a" href='/' variant="h6" sx={{
