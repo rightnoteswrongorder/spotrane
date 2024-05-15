@@ -42,15 +42,15 @@ const theme = createTheme({
 const router = createBrowserRouter(
     [
         {
-            path: "/spotrane",
+            path: "/",
             element: <App/>
         },
         {
-            path: "/spotrane/library",
+            path: "/library",
             element: <Library/>
         }
 
-    ]
+    ], { basename: "/spotrane" }
 )
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
