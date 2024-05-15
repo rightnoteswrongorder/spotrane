@@ -42,11 +42,11 @@ const theme = createTheme({
 const router = createBrowserRouter(
     [
         {
-            path: "/",
+            path: "/spotrane",
             element: <App/>
         },
         {
-            path: "/library",
+            path: "/spotrane/library",
             element: <Library/>
         }
 
