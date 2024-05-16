@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import {createTheme, CssBaseline, StyledEngineProvider, ThemeProvider} from "@mui/material";
 import {orange} from "@mui/material/colors";
-import SessionProvider from "./SessionProvider.tsx";
+import SessionProvider from "./providers/SessionProvider.tsx";
 import {createHashRouter, RouterProvider} from "react-router-dom";
-import Library from "./Library.tsx";
+import Library from "./components/Library.tsx";
 
 
 declare module '@mui/material/styles' {

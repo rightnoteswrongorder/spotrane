@@ -1,5 +1,5 @@
 import type {Meta, StoryObj} from "@storybook/react";
-import MenuBar from "../MenuBar.tsx";
+import MenuBar from "../components/MenuBar.tsx";
 
 const meta = {
     title: 'Example/MenuBar',

@@ -1,6 +1,6 @@
 import React, {createContext, ReactNode, useContext, useEffect, useState} from "react";
 import {Session} from "@supabase/supabase-js";
-import supabase from "./supaBaseClient.ts";
+import supabase from "../supabase/supaBaseClient.ts";
 
 const defaultSessionConfig: SessionConfig = {session: undefined}
 
@@ -41,6 +41,7 @@ const SessionProvider: React.FC<Props> = ({ children })  => {
 
 
 }
+
 export default SessionProvider
 
 export const useSession = () => {

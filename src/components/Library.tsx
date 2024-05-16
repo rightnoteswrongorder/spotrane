@@ -12,11 +12,11 @@ import {
     TablePagination, TextField,
     Typography
 } from "@mui/material";
-import supabase from "./supaBaseClient.ts";
+import supabase from "../supabase/supaBaseClient.ts";
 import {useEffect, useRef, useState} from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import {Tables} from "./database.types.ts";
+import {Tables} from "../interfaces/database.types.ts";
 import {SubmitHandler, useForm} from "react-hook-form";
 
 
