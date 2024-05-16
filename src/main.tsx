@@ -4,7 +4,7 @@ import App from './App.tsx'
 import {createTheme, CssBaseline, StyledEngineProvider, ThemeProvider} from "@mui/material";
 import {orange} from "@mui/material/colors";
 import SessionProvider from "./SessionProvider.tsx";
-import {createBrowserRouter,  RouterProvider} from "react-router-dom";
+import {createHashRouter, RouterProvider} from "react-router-dom";
 import Library from "./Library.tsx";
 
 
@@ -39,10 +39,10 @@ const theme = createTheme({
     },
 });
 
-const router = createBrowserRouter(
+const router = createHashRouter(
     [
         {
-            path: "/",
+            path: "",
             element: <App/>
         },
         {
@@ -50,7 +50,7 @@ const router = createBrowserRouter(
             element: <Library/>
         }
 
-    ], { basename: "/spotrane" }
+    ]
 )
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
