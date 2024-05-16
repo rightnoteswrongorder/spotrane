@@ -45,7 +45,7 @@ export default function MenuBar() {
                         <MenuItem component={Link} href='#library'>My Library</MenuItem>
                         <MenuItem onClick={handleLogout}>Logout</MenuItem>
                     </Menu>
-                    <Typography component="a" href='/' variant="h6" sx={{
+                    <Typography component="a" href='/spotrane' variant="h6" sx={{
                         flexGrow: 1,
                         mr: 2,
                         display: {xs: 'none', md: 'flex'},
