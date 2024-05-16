@@ -1,43 +1,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
-import {createTheme, CssBaseline, StyledEngineProvider, ThemeProvider} from "@mui/material";
-import {orange} from "@mui/material/colors";
+import {CssBaseline, StyledEngineProvider, ThemeProvider} from "@mui/material";
 import SessionProvider from "./providers/SessionProvider.tsx";
 import {createHashRouter, RouterProvider} from "react-router-dom";
 import Library from "./components/Library.tsx";
-
-
-declare module '@mui/material/styles' {
-    interface Theme {
-        status: {
-            danger: string;
-        };
-    }
-
-    // allow configuration using `createTheme`
-    interface ThemeOptions {
-        status?: {
-            danger?: string;
-        };
-    }
-}
-const theme = createTheme({
-    typography: {
-        fontFamily: 'Helvetica',
-    },
-    palette: {
-        primary: {
-            main: '#1db954',
-        },
-        secondary: {
-            main: '#212121',
-        },
-    },
-    status: {
-        danger: orange[500],
-    },
-});
+import theme from "./theme.ts";
 
 const router = createHashRouter(
     [

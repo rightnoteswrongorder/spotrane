@@ -2,7 +2,7 @@ import type {Meta, StoryObj} from "@storybook/react";
 import MenuBar from "../components/MenuBar.tsx";
 
 const meta = {
-    title: 'Example/MenuBar',
+    title: 'MenuBar',
     component: MenuBar,
     parameters: {
         // More on how to position stories at: https://storybook.js.org/docs/configure/story-layout
