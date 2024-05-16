@@ -15,10 +15,8 @@ import {
 import supabase from "../supabase/supaBaseClient.ts";
 import {useEffect, useRef, useState} from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
-import FavoriteIcon from "@mui/icons-material/Favorite";
 import {Tables} from "../interfaces/database.types.ts";
 import {SubmitHandler, useForm} from "react-hook-form";
-
 
 interface IFormInput {
     searchText: string
@@ -30,6 +28,16 @@ export default function Library() {
     const nextId = useRef(0);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [searchText, setSearchText] = useState("");
+
+    const deleteAlbum = (albumId: string) => {
+        (async () => {
+            await supabase.from('albums')
+                .delete()
+                .eq('id', albumId)
+            runSearch(searchText)
+        })();
+    }
 
     const all_albums = (from: number, to: number) => {
         (async () => {
@@ -74,25 +82,29 @@ export default function Library() {
 
     const {register, handleSubmit} = useForm<IFormInput>()
 
-    const handleReset  = () => {
+    const handleReset = () => {
         setPage(0)
         setRowsPerPage(5)
         all_albums(page, rowsPerPage)
     }
 
-    const onSubmit: SubmitHandler<IFormInput> = (formData) => {
+    const runSearch = (searchText: string) => {
         (async () => {
             const {data, error} = await supabase
-                .rpc('search_all_albums', {keyword:  formData.searchText.replace(" ", " | ")})
-             if (error) {
-                 console.error(error)
-             }
-             else {
-                 setPage(0)
-                 setTotalAlbums(data.length)
-                 setAlbums(data)
-             }
+                .rpc('search_all_albums', {keyword: searchText.replace(" ", " | ")})
+            if (error) {
+                console.error(error)
+            } else {
+                setPage(0)
+                setTotalAlbums(data.length)
+                setAlbums(data)
+            }
         })();
+    }
+
+    const onSubmit: SubmitHandler<IFormInput> = (formData) => {
+        setSearchText(formData.searchText)
+        runSearch(formData.searchText)
     }
 
     return (
@@ -103,7 +115,7 @@ export default function Library() {
                 </Grid>
                 <Grid xs={12} item={true}>
                     <form onSubmit={handleSubmit(onSubmit)}>
-                        <Stack sx={{paddingLeft: 5, paddingRight: 5 }}spacing={1}>
+                        <Stack sx={{paddingLeft: 5, paddingRight: 5}} spacing={1}>
                             <TextField variant='outlined' InputLabelProps={{shrink: true}} margin="dense"
                                        type='text' {...register("searchText", {required: true})} />
                             <Button type='submit' variant='outlined' color='secondary'>Search</Button>
@@ -114,7 +126,8 @@ export default function Library() {
                 <Grid xs={12} item={true}>
                     <Grid container justifyContent="center" spacing={3}>
                         {albums?.map(thing => (
-                            <Grid key={nextId.current++} item={true}><PlaylistCard2 album={thing}/></Grid>))}
+                            <Grid key={nextId.current++} item={true}><PlaylistCard2 deleteAlbum={deleteAlbum}
+                                                                                    album={thing}/></Grid>))}
                     </Grid>
                 </Grid>
                 <Grid container justifyContent="right" spacing={2}>
@@ -141,8 +154,15 @@ styled(Paper)(({theme}) => ({
 }));
 type CreatePlaylistCardProps = {
     album: Tables<'all_albums'>
+    deleteAlbum: (albumId: string) => void
 }
-const PlaylistCard2 = ({album}: CreatePlaylistCardProps) => {
+const PlaylistCard2 = ({album, deleteAlbum}: CreatePlaylistCardProps) => {
+
+    const deleteClickHandler = () => {
+        if (album && album.id) {
+            deleteAlbum(album.id)
+        }
+    }
 
     return (<Card sx={{width: '350px', height: '200px', display: 'inline-flex'}}>
         <Box sx={{display: 'flex', flexDirection: 'column'}}>
@@ -161,12 +181,9 @@ const PlaylistCard2 = ({album}: CreatePlaylistCardProps) => {
                 </Typography>
             </CardContent>
             <Box sx={{display: 'flex', alignItems: 'center', pl: 1, pb: 1}}>
-                <IconButton sx={{color: 'gray'}}
+                <IconButton onClick={deleteClickHandler} sx={{color: 'red'}}
                             aria-label="unfollow">
                     <DeleteIcon></DeleteIcon>
-                </IconButton>
-                <IconButton sx={{color: 'gray'}} aria-label="save">
-                    <FavoriteIcon></FavoriteIcon>
                 </IconButton>
             </Box>
         </Box>

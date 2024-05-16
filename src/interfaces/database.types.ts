@@ -105,7 +105,8 @@ export type Database = {
       all_albums: {
         Row: {
           artist: string | null
-          genres: string[] | null
+          genres: string | null
+          id: string | null
           image: string | null
           label: string | null
           name: string | null
@@ -115,7 +116,20 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      search_all_albums: {
+        Args: {
+          keyword: string
+        }
+        Returns: {
+          artist: string | null
+          genres: string | null
+          id: string | null
+          image: string | null
+          label: string | null
+          name: string | null
+          release_date: string | null
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
