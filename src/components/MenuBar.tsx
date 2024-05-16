@@ -54,7 +54,7 @@ export default function MenuBar() {
                         color: 'inherit',
                         textDecoration: 'none',
                     }}>
-                        Spotify World
+                        spotrane
                     </Typography>
                     <Button>My Library</Button>
                     {session ? <Box><Tooltip title={session.user.email}><AccountCircle/></Tooltip></Box> :
