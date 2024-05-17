@@ -42,6 +42,7 @@ export default function MenuBar() {
                             'aria-labelledby': 'basic-button',
                         }}
                     >
+                        <MenuItem component={Link} href='#'>Home</MenuItem>
                         <MenuItem component={Link} href='#library'>My Library</MenuItem>
                         <MenuItem onClick={handleLogout}>Logout</MenuItem>
                     </Menu>

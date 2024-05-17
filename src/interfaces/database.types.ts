@@ -17,6 +17,7 @@ export type Database = {
           label: string | null
           name: string
           release_date: string | null
+          spotify_uri: string | null
         }
         Insert: {
           artist?: string | null
@@ -25,6 +26,7 @@ export type Database = {
           label?: string | null
           name: string
           release_date?: string | null
+          spotify_uri?: string | null
         }
         Update: {
           artist?: string | null
@@ -33,6 +35,7 @@ export type Database = {
           label?: string | null
           name?: string
           release_date?: string | null
+          spotify_uri?: string | null
         }
         Relationships: [
           {
@@ -61,6 +64,27 @@ export type Database = {
           genres?: string[] | null
           id?: string
           image?: string | null
+          name?: string | null
+        }
+        Relationships: []
+      }
+      lists: {
+        Row: {
+          albums: string[] | null
+          created_at: string
+          id: number
+          name: string | null
+        }
+        Insert: {
+          albums?: string[] | null
+          created_at?: string
+          id?: number
+          name?: string | null
+        }
+        Update: {
+          albums?: string[] | null
+          created_at?: string
+          id?: number
           name?: string | null
         }
         Relationships: []
@@ -111,6 +135,7 @@ export type Database = {
           label: string | null
           name: string | null
           release_date: string | null
+          spotify_uri: string | null
         }
         Relationships: []
       }
@@ -128,6 +153,7 @@ export type Database = {
           label: string | null
           name: string | null
           release_date: string | null
+          spotify_uri: string | null
         }[]
       }
     }

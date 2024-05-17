@@ -11,7 +11,7 @@ import {
     Card,
     CardContent,
     CardMedia,
-    IconButton,
+    IconButton, Link,
     Paper,
     Stack,
     styled,
@@ -19,6 +19,7 @@ import {
     Typography
 } from '@mui/material';
 import {SubmitHandler, useForm} from 'react-hook-form';
+import LinkIcon from "@mui/icons-material/Link"
 import DeleteIcon from "@mui/icons-material/Delete";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import supabase from "../supabase/supaBaseClient.ts";
@@ -181,6 +182,8 @@ const PlaylistCard2 = ({album, saveAlbum, deleteAlbum, isSaved, getArtist, getAl
 
     const saveClickHandler = () => {
         if (fullFatAlbum && artist) {
+            console.log(fullFatAlbum.id)
+            console.log(fullFatAlbum.uri)
             saveAlbum(fullFatAlbum, artist)
             setSavedAlbum(true)
         }
@@ -217,6 +220,9 @@ const PlaylistCard2 = ({album, saveAlbum, deleteAlbum, isSaved, getArtist, getAl
                 <IconButton onClick={saveClickHandler} sx={{color: savedAlbum ? 'green' : 'gray'}} aria-label="save">
                     <FavoriteIcon></FavoriteIcon>
                 </IconButton>
+                <Link href={fullFatAlbum?.uri}>
+                    <LinkIcon></LinkIcon>
+                </Link>
             </Box>
         </Box>
         <CardMedia

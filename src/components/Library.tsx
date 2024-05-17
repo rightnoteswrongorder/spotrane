@@ -5,7 +5,7 @@ import {
     Card,
     CardContent,
     CardMedia,
-    IconButton,
+    IconButton, Link,
     Paper,
     Stack,
     styled,
@@ -17,6 +17,9 @@ import {useEffect, useRef, useState} from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {Tables} from "../interfaces/database.types.ts";
 import {SubmitHandler, useForm} from "react-hook-form";
+import LinkIcon from "@mui/icons-material/Link";
+import {PlaylistAddCheck} from "@mui/icons-material";
+import AddToListDialog from "./AddToListDialog.tsx";
 
 interface IFormInput {
     searchText: string
@@ -29,6 +32,24 @@ export default function Library() {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [searchText, setSearchText] = useState("");
+
+    const addToList = (listName: string, albumId: string) => {
+        (async () => {
+            const {data} = await supabase.from('lists')
+                .select('*')
+                .eq('name', listName)
+
+            const results = data as Tables<'lists'>[]
+
+            if (results && results.length > 0 && results[0].albums) {
+                const oldListIds = results[0]?.albums
+                const newListIds = [...oldListIds, albumId]
+                await supabase.from('lists')
+                    .update({albums: newListIds})
+                    .eq('name', listName)
+            }
+        })();
+    }
 
     const deleteAlbum = (albumId: string) => {
         (async () => {
@@ -127,6 +148,7 @@ export default function Library() {
                     <Grid container justifyContent="center" spacing={3}>
                         {albums?.map(thing => (
                             <Grid key={nextId.current++} item={true}><PlaylistCard2 deleteAlbum={deleteAlbum}
+                                                                                    addToList={addToList}
                                                                                     album={thing}/></Grid>))}
                     </Grid>
                 </Grid>
@@ -155,13 +177,24 @@ styled(Paper)(({theme}) => ({
 type CreatePlaylistCardProps = {
     album: Tables<'all_albums'>
     deleteAlbum: (albumId: string) => void
+    addToList: (listName: string, albumId: string) => void
 }
-const PlaylistCard2 = ({album, deleteAlbum}: CreatePlaylistCardProps) => {
+const PlaylistCard2 = ({album, deleteAlbum, addToList}: CreatePlaylistCardProps) => {
+
+    const [listDialogOpen, setListDialogOpen] = useState<boolean>(false);
 
     const deleteClickHandler = () => {
         if (album && album.id) {
             deleteAlbum(album.id)
         }
+    }
+
+    const addToListClickHandler = () => {
+        setListDialogOpen(true)
+    }
+
+    const handleAddToListDialogClose = () => {
+        setListDialogOpen(false)
     }
 
     return (<Card sx={{width: '350px', height: '200px', display: 'inline-flex'}}>
@@ -185,6 +218,13 @@ const PlaylistCard2 = ({album, deleteAlbum}: CreatePlaylistCardProps) => {
                             aria-label="unfollow">
                     <DeleteIcon></DeleteIcon>
                 </IconButton>
+                <Link href={album.spotify_uri ? album.spotify_uri : ''}>
+                    <LinkIcon></LinkIcon>
+                </Link>
+                <IconButton onClick={addToListClickHandler}
+                            aria-label="add-to-list">
+                    <PlaylistAddCheck></PlaylistAddCheck>
+                </IconButton>
             </Box>
         </Box>
         <CardMedia
@@ -193,5 +233,8 @@ const PlaylistCard2 = ({album, deleteAlbum}: CreatePlaylistCardProps) => {
             image={album?.image ? album?.image : ""}
             alt="album cover"
         />
+        {listDialogOpen && album.id &&
+            <AddToListDialog isOpen={true} handleAddToListDialogClose={handleAddToListDialogClose} handleAdd={addToList}
+                             albumId={album.id}/>}
     </Card>)
 }
