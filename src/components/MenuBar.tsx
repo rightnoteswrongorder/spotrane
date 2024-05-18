@@ -44,6 +44,7 @@ export default function MenuBar() {
                     >
                         <MenuItem component={Link} href='#'>Home</MenuItem>
                         <MenuItem component={Link} href='#library'>My Library</MenuItem>
+                        <MenuItem component={Link} href='#lists'>My Lists</MenuItem>
                         <MenuItem onClick={handleLogout}>Logout</MenuItem>
                     </Menu>
                     <Typography component="a" href='/spotrane' variant="h6" sx={{
