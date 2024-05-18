@@ -5,7 +5,8 @@ import {
     Card,
     CardContent,
     CardMedia,
-    IconButton, Link, MenuItem,
+    FormControl,
+    IconButton, InputLabel, Link, MenuItem,
     Paper, Select,
     Stack,
     styled,
@@ -15,9 +16,10 @@ import supabase from "../supabase/supaBaseClient.ts";
 import {useEffect, useRef, useState} from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {Tables} from "../interfaces/database.types.ts";
-import {SubmitHandler, useForm} from "react-hook-form";
+import {Controller, SubmitHandler, useForm} from "react-hook-form";
 import LinkIcon from "@mui/icons-material/Link";
 import * as React from "react";
+import CreateListDialog from "./CreateListDialog.tsx";
 
 interface IFormInput {
     listName: string
@@ -25,7 +27,7 @@ interface IFormInput {
 
 export default function Lists() {
     const [albums, setAlbums] = useState<Tables<'all_albums'>[]>([]);
-    console.log(setAlbums)
+    const [lists, setLists] = React.useState<(Tables<'lists'> | null)[]>([]);
     const nextId = useRef(0);
 
     const deleteAlbum = (albumId: string) => {
@@ -42,20 +44,6 @@ export default function Lists() {
     }, []);
 
 
-    // const runSearch = (searchText: string) => {
-    //     (async () => {
-    //         const {data, error} = await supabase
-    //             .rpc('search_all_albums', {keyword: searchText.replace(" ", " | ")})
-    //         if (error) {
-    //             console.error(error)
-    //         } else {
-    //             setAlbums(data)
-    //         }
-    //     })();
-    // }
-
-    const [lists, setLists] = React.useState<(Tables<'lists'> | null)[]>([]);
-
     const getAllLists = () => {
         (async () => {
             const {data} = await supabase
@@ -66,16 +54,40 @@ export default function Lists() {
         })();
     }
 
-    const {register, handleSubmit} = useForm<IFormInput>()
+    const albumsOnList = (albumIds: string[]) => {
+        (async () => {
+            const {data} = await supabase
+                .from('all_albums')
+                .select("*")
+                .in('id', albumIds)
+            const f = data as Tables<'all_albums'>[]
+            console.log(f)
+            setAlbums(f)
+        })();
+    }
+
+    const {handleSubmit, control, reset} = useForm<IFormInput>()
 
     const handleReset = () => {
+        setAlbums([])
+        reset()
+    }
+
+    const [listDialogOpen, setListDialogOpen] = useState<boolean>(false);
+
+    const handleCreateList = () => {
+        setListDialogOpen(true)
+    }
+
+    const handleAddToListDialogClose = () => {
+        setListDialogOpen(false)
     }
 
     const onSubmit: SubmitHandler<IFormInput> = (formData) => {
-        setListName(formData.listName)
+        const albumIds = lists.find(list => list?.name === formData.listName)?.albums
+        if (albumIds)
+            albumsOnList(albumIds)
     }
-
-    const [listName, setListName] = React.useState('');
 
     return (
         <div className="container" style={{padding: '0 0 100px 0'}}>
@@ -86,23 +98,36 @@ export default function Lists() {
                 <Grid xs={12} item={true}>
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <Stack sx={{paddingLeft: 5, paddingRight: 5}} spacing={1}>
-                            <Select
-                                labelId="demo-simple-select-label"
-                                id="demo-simple-select"
-                                value={listName}
-                                label="List"
-                                {...register("listName")}
-                            >
-                                {
-                                    lists.map(item => {
-                                        if (item && item.name) {
-                                            return <MenuItem key={item.name} value={item.name}>{item.name}</MenuItem>
-                                        }
-                                    })
-                                }
-                            </Select>
+                            <Controller
+                                control={control}
+                                name="listName"
+                                render={({field: {onChange, value}}) => (
+                                    <FormControl fullWidth>
+                                        <InputLabel id="demo-simple-select-label">List</InputLabel>
+                                        <Select
+                                            labelId="demo-simple-select-label"
+                                            id="demo-simple-select"
+                                            value={value ?? ""}
+                                            onChange={onChange}
+                                            label="List"
+                                        >
+                                            {
+                                                lists.map(item => {
+                                                    if (item && item.name) {
+                                                        return <MenuItem key={item.name}
+                                                                         value={item.name}>{item.name}</MenuItem>
+                                                    }
+                                                })
+                                            }
+                                        </Select>
+                                    </FormControl>
+                                )}
+                            />
                             <Button type='submit' variant='outlined' color='secondary'>Search</Button>
                             <Button variant='outlined' onClick={handleReset} color='secondary'>Reset</Button>
+                            <Button variant='outlined' onClick={handleCreateList} color='secondary'>Create New List</Button>
+                            {listDialogOpen &&
+                                <CreateListDialog isOpen={true} handleAddToListDialogClose={handleAddToListDialogClose}/>}
                         </Stack>
                     </form>
                 </Grid>
