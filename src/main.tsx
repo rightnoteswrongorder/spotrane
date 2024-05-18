@@ -6,6 +6,7 @@ import SessionProvider from "./providers/SessionProvider.tsx";
 import {createHashRouter, RouterProvider} from "react-router-dom";
 import Library from "./components/Library.tsx";
 import theme from "./theme.ts";
+import Lists from "./components/Lists.tsx";
 
 const router = createHashRouter(
     [
@@ -16,6 +17,10 @@ const router = createHashRouter(
         {
             path: "/library",
             element: <Library/>
+        },
+        {
+            path: "/lists",
+            element: <Lists/>
         }
 
     ]
