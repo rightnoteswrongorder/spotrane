@@ -33,21 +33,13 @@ export default function Library() {
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [searchText, setSearchText] = useState("");
 
-    const addToList = (listName: string, albumId: string) => {
+    const addToList = (list: Tables<'lists'>, albumId: string) => {
         (async () => {
-            const {data} = await supabase.from('lists')
-                .select('*')
-                .eq('name', listName)
-
-            const results = data as Tables<'lists'>[]
-
-            if (results && results.length > 0 && results[0].albums) {
-                const oldListIds = results[0]?.albums
-                const newListIds = [...oldListIds, albumId]
-                await supabase.from('lists')
-                    .update({albums: newListIds})
-                    .eq('name', listName)
-            }
+            const newListIds = [...list?.albums ?? [], albumId]
+            await supabase.from('lists')
+                .update({albums: newListIds})
+                .eq('name', list.name)
+            //}
         })();
     }
 
@@ -177,7 +169,7 @@ styled(Paper)(({theme}) => ({
 type CreatePlaylistCardProps = {
     album: Tables<'all_albums'>
     deleteAlbum: (albumId: string) => void
-    addToList: (listName: string, albumId: string) => void
+    addToList: (listName: Tables<'lists'>, albumId: string) => void
 }
 const PlaylistCard2 = ({album, deleteAlbum, addToList}: CreatePlaylistCardProps) => {
 

@@ -14,13 +14,16 @@ import {useEffect} from "react";
 type AddToListDialogProps = {
     isOpen: boolean
     handleAddToListDialogClose: () => void
-    handleAdd: (listName: string, albumId: string) => void
+    handleAdd: (list: Tables<'lists'>, albumId: string) => void
     albumId: string
 }
 
 export default function AddToListDialog({isOpen, handleAddToListDialogClose, handleAdd, albumId}: AddToListDialogProps) {
 
     const [lists, setLists] = React.useState<(Tables<'lists'> | null)[]>([]);
+    const [open, setOpen] = React.useState(false);
+    const [listName, setListName] = React.useState('');
+    const [selectedList, setSelectedList] = React.useState<Tables<'lists'> | undefined | null>();
 
     const getAllLists = () => {
         (async () => {
@@ -32,7 +35,6 @@ export default function AddToListDialog({isOpen, handleAddToListDialogClose, han
         })();
     }
 
-    const [open, setOpen] = React.useState(false);
 
     useEffect(() => {
         getAllLists()
@@ -45,10 +47,9 @@ export default function AddToListDialog({isOpen, handleAddToListDialogClose, han
         handleAddToListDialogClose()
     };
 
-    const [listName, setListName] = React.useState('');
-
     const handleChange = (event: SelectChangeEvent) => {
         setListName(event.target.value as string);
+        setSelectedList(lists.find(list => list?.name === event.target.value))
     };
 
     return (
@@ -60,7 +61,10 @@ export default function AddToListDialog({isOpen, handleAddToListDialogClose, han
                     component: 'form',
                     onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
                         console.log(event)
-                        handleAdd(listName, albumId)
+                        if(selectedList) {
+                            handleAdd(selectedList, albumId)
+                            handleClose()
+                        }
                     },
                 }}
             >

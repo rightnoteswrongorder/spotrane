@@ -27,17 +27,21 @@ interface IFormInput {
 
 export default function Lists() {
     const [albums, setAlbums] = useState<Tables<'all_albums'>[]>([]);
+    const [selectedList, setSelectedList] = useState<Tables<'lists'>>()
     const [lists, setLists] = React.useState<(Tables<'lists'> | null)[]>([]);
     const nextId = useRef(0);
 
-    const deleteAlbum = (albumId: string) => {
+
+    const deleteAlbumFromList = (list: Tables<'lists'>, albumId: string) => {
         (async () => {
-            await supabase.from('albums')
-                .delete()
-                .eq('id', albumId)
+            const newListIds = list.albums?.filter(id => id != albumId)
+            await supabase.from('lists')
+                .update({albums: newListIds})
+                .eq('name', list.name)
+            if(newListIds)
+                albumsOnList(newListIds)
         })();
     }
-
 
     useEffect(() => {
         getAllLists()
@@ -61,7 +65,6 @@ export default function Lists() {
                 .select("*")
                 .in('id', albumIds)
             const f = data as Tables<'all_albums'>[]
-            console.log(f)
             setAlbums(f)
         })();
     }
@@ -84,9 +87,14 @@ export default function Lists() {
     }
 
     const onSubmit: SubmitHandler<IFormInput> = (formData) => {
-        const albumIds = lists.find(list => list?.name === formData.listName)?.albums
-        if (albumIds)
-            albumsOnList(albumIds)
+        const list = lists.find(list => list?.name === formData.listName)
+        if (list) {
+            setSelectedList(list)
+            const albumIds = list?.albums
+            if (albumIds)
+                albumsOnList(albumIds)
+
+        }
     }
 
     return (
@@ -125,16 +133,18 @@ export default function Lists() {
                             />
                             <Button type='submit' variant='outlined' color='secondary'>Search</Button>
                             <Button variant='outlined' onClick={handleReset} color='secondary'>Reset</Button>
-                            <Button variant='outlined' onClick={handleCreateList} color='secondary'>Create New List</Button>
+                            <Button variant='outlined' onClick={handleCreateList} color='secondary'>Create New
+                                List</Button>
                             {listDialogOpen &&
-                                <CreateListDialog isOpen={true} handleAddToListDialogClose={handleAddToListDialogClose}/>}
+                                <CreateListDialog isOpen={true}
+                                                  handleAddToListDialogClose={handleAddToListDialogClose}/>}
                         </Stack>
                     </form>
                 </Grid>
                 <Grid xs={12} item={true}>
                     <Grid container justifyContent="center" spacing={3}>
                         {albums?.map(thing => (
-                            <Grid key={nextId.current++} item={true}><PlaylistCard2 deleteAlbum={deleteAlbum}
+                            <Grid key={nextId.current++} item={true}><PlaylistCard2 list={selectedList} deleteAlbum={deleteAlbumFromList}
                                                                                     album={thing}/></Grid>))}
                     </Grid>
                 </Grid>
@@ -153,14 +163,13 @@ styled(Paper)(({theme}) => ({
 }));
 type CreatePlaylistCardProps = {
     album: Tables<'all_albums'>
-    deleteAlbum: (albumId: string) => void
+    list: Tables<'lists'> | undefined
+    deleteAlbum: (list: Tables<'lists'>, albumId: string) => void
 }
-const PlaylistCard2 = ({album, deleteAlbum}: CreatePlaylistCardProps) => {
-
-
+const PlaylistCard2 = ({album, list, deleteAlbum}: CreatePlaylistCardProps) => {
     const deleteClickHandler = () => {
-        if (album && album.id) {
-            deleteAlbum(album.id)
+        if (album && album.id && list) {
+            deleteAlbum(list, album.id)
         }
     }
 
