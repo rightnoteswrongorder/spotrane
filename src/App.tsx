@@ -1,12 +1,12 @@
 import {useSpotify} from "./hooks/useSpotfy.ts";
-import { Scopes } from "@spotify/web-api-ts-sdk";
+import {Scopes} from "@spotify/web-api-ts-sdk";
 import {
-    Box,
+    Box, CircularProgress
 } from '@mui/material';
-import MenuBar from "./components/MenuBar.tsx";
-import LoginForm from "./components/LoginForm.tsx";
+import MenuBar from "./pages/components/MenuBar.tsx";
+import LoginForm from "./pages/LoginForm.tsx";
 import {useSession} from "./providers/SessionProvider.tsx";
-import SpotifySearch from "./components/SpotifySearch.tsx";
+import SpotifySearch from "./pages/SpotifySearch.tsx";
 
 function App() {
 
@@ -16,14 +16,31 @@ function App() {
         Scopes.all
     );
 
-    const session = useSession().session
+    const {session, loading} = useSession()
+
+    let landing = <></>
+
+    if (loading) {
+        landing = <Box
+            sx={{
+                marginTop: 10,
+                width: '100%',
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+            }}
+        >
+            <CircularProgress/>
+        </Box>
+    } else {
+        landing = !session ? <LoginForm/> : <Box sx={{flexGrow: 1}}>
+            <SpotifySearch sdk={sdk}/></Box>
+    }
 
     return (
         <div className="container" style={{padding: '0 0 100px 0'}}>
             <MenuBar/>
-            {!session ? <LoginForm/> : <Box sx={{flexGrow: 1}}>
-                <SpotifySearch sdk={sdk}/>
-            </Box>}
+            {landing}
         </div>
     )
 }

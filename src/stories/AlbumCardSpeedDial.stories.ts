@@ -1,5 +1,5 @@
 import type {Meta, StoryObj} from "@storybook/react";
-import AlbumCardSpeedDial from "../components/AlbumCardSpeedDial.tsx";
+import AlbumCardSpeedDial from "../pages/components/AlbumCardSpeedDial.tsx";
 
 const meta = {
     title: 'AlbumCardSpeedDial',

@@ -1,9 +1,9 @@
 import {AppBar, Box, Button, IconButton, Link, Menu, MenuItem, Toolbar, Tooltip, Typography} from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import {AccountCircle} from "@mui/icons-material";
-import {useSession} from "../providers/SessionProvider.tsx";
+import {useSession} from "../../providers/SessionProvider.tsx";
 import React from "react";
-import supabase from "../supabase/supaBaseClient.ts";
+import {SupabaseApi} from "../../api/supabase.ts";
 
 export default function MenuBar() {
     const session = useSession().session
@@ -16,7 +16,7 @@ export default function MenuBar() {
         setAnchorEl(null);
     };
     const handleLogout = () => {
-        supabase.auth.signOut();
+        SupabaseApi.signOut()
         setAnchorEl(null);
     };
     return (

@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import supabase from "../supabase/supaBaseClient.ts";
+import supabase from "../api/supaBaseClient.ts";
 import {Avatar, Box, Button, TextField, Typography} from "@mui/material";
 import {LockOutlined} from "@mui/icons-material";
 

@@ -8,7 +8,7 @@ import {DialogContentText, TextField} from '@mui/material';
 import {FormControl} from '@mui/material';
 import {Box} from '@mui/material';
 import {useEffect} from "react";
-import supabase from '../supabase/supaBaseClient';
+import {SupabaseApi} from "../../api/supabase.ts";
 
 type AddToListDialogProps = {
     isOpen: boolean
@@ -28,17 +28,6 @@ export default function CreateListDialog({isOpen, handleAddToListDialogClose}: A
         handleAddToListDialogClose();
     };
 
-    const createList = (listName : string) => {
-        (async () => {
-            await supabase
-                .from('lists')
-                .insert([
-                    { name: listName },
-                ])
-                .select()
-        })();
-    }
-
     return (
         <React.Fragment>
             <Dialog
@@ -49,8 +38,7 @@ export default function CreateListDialog({isOpen, handleAddToListDialogClose}: A
                     onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
                         event.preventDefault();
                         const formData = new FormData(event.currentTarget);
-                        console.log(formData.get('listName'));
-                        createList(formData.get('listName') as string)
+                        SupabaseApi.createList(formData.get('listName') as string)
                         handleClose();
                     },
                 }}
