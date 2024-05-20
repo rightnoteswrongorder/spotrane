@@ -1,5 +1,5 @@
 import type {Meta, StoryObj} from "@storybook/react";
-import AddToListDialog from "../components/AddToListDialog.tsx";
+import AddToListDialog from "../pages/components/AddToListDialog.tsx";
 
 const meta = {
     title: 'AddToListDialog',

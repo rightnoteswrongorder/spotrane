@@ -1,6 +1,6 @@
 import React, {createContext, ReactNode, useContext, useEffect, useState} from "react";
 import {Session} from "@supabase/supabase-js";
-import supabase from "../supabase/supaBaseClient.ts";
+import supabase from "../api/supaBaseClient.ts";
 
 const defaultSessionConfig: SessionConfig = {session: undefined}
 

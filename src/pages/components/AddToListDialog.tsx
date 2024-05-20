@@ -7,18 +7,18 @@ import DialogTitle from '@mui/material/DialogTitle';
 import {InputLabel, MenuItem, Select, SelectChangeEvent} from '@mui/material';
 import {FormControl} from '@mui/material';
 import {Box} from '@mui/material';
-import supabase from "../supabase/supaBaseClient.ts";
-import {Tables} from "../interfaces/database.types.ts";
+import supabase from "../../api/supaBaseClient.ts";
+import {Tables} from "../../interfaces/database.types.ts";
 import {useEffect} from "react";
+import {addToList} from "../../api/supabase.ts";
 
 type AddToListDialogProps = {
     isOpen: boolean
     handleAddToListDialogClose: () => void
-    handleAdd: (list: Tables<'lists'>, albumId: string) => void
     albumId: string
 }
 
-export default function AddToListDialog({isOpen, handleAddToListDialogClose, handleAdd, albumId}: AddToListDialogProps) {
+export default function AddToListDialog({isOpen, handleAddToListDialogClose, albumId}: AddToListDialogProps) {
 
     const [lists, setLists] = React.useState<(Tables<'lists'> | null)[]>([]);
     const [open, setOpen] = React.useState(false);
@@ -62,7 +62,7 @@ export default function AddToListDialog({isOpen, handleAddToListDialogClose, han
                     onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
                         console.log(event)
                         if(selectedList) {
-                            handleAdd(selectedList, albumId)
+                            addToList(selectedList, albumId)
                             handleClose()
                         }
                     },

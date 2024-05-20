@@ -8,7 +8,7 @@ import {DialogContentText, TextField} from '@mui/material';
 import {FormControl} from '@mui/material';
 import {Box} from '@mui/material';
 import {useEffect} from "react";
-import supabase from '../supabase/supaBaseClient';
+import supabase from '../../api/supaBaseClient.ts';
 
 type AddToListDialogProps = {
     isOpen: boolean

@@ -1,9 +1,9 @@
 import {AppBar, Box, Button, IconButton, Link, Menu, MenuItem, Toolbar, Tooltip, Typography} from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import {AccountCircle} from "@mui/icons-material";
-import {useSession} from "../providers/SessionProvider.tsx";
+import {useSession} from "../../providers/SessionProvider.tsx";
 import React from "react";
-import supabase from "../supabase/supaBaseClient.ts";
+import supabase from "../../api/supaBaseClient.ts";
 
 export default function MenuBar() {
     const session = useSession().session

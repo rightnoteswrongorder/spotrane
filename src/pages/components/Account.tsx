@@ -1,5 +1,5 @@
 import React, {useState, useEffect, ReactElement} from 'react'
-import supabase from "../supabase/supaBaseClient.ts";
+import supabase from "../../api/supaBaseClient.ts";
 import {Session} from "@supabase/supabase-js";
 interface AccountProps {
     session: Session

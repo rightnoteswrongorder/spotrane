@@ -3,10 +3,10 @@ import { Scopes } from "@spotify/web-api-ts-sdk";
 import {
     Box,
 } from '@mui/material';
-import MenuBar from "./components/MenuBar.tsx";
-import LoginForm from "./components/LoginForm.tsx";
+import MenuBar from "./pages/components/MenuBar.tsx";
+import LoginForm from "./pages/LoginForm.tsx";
 import {useSession} from "./providers/SessionProvider.tsx";
-import SpotifySearch from "./components/SpotifySearch.tsx";
+import SpotifySearch from "./pages/SpotifySearch.tsx";
 
 function App() {
 

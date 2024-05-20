@@ -4,9 +4,9 @@ import App from './App.tsx'
 import {CssBaseline, StyledEngineProvider, ThemeProvider} from "@mui/material";
 import SessionProvider from "./providers/SessionProvider.tsx";
 import {createHashRouter, RouterProvider} from "react-router-dom";
-import Library from "./components/Library.tsx";
+import Library from "./pages/Library.tsx";
 import theme from "./theme.ts";
-import Lists from "./components/Lists.tsx";
+import Lists from "./pages/Lists.tsx";
 
 const router = createHashRouter(
     [

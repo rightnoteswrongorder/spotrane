@@ -1,52 +1,34 @@
-import MenuBar from "./MenuBar.tsx";
+import MenuBar from "./components/MenuBar.tsx";
 import Grid from "@mui/material/Grid";
 import {
-    Box, Button,
-    Card,
-    CardContent,
-    CardMedia,
+    Button,
     FormControl,
-    IconButton, InputLabel, Link, MenuItem,
-    Paper, Select,
+    InputLabel, MenuItem,
+    Select,
     Stack,
-    styled,
-    Typography
 } from "@mui/material";
-import supabase from "../supabase/supaBaseClient.ts";
+import supabase from "../api/supaBaseClient.ts";
 import {useEffect, useRef, useState} from "react";
-import DeleteIcon from "@mui/icons-material/Delete";
 import {Tables} from "../interfaces/database.types.ts";
 import {Controller, SubmitHandler, useForm} from "react-hook-form";
-import LinkIcon from "@mui/icons-material/Link";
 import * as React from "react";
-import CreateListDialog from "./CreateListDialog.tsx";
+import CreateListDialog from "./components/CreateListDialog.tsx";
+import {AlbumCard} from "./components/AlbumCard.tsx";
+import {SpotraneAlbum} from "../interfaces/SpotraneAlbum.ts";
 
 interface IFormInput {
     listName: string
 }
 
 export default function Lists() {
-    const [albums, setAlbums] = useState<Tables<'all_albums'>[]>([]);
+    const [albums, setAlbums] = useState<SpotraneAlbum[]>([]);
     const [selectedList, setSelectedList] = useState<Tables<'lists'>>()
     const [lists, setLists] = React.useState<(Tables<'lists'> | null)[]>([]);
     const nextId = useRef(0);
 
-
-    const deleteAlbumFromList = (list: Tables<'lists'>, albumId: string) => {
-        (async () => {
-            const newListIds = list.albums?.filter(id => id != albumId)
-            await supabase.from('lists')
-                .update({albums: newListIds})
-                .eq('name', list.name)
-            if(newListIds)
-                albumsOnList(newListIds)
-        })();
-    }
-
     useEffect(() => {
         getAllLists()
     }, []);
-
 
     const getAllLists = () => {
         (async () => {
@@ -65,7 +47,19 @@ export default function Lists() {
                 .select("*")
                 .in('id', albumIds)
             const f = data as Tables<'all_albums'>[]
-            setAlbums(f)
+            const g = f.map((dbAlbum) => {
+                return {
+                    id: dbAlbum.id,
+                    name: dbAlbum.name,
+                    artistName: dbAlbum.artist,
+                    artistGenres: dbAlbum.genres ?? [],
+                    label: dbAlbum.label,
+                    releaseDate: dbAlbum.release_date,
+                    imageUri: dbAlbum.image,
+                    uri: dbAlbum.spotify_uri,
+                } as SpotraneAlbum
+            })
+            setAlbums(g)
         })();
     }
 
@@ -143,9 +137,8 @@ export default function Lists() {
                 </Grid>
                 <Grid xs={12} item={true}>
                     <Grid container justifyContent="center" spacing={3}>
-                        {albums?.map(thing => (
-                            <Grid key={nextId.current++} item={true}><PlaylistCard2 list={selectedList} deleteAlbum={deleteAlbumFromList}
-                                                                                    album={thing}/></Grid>))}
+                        {albums?.map(album => (
+                            <Grid key={nextId.current++} item={true}><AlbumCard simplifiedAlbum={album} fromList={selectedList}/></Grid>))}
                     </Grid>
                 </Grid>
             </Grid>
@@ -153,57 +146,3 @@ export default function Lists() {
     )
 }
 
-styled(Paper)(({theme}) => ({
-    // backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-    // ...theme.typography.body2,
-    padding: theme.spacing(2),
-    display: 'inline-flex',
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-}));
-type CreatePlaylistCardProps = {
-    album: Tables<'all_albums'>
-    list: Tables<'lists'> | undefined
-    deleteAlbum: (list: Tables<'lists'>, albumId: string) => void
-}
-const PlaylistCard2 = ({album, list, deleteAlbum}: CreatePlaylistCardProps) => {
-    const deleteClickHandler = () => {
-        if (album && album.id && list) {
-            deleteAlbum(list, album.id)
-        }
-    }
-
-    return (<Card sx={{width: '350px', height: '200px', display: 'inline-flex'}}>
-        <Box sx={{display: 'flex', flexDirection: 'column'}}>
-            <CardContent sx={{flex: '1 0 auto'}}>
-                <Typography noWrap sx={{width: '200px'}} component="div" variant="h6">
-                    {`${album?.name}`}
-                </Typography>
-                <Typography noWrap sx={{width: '200px'}} variant="subtitle1" color="text.secondary" component="div">
-                    {`${album?.artist}`}
-                </Typography>
-                <Typography noWrap sx={{width: '200px'}} variant="subtitle1" color="text.secondary" component="div">
-                    {`${album?.release_date?.substr(0, 4)} ${album?.label}`}
-                </Typography>
-                <Typography noWrap sx={{width: '200px'}} variant="subtitle1" color="text.secondary" component="div">
-                    {`${album?.genres}`}
-                </Typography>
-            </CardContent>
-            <Box sx={{display: 'flex', alignItems: 'center', pl: 1, pb: 1}}>
-                <IconButton onClick={deleteClickHandler} sx={{color: 'red'}}
-                            aria-label="unfollow">
-                    <DeleteIcon></DeleteIcon>
-                </IconButton>
-                <Link href={album.spotify_uri ? album.spotify_uri : ''}>
-                    <LinkIcon></LinkIcon>
-                </Link>
-            </Box>
-        </Box>
-        <CardMedia
-            component="img"
-            sx={{width: 100, height: 100}}
-            image={album?.image ? album?.image : ""}
-            alt="album cover"
-        />
-    </Card>)
-}
