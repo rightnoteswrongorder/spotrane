@@ -3,10 +3,9 @@ import {Scopes} from "@spotify/web-api-ts-sdk";
 import {
     Box, CircularProgress
 } from '@mui/material';
-import MenuBar from "./pages/components/MenuBar.tsx";
 import LoginForm from "./pages/LoginForm.tsx";
 import {useSession} from "./providers/SessionProvider.tsx";
-import SpotifySearch from "./pages/SpotifySearch.tsx";
+import Library from "./pages/Library.tsx";
 
 function App() {
 
@@ -34,12 +33,11 @@ function App() {
         </Box>
     } else {
         landing = !session ? <LoginForm/> : <Box sx={{flexGrow: 1}}>
-            <SpotifySearch sdk={sdk}/></Box>
+            <Library sdk={sdk}/></Box>
     }
 
     return (
         <div className="container" style={{padding: '0 0 100px 0'}}>
-            <MenuBar/>
             {landing}
         </div>
     )

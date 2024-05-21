@@ -11,18 +11,23 @@ import {SubmitHandler, useForm} from "react-hook-form";
 import {AlbumCard} from "./components/AlbumCard.tsx";
 import {SpotraneAlbum} from "../interfaces/SpotraneAlbum.ts";
 import {SupabaseApi} from "../api/supabase.ts";
+import SpotifySearch from "./SpotifySearch.tsx";
+import Dialog from "@mui/material/Dialog";
+import {SpotifyApi} from "@spotify/web-api-ts-sdk";
 
 interface IFormInput {
     searchText: string
 }
 
-export default function Library() {
+export default function Library({sdk}: { sdk: SpotifyApi | null }) {
     const [albums, setAlbums] = useState<SpotraneAlbum[]>([]);
     const [searchTotal, setSearchTotal] = useState<number>(0)
     const [totalAlbums, setTotalAlbums] = useState<number>(0)
     const nextId = useRef(0);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [spotifySearchText, setShowSpotifySearchText] = useState("");
+    const [showSearchSpotifyDialog, setShowSpotifyDialog] = useState(false)
 
     const dbAlbumToSpotrane = (dbAlbums: Tables<'all_albums'>[]): SpotraneAlbum[] => {
         return dbAlbums.map(dbAlbum => {
@@ -107,6 +112,15 @@ export default function Library() {
         runSearch(formData.searchText)
     }
 
+    const onShowSpotifySearch: SubmitHandler<IFormInput> = (formData) => {
+        setShowSpotifySearchText(formData.searchText)
+        setShowSpotifyDialog(true)
+    }
+
+    const handleClose = () => {
+        setShowSpotifyDialog(false);
+    };
+
     return (
         <div className="container" style={{padding: '0 0 100px 0'}}>
             <Grid container spacing={2}>
@@ -114,11 +128,18 @@ export default function Library() {
                     <MenuBar/>
                 </Grid>
                 <Grid xs={12} item={true}>
-                    <form onSubmit={handleSubmit(onSubmit)}>
+                    <Dialog open={showSearchSpotifyDialog}
+                            onClose={handleClose}
+                            fullWidth
+                    >
+                        <SpotifySearch searchText={spotifySearchText} sdk={sdk}/>
+                    </Dialog>
+                    <form>
                         <Stack sx={{paddingLeft: 5, paddingRight: 5}} spacing={1}>
                             <TextField variant='outlined' InputLabelProps={{shrink: true}} margin="dense"
                                        type='text' {...register("searchText", {required: true})} />
-                            <Button type='submit' variant='outlined' color='secondary'>Search</Button>
+                            <Button  onClick={handleSubmit(onSubmit)} variant='outlined' color='secondary'>Search</Button>
+                            <Button variant='outlined' onClick={handleSubmit(onShowSpotifySearch)} color='secondary'>Search Spotify</Button>
                             <Button variant='outlined' onClick={onReset} color='secondary'>Reset</Button>
                         </Stack>
                     </form>
