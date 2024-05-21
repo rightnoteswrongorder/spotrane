@@ -34,7 +34,7 @@ export const SupabaseApi = {
     },
 
     upsertArtist: async (artist: SpotraneArtist) => {
-        supabase.from('artists')
+        await supabase.from('artists')
             .upsert([
                 {
                     id: artist.id,

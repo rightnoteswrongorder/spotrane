@@ -1,18 +1,17 @@
-import {Dispatch, SetStateAction, useState} from "react";
+import {useState} from "react";
 import {Box, Card, CardContent, CardMedia, Typography} from "@mui/material";
 import {AlbumCardIcons} from "./AlbumCardIcons.tsx";
 import AddToListDialog from "./AddToListDialog.tsx";
 import {SpotraneAlbum} from "../../interfaces/SpotraneAlbum.ts";
-import {Tables} from "../../interfaces/database.types.ts";
 
 type AlbumCardProps = {
-    simplifiedAlbum: SpotraneAlbum
-    list?: Tables<'lists'>
-    listAlbums?: SpotraneAlbum[]
-    setListAlbums?: Dispatch<SetStateAction<SpotraneAlbum[]>>
+    album: SpotraneAlbum
+    saveAlbum?: (album: SpotraneAlbum) => void
+    deleteAlbumFromLibrary?: (albumId: string) => void
+    deleteAlbumFromList?: (albumId: string) => void
 }
 
-export const AlbumCard = ({simplifiedAlbum, list, listAlbums, setListAlbums}: AlbumCardProps) => {
+export const AlbumCard = ({album, saveAlbum, deleteAlbumFromLibrary, deleteAlbumFromList}: AlbumCardProps) => {
     const [listDialogOpen, setListDialogOpen] = useState<boolean>(false);
 
     const toggleListDialog = () => {
@@ -27,28 +26,29 @@ export const AlbumCard = ({simplifiedAlbum, list, listAlbums, setListAlbums}: Al
         <Box sx={{display: 'flex', flexDirection: 'column'}}>
             <CardContent sx={{flex: '1 0 auto'}}>
                 <Typography noWrap sx={{width: '200px'}} component="div" variant="h6">
-                    {`${simplifiedAlbum?.name}`}
+                    {`${album?.name}`}
                 </Typography>
                 <Typography noWrap sx={{width: '200px'}} variant="subtitle1" color="text.secondary" component="div">
-                    {`${simplifiedAlbum?.artistName}`}
+                    {`${album?.artistName}`}
                 </Typography>
                 <Typography noWrap sx={{width: '200px'}} variant="subtitle1" color="text.secondary" component="div">
-                    {`${simplifiedAlbum?.releaseDate?.substr(0, 4)} ${simplifiedAlbum?.label}`}
+                    {`${album?.releaseDate?.substr(0, 4)} ${album?.label}`}
                 </Typography>
                 <Typography noWrap sx={{width: '200px'}} variant="subtitle1" color="text.secondary" component="div">
-                    {`${simplifiedAlbum?.artistGenres}`}
+                    {`${album?.artistGenres}`}
                 </Typography>
             </CardContent>
-            {simplifiedAlbum && <AlbumCardIcons album={simplifiedAlbum} list={list} listAlbums={listAlbums} setListAlbums={setListAlbums} toggleListDialog={toggleListDialog}/>}
+            {album && <AlbumCardIcons album={album} saveAlbum={saveAlbum} deleteAlbumFromLibrary={deleteAlbumFromLibrary} deleteAlbumFromList={deleteAlbumFromList}
+                                                toggleListDialog={toggleListDialog}/>}
         </Box>
         <CardMedia
             component="img"
             sx={{width: 100, height: 100}}
-            image={simplifiedAlbum?.imageUri}
+            image={album?.imageUri}
             alt="album cover"
         />
-        {listDialogOpen && simplifiedAlbum?.id &&
+        {listDialogOpen && album?.id &&
             <AddToListDialog isOpen={true} handleAddToListDialogClose={handleAddToListDialogClose}
-                             albumId={simplifiedAlbum.id}/>}
+                             albumId={album.id}/>}
     </Card>)
 }

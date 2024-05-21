@@ -30,6 +30,14 @@ export default function Lists() {
         getAllLists()
     }, []);
 
+    const deleteAlbumFromList = (albumId : string) => {
+        if(selectedList) {
+            SupabaseApi.deleteAlbumFromList(selectedList, albumId)
+            const updated = albums?.filter(listAlbums => listAlbums.id != albumId)
+            setAlbums(updated)
+        }
+    }
+
     const getAllLists = () => {
         (async () => {
             const data = await SupabaseApi.getLists()
@@ -50,6 +58,7 @@ export default function Lists() {
                     releaseDate: dbAlbum.release_date,
                     imageUri: dbAlbum.image,
                     uri: dbAlbum.spotify_uri,
+                    saved: true
                 } as SpotraneAlbum
             }))
         })();
@@ -133,9 +142,8 @@ export default function Lists() {
                 <Grid xs={12} item={true}>
                     <Grid container justifyContent="center" spacing={3}>
                         {albums?.map(album => (
-                            <Grid key={nextId.current++} item={true}><AlbumCard simplifiedAlbum={album}
-                                                                                list={selectedList} listAlbums={albums}
-                                                                                setListAlbums={setAlbums}/></Grid>))}
+                            <Grid key={nextId.current++} item={true}><AlbumCard album={album}
+                                                                                deleteAlbumFromList={deleteAlbumFromList}/></Grid>))}
                     </Grid>
                 </Grid>
             </Grid>

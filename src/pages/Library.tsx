@@ -35,8 +35,18 @@ export default function Library() {
                 releaseDate: dbAlbum.release_date,
                 imageUri: dbAlbum.image,
                 uri: dbAlbum.spotify_uri,
+                saved: true
             } as SpotraneAlbum
         })
+    }
+
+    const deleteAlbumFromLibrary = (albumId: string) => {
+        const album = albums.find(album => album.id == albumId)
+        if(album) {
+            SupabaseApi.deleteAlbum(album)
+            const updated = albums?.filter(libAlum => libAlum.id != albumId)
+            setAlbums(updated)
+        }
     }
 
     const allAlbums = (from: number, to: number) => {
@@ -116,7 +126,7 @@ export default function Library() {
                 <Grid xs={12} item={true}>
                     <Grid container justifyContent="center" spacing={3}>
                         {albums?.map(album => (
-                            <Grid key={nextId.current++} item={true}><AlbumCard simplifiedAlbum={album}/></Grid>))}
+                            <Grid key={nextId.current++} item={true}><AlbumCard album={album} deleteAlbumFromLibrary={deleteAlbumFromLibrary}/></Grid>))}
                     </Grid>
                 </Grid>
                 <Grid container justifyContent="right" spacing={2}>

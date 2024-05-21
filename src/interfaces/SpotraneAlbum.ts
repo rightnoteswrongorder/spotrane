@@ -10,4 +10,5 @@ export type SpotraneAlbum = {
     label?:string
     artistName?: string
     artistGenres?: string[]
+    saved?: boolean
 }
