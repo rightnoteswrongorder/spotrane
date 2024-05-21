@@ -49,8 +49,6 @@ export default function MenuBar() {
                     </Menu>
                     <Typography component="a" href='/spotrane' variant="h6" sx={{
                         flexGrow: 1,
-                        mr: 2,
-                        display: {xs: 'none', md: 'flex'},
                         fontFamily: 'Helvetica',
                         fontWeight: 700,
                         color: 'inherit',
@@ -58,8 +56,7 @@ export default function MenuBar() {
                     }}>
                         spotrane
                     </Typography>
-                    <Button>My Library</Button>
-                    {session ? <Box><Tooltip title={session.user.email}><AccountCircle/></Tooltip></Box> :
+                    {session ? <Box sx={{mt: 1}} ><Tooltip title={session.user.email}><AccountCircle/></Tooltip></Box> :
                         <Button color="inherit">Login</Button>}
                 </Toolbar>
             </AppBar>

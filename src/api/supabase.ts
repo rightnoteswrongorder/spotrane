@@ -1,6 +1,5 @@
 import supabase from "./supaBaseClient.ts";
-import {PostgrestSingleResponse} from "@supabase/supabase-js";
-import {Database, Tables} from "../interfaces/database.types.ts";
+import {Tables} from "../interfaces/database.types.ts";
 import {SpotraneAlbum} from "../interfaces/SpotraneAlbum.ts";
 import {SpotraneArtist} from "../interfaces/SpotraneArtist.ts";
 
@@ -34,17 +33,15 @@ export const SupabaseApi = {
         })();
     },
 
-    upsertArtist: async (artist: SpotraneArtist | undefined): Promise<PostgrestSingleResponse<Database['public']['Tables']['artists']['Row']> | undefined> => {
-        if (artist) {
-            return supabase.from('artists')
-                .upsert([
-                    {
-                        id: artist.id,
-                        name: artist.name,
-                        genres: artist.genres
-                    }
-                ]).select().single();
-        }
+    upsertArtist: async (artist: SpotraneArtist) => {
+        return supabase.from('artists')
+            .upsert([
+                {
+                    id: artist.id,
+                    name: artist.name,
+                    genres: artist.genres
+                }
+            ]).select().single();
     },
 
     searchAllAlbums: async (searchText: string): Promise<Tables<'all_albums'>[]> => {
@@ -73,23 +70,21 @@ export const SupabaseApi = {
 
     saveAlbum: (album: SpotraneAlbum) => {
         (async () => {
-            const res = await SupabaseApi.upsertArtist(album.artist);
-            if (res) {
-                await supabase.from('albums')
-                    .upsert([
-                        {
-                            id: album.id,
-                            name: album.name,
-                            artist: res.data?.id,
-                            image: album.imageUri,
-                            release_date: album.releaseDate,
-                            label: album.label,
-                            spotify_uri: album.albumUri
+            album.artist && await SupabaseApi.upsertArtist(album.artist);
+            await supabase.from('albums')
+                .upsert([
+                    {
+                        id: album.id,
+                        name: album.name,
+                        artist: album.artist?.id,
+                        image: album.imageUri,
+                        release_date: album.releaseDate,
+                        label: album.label,
+                        spotify_uri: album.albumUri
 
-                        },
-                    ])
-                    .select()
-            }
+                    },
+                ])
+                .select()
         })();
     },
 
