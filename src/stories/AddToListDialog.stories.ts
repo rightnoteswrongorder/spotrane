@@ -19,7 +19,6 @@ export const Vanilla: Story = {
     args: {
         isOpen: true,
         handleAddToListDialogClose: noop,
-        handleAdd: noop,
         albumId: ""
     }
 };

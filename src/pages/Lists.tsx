@@ -40,9 +40,8 @@ export default function Lists() {
 
     const albumsOnList = (albumIds: string[]) => {
         (async () => {
-            const {data} = await SupabaseApi.getAlbumsByListOfIds(albumIds)
-            const f = data as Tables<'all_albums'>[]
-            const g = f.map((dbAlbum) => {
+            const result = await SupabaseApi.getAlbumsByListOfIds(albumIds)
+            setAlbums(result.map((dbAlbum) => {
                 return {
                     id: dbAlbum.id,
                     name: dbAlbum.name,
@@ -53,12 +52,11 @@ export default function Lists() {
                     imageUri: dbAlbum.image,
                     uri: dbAlbum.spotify_uri,
                 } as SpotraneAlbum
-            })
-            setAlbums(g)
+            }))
         })();
     }
 
-    const { control, reset} = useForm<IFormInput>()
+    const {control, reset} = useForm<IFormInput>()
 
     const handleReset = () => {
         setAlbums([])
@@ -110,8 +108,8 @@ export default function Lists() {
                                             value={value ?? ""}
                                             onChange={(e) => {
                                                 onChange(e)
-                                                 getAllLists()
-                                                 runListLoad(e.target.value)
+                                                getAllLists()
+                                                runListLoad(e.target.value)
                                             }}
                                             label="List"
                                         >
