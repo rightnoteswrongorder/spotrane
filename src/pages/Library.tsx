@@ -5,7 +5,7 @@ import {
     Stack,
     TablePagination, TextField, Typography,
 } from "@mui/material";
-import {useEffect, useRef, useState} from "react";
+import {MouseEvent, ChangeEvent, useEffect, useRef, useState} from "react";
 import {Tables} from "../interfaces/database.types.ts";
 import {SubmitHandler, useForm} from "react-hook-form";
 import {AlbumCard} from "./components/AlbumCard.tsx";
@@ -39,14 +39,14 @@ export default function Library() {
         })
     }
 
-    const all_albums = (from: number, to: number) => {
+    const allAlbums = (from: number, to: number) => {
         (async () => {
             const data = await SupabaseApi.getAllAlbums(from, to)
             setAlbums(dbAlbumToSpotrane(data))
         })();
     }
 
-    const count_albums = () => {
+    const countAlbums = () => {
         (async () => {
             const count = await SupabaseApi.countAlbums()
             setTotalAlbums(count)
@@ -54,21 +54,21 @@ export default function Library() {
     }
 
     useEffect(() => {
-        count_albums()
-        all_albums(page, rowsPerPage)
+        countAlbums()
+        allAlbums(page, rowsPerPage)
     }, [rowsPerPage]);
 
     const handleChangePage = (
-        event: React.MouseEvent<HTMLButtonElement> | null,
+        event: MouseEvent<HTMLButtonElement> | null,
         newPage: number,
     ) => {
         console.log(event?.target)
-        all_albums(newPage * rowsPerPage, newPage * rowsPerPage + rowsPerPage)
+        allAlbums(newPage * rowsPerPage, newPage * rowsPerPage + rowsPerPage)
         setPage(newPage);
     };
 
     const handleChangeRowsPerPage = (
-        event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+        event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     ) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
@@ -81,7 +81,7 @@ export default function Library() {
         setPage(0)
         setSearchTotal(0)
         setRowsPerPage(5)
-        all_albums(page, rowsPerPage)
+        allAlbums(page, rowsPerPage)
     }
 
     const runSearch = (searchText: string) => {

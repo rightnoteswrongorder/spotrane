@@ -34,14 +34,14 @@ export const SupabaseApi = {
     },
 
     upsertArtist: async (artist: SpotraneArtist) => {
-        return supabase.from('artists')
+        supabase.from('artists')
             .upsert([
                 {
                     id: artist.id,
                     name: artist.name,
                     genres: artist.genres
                 }
-            ]).select().single();
+            ])
     },
 
     searchAllAlbums: async (searchText: string): Promise<Tables<'all_albums'>[]> => {
@@ -88,20 +88,19 @@ export const SupabaseApi = {
         })();
     },
 
-    isSaved: (albumId: string): Promise<boolean | null> => {
-        return (async () => {
-            const result = await supabase
-                .from('albums')
-                .select("*")
-                .eq('id', albumId)
-            return result.data && result.data?.length > 0
-        })();
+    isSaved: async (albumId: string): Promise<boolean> => {
+        const {data} = await supabase
+            .from('albums')
+            .select("*")
+            .eq('id', albumId)
+        return !!(data && data.length > 0)
     },
 
-    getLists: async () => {
-        return supabase
+    getLists: async () : Promise<Tables<'lists'>[] | null> => {
+        const {data} = await supabase
             .from('lists')
             .select('*')
+        return data
     },
 
     addToList: (list: Tables<'lists'>, albumId: string) => {

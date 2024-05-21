@@ -32,9 +32,8 @@ export default function Lists() {
 
     const getAllLists = () => {
         (async () => {
-            const {data} = await SupabaseApi.getLists()
-            const typedData = data as (Tables<'lists'> | null)[]
-            setLists(typedData)
+            const data = await SupabaseApi.getLists()
+            data && setLists(data)
         })();
     }
 
@@ -74,15 +73,12 @@ export default function Lists() {
         setListDialogOpen(false)
     }
 
-
     const runListLoad = (listName: string) => {
         const list = lists.find(list => list?.name === listName)
 
         if (list) {
             setSelectedList(list)
-            const albumIds = list?.albums
-            if (albumIds)
-                albumsOnList(albumIds)
+            list && list?.albums && albumsOnList(list?.albums)
         }
     }
 

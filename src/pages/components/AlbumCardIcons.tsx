@@ -25,35 +25,27 @@ export const AlbumCardIcons = ({album, list, listAlbums, setListAlbums, toggleLi
     }, [album, SupabaseApi.deleteAlbum])
 
     const isSavedAlbum = () => {
-        if (album?.id) {
-            SupabaseApi.isSaved(album?.id).then(res => {
-                res ? setSavedAlbum(true) : setSavedAlbum(false)
-            })
-        }
+        SupabaseApi.isSaved(album?.id).then(res => {
+            res ? setSavedAlbum(true) : setSavedAlbum(false)
+        })
     }
 
     const saveClickHandler = () => {
-        if (album) {
-            SupabaseApi.saveAlbum(album)
-            setSavedAlbum(true)
-        }
+        SupabaseApi.saveAlbum(album)
+        setSavedAlbum(true)
     }
 
     const deleteClickHandler = () => {
-        if (album) {
-            if (list) {
-                SupabaseApi.deleteAlbumFromList(list, album.id)
-                const newListIds = listAlbums?.filter(listAlbums => listAlbums.id != album.id)
-                if (setListAlbums && newListIds) {
-                    setListAlbums(newListIds)
-                }
-            } else {
-                SupabaseApi.deleteAlbum(album)
-
+        if (list) {
+            SupabaseApi.deleteAlbumFromList(list, album.id)
+            const newListIds = listAlbums?.filter(listAlbums => listAlbums.id != album.id)
+            if (setListAlbums && newListIds) {
+                setListAlbums(newListIds)
             }
-
-            setSavedAlbum(false)
+        } else {
+            SupabaseApi.deleteAlbum(album)
         }
+        setSavedAlbum(false)
     }
 
     const addToListClickHandler = () => {
