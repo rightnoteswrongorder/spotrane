@@ -30,9 +30,10 @@ export const AlbumCardIcons = ({album, saveAlbum, deleteAlbumFromLibrary, delete
     const addToListClickHandler = () => {
         toggleListDialog()
     }
+    console.log(album)
 
     return (
-        <Box sx={{display: 'flex', alignItems: 'center', pl: 1, pb: 1}}>
+        <Box sx={{display: 'flex', alignItems: 'center'}}>
             {(deleteAlbumFromLibrary || deleteAlbumFromList) && <IconButton onClick={deleteClickHandler} sx={{color: album.saved ? 'red' : 'gray'}}
                         aria-label="unfollow">
                 <DeleteIcon></DeleteIcon>

@@ -10,7 +10,7 @@ export const SpotifyApiProxy = {
     },
 
     searchForAlbum: async (sdk: SpotifyApi | null, searchText: string): Promise<SearchResults<readonly ["album"]> | undefined> => {
-        return sdk?.search(searchText, ["album"], "GB", 5)
+        return sdk?.search(searchText, ["album"], "GB", 6)
     }
 
 }

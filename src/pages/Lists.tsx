@@ -57,7 +57,7 @@ export default function Lists() {
                     label: dbAlbum.label,
                     releaseDate: dbAlbum.release_date,
                     imageUri: dbAlbum.image,
-                    uri: dbAlbum.spotify_uri,
+                    albumUri: dbAlbum.spotify_uri,
                     saved: true
                 } as SpotraneAlbum
             }))

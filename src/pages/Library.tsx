@@ -39,7 +39,7 @@ export default function Library({sdk}: { sdk: SpotifyApi | null }) {
                 label: dbAlbum.label,
                 releaseDate: dbAlbum.release_date,
                 imageUri: dbAlbum.image,
-                uri: dbAlbum.spotify_uri,
+                albumUri: dbAlbum.spotify_uri,
                 saved: true
             } as SpotraneAlbum
         })

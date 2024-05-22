@@ -22,19 +22,19 @@ export const AlbumCard = ({album, saveAlbum, deleteAlbumFromLibrary, deleteAlbum
         setListDialogOpen(false)
     }
 
-    return (<Card sx={{width: '350px', height: '200px', display: 'inline-flex'}}>
+    return (<Card sx={{height: '175px', display: 'inline-flex'}}>
         <Box sx={{display: 'flex', flexDirection: 'column'}}>
-            <CardContent sx={{flex: '1 0 auto'}}>
-                <Typography noWrap sx={{width: '200px'}} component="div" variant="h6">
+            <CardContent sx={{flex: '1 0 auto', padding: 0.5}}>
+                <Typography noWrap sx={{width: '175px'}} component="div" variant="h6">
                     {`${album?.name}`}
                 </Typography>
-                <Typography noWrap sx={{width: '200px'}} variant="subtitle1" color="text.secondary" component="div">
+                <Typography noWrap sx={{width: '175px'}} variant="subtitle1" color="text.secondary" component="div">
                     {`${album?.artistName}`}
                 </Typography>
-                <Typography noWrap sx={{width: '200px'}} variant="subtitle1" color="text.secondary" component="div">
+                <Typography noWrap sx={{width: '175px'}} variant="subtitle1" color="text.secondary" component="div">
                     {`${album?.releaseDate?.substr(0, 4)} ${album?.label}`}
                 </Typography>
-                <Typography noWrap sx={{width: '200px'}} variant="subtitle1" color="text.secondary" component="div">
+                <Typography noWrap sx={{width: '175px'}} variant="subtitle1" color="text.secondary" component="div">
                     {`${album?.artistGenres}`}
                 </Typography>
             </CardContent>
@@ -43,7 +43,7 @@ export const AlbumCard = ({album, saveAlbum, deleteAlbumFromLibrary, deleteAlbum
         </Box>
         <CardMedia
             component="img"
-            sx={{width: 100, height: 100}}
+            sx={{width: 80, height: 80, padding: 0.5}}
             image={album?.imageUri}
             alt="album cover"
         />
