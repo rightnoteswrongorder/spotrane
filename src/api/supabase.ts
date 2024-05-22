@@ -103,15 +103,27 @@ export const SupabaseApi = {
         return data
     },
 
-    addToList: (list: Tables<'lists'>, albumId: string) => {
+    addToList: (list: Tables<'lists'>, album: SpotraneAlbum) => {
         (async () => {
-            const newListIds = [...list?.albums ?? [], albumId]
+            album.artist && await SupabaseApi.upsertArtist(album.artist)
+            await SupabaseApi.saveAlbum(album)
+            const newListIds = [...list?.albums ?? [], album.id]
             await supabase.from('lists')
                 .update({albums: newListIds})
                 .eq('name', list.name)
             //}
         })();
     },
+
+    // addToList: (list: Tables<'lists'>, albumId: string) => {
+    //     (async () => {
+    //         const newListIds = [...list?.albums ?? [], albumId]
+    //         await supabase.from('lists')
+    //             .update({albums: newListIds})
+    //             .eq('name', list.name)
+    //         //}
+    //     })();
+    // },
 
     createList: (listName: string) => {
         (async () => {

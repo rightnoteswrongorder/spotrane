@@ -9,13 +9,14 @@ import Library from "./pages/Library.tsx";
 
 function App() {
 
+    const {session, loading} = useSession()
+
     const sdk = useSpotify(
         import.meta.env.VITE_SPOTIFY_CLIENT_ID,
         import.meta.env.VITE_REDIRECT_TARGET,
         Scopes.all
     );
 
-    const {session, loading} = useSession()
 
     let landing = <></>
 

@@ -2,7 +2,7 @@ import {Box, IconButton, Link, SvgIcon} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
 import SpotifyIcon from "../../static/images/spotify.svg?react"
-import {PlaylistAddCheck} from "@mui/icons-material";
+import {PlaylistAdd, PlaylistAddCheck} from "@mui/icons-material";
 import {SpotraneAlbum} from "../../interfaces/SpotraneAlbum.ts";
 
 type AlbumCardIconProps = {
@@ -10,10 +10,11 @@ type AlbumCardIconProps = {
     saveAlbum?: (album: SpotraneAlbum) => void
     deleteAlbumFromLibrary?: (albumId: string) => void
     deleteAlbumFromList?: (albumId: string) => void
+    addToList?: (album: SpotraneAlbum) => void
     toggleListDialog: () => void
 }
 
-export const AlbumCardIcons = ({album, saveAlbum, deleteAlbumFromLibrary, deleteAlbumFromList, toggleListDialog}: AlbumCardIconProps) => {
+export const AlbumCardIcons = ({album, saveAlbum, deleteAlbumFromLibrary, deleteAlbumFromList, addToList, toggleListDialog}: AlbumCardIconProps) => {
 
     const saveClickHandler = () => {
         saveAlbum && saveAlbum(album)
@@ -30,7 +31,10 @@ export const AlbumCardIcons = ({album, saveAlbum, deleteAlbumFromLibrary, delete
     const addToListClickHandler = () => {
         toggleListDialog()
     }
-    console.log(album)
+
+    const addToListHandler = () => {
+        addToList && addToList(album)
+    }
 
     return (
         <Box sx={{display: 'flex', alignItems: 'center'}}>
@@ -42,10 +46,14 @@ export const AlbumCardIcons = ({album, saveAlbum, deleteAlbumFromLibrary, delete
                         sx={{color: album.saved ? (theme) => theme.palette.primary.main : 'gray'}} aria-label="save">
                 <SaveIcon></SaveIcon>
             </IconButton>}
-            {!saveAlbum && <IconButton onClick={addToListClickHandler}
+            {addToList && <IconButton onClick={addToListHandler}
                         aria-label="add-to-list">
                 <PlaylistAddCheck></PlaylistAddCheck>
             </IconButton>}
+            <IconButton onClick={addToListClickHandler}
+                        aria-label="add-to-list">
+                <PlaylistAdd></PlaylistAdd>
+            </IconButton>
             <IconButton component={Link} href={album?.albumUri}>
                 <SvgIcon component={SpotifyIcon} inheritViewBox/>
             </IconButton>

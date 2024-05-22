@@ -26,7 +26,6 @@ export default function Library({sdk}: { sdk: SpotifyApi | null }) {
     const nextId = useRef(0);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [spotifySearchText, setShowSpotifySearchText] = useState("");
     const [showSearchSpotifyDialog, setShowSpotifyDialog] = useState(false)
 
     const dbAlbumToSpotrane = (dbAlbums: Tables<'all_albums'>[]): SpotraneAlbum[] => {
@@ -112,8 +111,7 @@ export default function Library({sdk}: { sdk: SpotifyApi | null }) {
         runSearch(formData.searchText)
     }
 
-    const onShowSpotifySearch: SubmitHandler<IFormInput> = (formData) => {
-        setShowSpotifySearchText(formData.searchText)
+    const onShowSpotifySearch = () => {
         setShowSpotifyDialog(true)
     }
 
@@ -132,14 +130,14 @@ export default function Library({sdk}: { sdk: SpotifyApi | null }) {
                             onClose={handleClose}
                             fullWidth
                     >
-                        <SpotifySearch searchText={spotifySearchText} sdk={sdk}/>
+                        <SpotifySearch sdk={sdk}/>
                     </Dialog>
                     <form>
                         <Stack sx={{paddingLeft: 5, paddingRight: 5}} spacing={1}>
                             <TextField variant='outlined' InputLabelProps={{shrink: true}} margin="dense"
                                        type='text' {...register("searchText", {required: true})} />
-                            <Button  onClick={handleSubmit(onSubmit)} variant='outlined' color='secondary'>Search</Button>
-                            <Button variant='outlined' onClick={handleSubmit(onShowSpotifySearch)} color='secondary'>Search Spotify</Button>
+                            <Button type='submit' onClick={handleSubmit(onSubmit)} variant='outlined' color='secondary'>Search</Button>
+                            <Button variant='outlined' onClick={onShowSpotifySearch} color='secondary'>Search Spotify</Button>
                             <Button variant='outlined' onClick={onReset} color='secondary'>Reset</Button>
                         </Stack>
                     </form>

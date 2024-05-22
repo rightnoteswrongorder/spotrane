@@ -9,9 +9,10 @@ type AlbumCardProps = {
     saveAlbum?: (album: SpotraneAlbum) => void
     deleteAlbumFromLibrary?: (albumId: string) => void
     deleteAlbumFromList?: (albumId: string) => void
+    addToList?: (album: SpotraneAlbum) => void
 }
 
-export const AlbumCard = ({album, saveAlbum, deleteAlbumFromLibrary, deleteAlbumFromList}: AlbumCardProps) => {
+export const AlbumCard = ({album, saveAlbum, deleteAlbumFromLibrary, deleteAlbumFromList, addToList}: AlbumCardProps) => {
     const [listDialogOpen, setListDialogOpen] = useState<boolean>(false);
 
     const toggleListDialog = () => {
@@ -39,7 +40,7 @@ export const AlbumCard = ({album, saveAlbum, deleteAlbumFromLibrary, deleteAlbum
                 </Typography>
             </CardContent>
             {album && <AlbumCardIcons album={album} saveAlbum={saveAlbum} deleteAlbumFromLibrary={deleteAlbumFromLibrary} deleteAlbumFromList={deleteAlbumFromList}
-                                                toggleListDialog={toggleListDialog}/>}
+                                                addToList={addToList} toggleListDialog={toggleListDialog}/>}
         </Box>
         <CardMedia
             component="img"
@@ -49,6 +50,6 @@ export const AlbumCard = ({album, saveAlbum, deleteAlbumFromLibrary, deleteAlbum
         />
         {listDialogOpen && album?.id &&
             <AddToListDialog isOpen={true} handleAddToListDialogClose={handleAddToListDialogClose}
-                             albumId={album.id}/>}
+                             album={album}/>}
     </Card>)
 }
