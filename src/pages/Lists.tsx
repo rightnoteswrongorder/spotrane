@@ -35,30 +35,26 @@ export default function Lists() {
     const [showSearchSpotifyDialog, setShowSpotifyDialog] = useState(false)
 
 
-    const handleDbChange = (payload: RealtimePostgresChangesPayload<Tables<'lists'>>) => {
-        const data = payload.new as Tables<'lists'>
-        data.albums && albumsOnList(data.albums)
+    const handleDbChange = (payload: RealtimePostgresChangesPayload<Tables<'list_entry'>>) => {
+        console.log(payload)
+        const data = payload.new as Tables<'list_entry'>
+        data.list_id == selectedList?.id && albumsOnList()
     }
 
 
     useEffect(() => {
-        supabase.channel('lists').on<Tables<'lists'>>('postgres_changes', {
+        supabase.channel('list_entry').on<Tables<'list_entry'>>('postgres_changes', {
             event: 'INSERT',
             schema: 'public',
-            table: 'lists'
+            table: 'list_entry'
         }, handleDbChange).subscribe()
 
-        supabase.channel('lists').on<Tables<'lists'>>('postgres_changes', {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'lists'
-        }, handleDbChange).subscribe()
         getAllLists()
     }, []);
 
     useEffect(() => {
-        selectedList && selectedList.albums && albumsOnList(selectedList?.albums)
-    }, [selectedList, setSelectedList]);
+        albumsOnList()
+    }, [selectedList]);
 
     const sdk = useSpotify(
         import.meta.env.VITE_SPOTIFY_CLIENT_ID,
@@ -81,23 +77,28 @@ export default function Lists() {
         })();
     }
 
-    const albumsOnList = (albumIds: string[]) => {
+    const albumsOnList = () => {
         (async () => {
-            const result = await SupabaseApi.getAlbumsByListOfIds(albumIds)
-            setAlbums(result.map((dbAlbum) => {
-                return {
-                    id: dbAlbum.id,
-                    name: dbAlbum.name,
-                    artistName: dbAlbum.artist,
-                    artistGenres: dbAlbum.genres ?? [],
-                    label: dbAlbum.label,
-                    releaseDate: dbAlbum.release_date,
-                    imageUri: dbAlbum.image,
-                    albumUri: dbAlbum.spotify_uri,
-                    saved: true
-                } as SpotraneAlbum
-            }))
-        })();
+                if (selectedList && selectedList.name) {
+                    const tryme = await SupabaseApi.getAlbumsOnList(selectedList?.name)
+                    tryme && setAlbums(tryme.map((dbAlbum) => {
+                        return {
+                            id: dbAlbum.id,
+                            name: dbAlbum.name,
+                            artistName: dbAlbum.artist,
+                            artistGenres: dbAlbum.genres ?? [],
+                            label: dbAlbum.label,
+                            releaseDate: dbAlbum.release_date,
+                            imageUri: dbAlbum.image,
+                            albumUri: dbAlbum.spotify_uri,
+                            saved: true
+                        } as SpotraneAlbum
+
+                    }))
+                }
+            }
+        )
+        ();
     }
 
     const {control, reset} = useForm<IFormInput>()

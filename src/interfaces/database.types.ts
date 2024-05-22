@@ -51,38 +51,75 @@ export type Database = {
         Row: {
           genres: string[] | null
           id: string
-          image: string | null
           name: string | null
         }
         Insert: {
           genres?: string[] | null
           id: string
-          image?: string | null
           name?: string | null
         }
         Update: {
           genres?: string[] | null
           id?: string
-          image?: string | null
           name?: string | null
         }
         Relationships: []
       }
+      list_entry: {
+        Row: {
+          album_id: string | null
+          created_at: string
+          id: number
+          list_id: number | null
+        }
+        Insert: {
+          album_id?: string | null
+          created_at?: string
+          id?: number
+          list_id?: number | null
+        }
+        Update: {
+          album_id?: string | null
+          created_at?: string
+          id?: number
+          list_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "list_entry_album_id_fkey"
+            columns: ["album_id"]
+            isOneToOne: false
+            referencedRelation: "albums"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "list_entry_album_id_fkey"
+            columns: ["album_id"]
+            isOneToOne: false
+            referencedRelation: "all_albums"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "list_entry_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "lists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lists: {
         Row: {
-          albums: string[] | null
           created_at: string
           id: number
           name: string | null
         }
         Insert: {
-          albums?: string[] | null
           created_at?: string
           id?: number
           name?: string | null
         }
         Update: {
-          albums?: string[] | null
           created_at?: string
           id?: number
           name?: string | null
@@ -141,6 +178,21 @@ export type Database = {
       }
     }
     Functions: {
+      albums_on_list: {
+        Args: {
+          list_name: string
+        }
+        Returns: {
+          artist: string | null
+          genres: string | null
+          id: string | null
+          image: string | null
+          label: string | null
+          name: string | null
+          release_date: string | null
+          spotify_uri: string | null
+        }[]
+      }
       search_all_albums: {
         Args: {
           keyword: string

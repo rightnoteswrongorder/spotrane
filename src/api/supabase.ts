@@ -26,10 +26,10 @@ export const SupabaseApi = {
 
     deleteAlbumFromList: (list: Tables<'lists'>, albumId: string) => {
         (async () => {
-            const newListIds = list.albums?.filter(id => id != albumId)
-            await supabase.from('lists')
-                .update({albums: newListIds})
-                .eq('name', list.name)
+            await supabase.from('list_entry')
+                .delete()
+                .eq('list_id', list.id)
+                .eq('album_id', albumId)
         })();
     },
 
@@ -42,6 +42,23 @@ export const SupabaseApi = {
                     genres: artist.genres
                 }
             ])
+    },
+
+    upsertAlbum: async (album: SpotraneAlbum) => {
+        await supabase.from('albums')
+            .upsert([
+                {
+                    id: album.id,
+                    name: album.name,
+                    artist: album.artist?.id,
+                    image: album.imageUri,
+                    release_date: album.releaseDate,
+                    label: album.label,
+                    spotify_uri: album.albumUri
+
+                },
+            ])
+            .select()
     },
 
     searchAllAlbums: async (searchText: string): Promise<Tables<'all_albums'>[]> => {
@@ -57,14 +74,6 @@ export const SupabaseApi = {
             .from('all_albums')
             .select("*")
             .range(from, to - 1)
-        return data || []
-    },
-
-    getAlbumsByListOfIds: async (albumIds: string[]): Promise<Tables<'all_albums'>[]> => {
-        const {data} = await supabase
-            .from('all_albums')
-            .select("*")
-            .in('id', albumIds)
         return data || []
     },
 
@@ -96,6 +105,14 @@ export const SupabaseApi = {
         return !!(data && data.length > 0)
     },
 
+    getAlbumsOnList: async (listName: string) : Promise<Tables<'all_albums'>[] | null> => {
+        const {data} = await supabase
+            .rpc('albums_on_list', {
+                list_name: listName
+            })
+        return data
+    },
+
     getLists: async () : Promise<Tables<'lists'>[] | null> => {
         const {data} = await supabase
             .from('lists')
@@ -106,24 +123,14 @@ export const SupabaseApi = {
     addToList: (list: Tables<'lists'>, album: SpotraneAlbum) => {
         (async () => {
             album.artist && await SupabaseApi.upsertArtist(album.artist)
-            await SupabaseApi.saveAlbum(album)
-            const newListIds = [...list?.albums ?? [], album.id]
-            await supabase.from('lists')
-                .update({albums: newListIds})
-                .eq('name', list.name)
-            //}
+            await SupabaseApi.upsertAlbum(album)
+            await supabase
+                .from('list_entry')
+                .insert([
+                    { list_id: list.id, album_id: album.id },
+                ])
         })();
     },
-
-    // addToList: (list: Tables<'lists'>, albumId: string) => {
-    //     (async () => {
-    //         const newListIds = [...list?.albums ?? [], albumId]
-    //         await supabase.from('lists')
-    //             .update({albums: newListIds})
-    //             .eq('name', list.name)
-    //         //}
-    //     })();
-    // },
 
     createList: (listName: string) => {
         (async () => {
