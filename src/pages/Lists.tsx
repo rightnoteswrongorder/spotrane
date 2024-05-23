@@ -33,10 +33,12 @@ export default function Lists() {
     const [lists, setLists] = React.useState<(Tables<'lists'> | null)[]>([]);
     const nextId = useRef(0);
     const [showSearchSpotifyDialog, setShowSpotifyDialog] = useState(false)
+    const [websocketUpdate, setWebSocketUpdate] = useState("")
 
 
     const handleDbChange = (payload: RealtimePostgresChangesPayload<Tables<'list_entry'>>) => {
         const data = payload.new as Tables<'list_entry'>
+        setWebSocketUpdate(payload.commit_timestamp)
         console.log("Websocket update from list entry update: " + data.list_id)
     }
 
@@ -53,7 +55,7 @@ export default function Lists() {
 
     useEffect(() => {
         albumsOnList()
-    }, [selectedList, handleDbChange]);
+    }, [selectedList, websocketUpdate]);
 
     const sdk = useSpotify(
         import.meta.env.VITE_SPOTIFY_CLIENT_ID,
