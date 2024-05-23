@@ -42,6 +42,20 @@ export type Database = {
             foreignKeyName: "albums_artist_fkey"
             columns: ["artist"]
             isOneToOne: false
+            referencedRelation: "albums_on_lists"
+            referencedColumns: ["artist_id"]
+          },
+          {
+            foreignKeyName: "albums_artist_fkey"
+            columns: ["artist"]
+            isOneToOne: false
+            referencedRelation: "all_albums"
+            referencedColumns: ["artist_id"]
+          },
+          {
+            foreignKeyName: "albums_artist_fkey"
+            columns: ["artist"]
+            isOneToOne: false
             referencedRelation: "artists"
             referencedColumns: ["id"]
           },
@@ -90,6 +104,13 @@ export type Database = {
             columns: ["album_id"]
             isOneToOne: false
             referencedRelation: "albums"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "list_entry_album_id_fkey"
+            columns: ["album_id"]
+            isOneToOne: false
+            referencedRelation: "albums_on_lists"
             referencedColumns: ["id"]
           },
           {
@@ -163,9 +184,25 @@ export type Database = {
       }
     }
     Views: {
+      albums_on_lists: {
+        Row: {
+          artist: string | null
+          artist_id: string | null
+          genres: string | null
+          id: string | null
+          image: string | null
+          label: string | null
+          list_name: string | null
+          name: string | null
+          release_date: string | null
+          spotify_uri: string | null
+        }
+        Relationships: []
+      }
       all_albums: {
         Row: {
           artist: string | null
+          artist_id: string | null
           genres: string | null
           id: string | null
           image: string | null
@@ -178,27 +215,13 @@ export type Database = {
       }
     }
     Functions: {
-      albums_on_list: {
-        Args: {
-          list_name: string
-        }
-        Returns: {
-          artist: string | null
-          genres: string | null
-          id: string | null
-          image: string | null
-          label: string | null
-          name: string | null
-          release_date: string | null
-          spotify_uri: string | null
-        }[]
-      }
       search_all_albums: {
         Args: {
           keyword: string
         }
         Returns: {
           artist: string | null
+          artist_id: string | null
           genres: string | null
           id: string | null
           image: string | null

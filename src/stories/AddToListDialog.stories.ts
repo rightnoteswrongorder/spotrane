@@ -28,8 +28,9 @@ export const Vanilla: Story = {
                 name: '',
                 genres: []
             },
+            artistId: '',
             albumUri: '',
-            artistGenres: [],
+            artistGenres: '',
             artistName: '',
             label: '',
             releaseDate: '',

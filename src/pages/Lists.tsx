@@ -36,7 +36,6 @@ export default function Lists() {
 
 
     const handleDbChange = (payload: RealtimePostgresChangesPayload<Tables<'list_entry'>>) => {
-        console.log(payload)
         const data = payload.new as Tables<'list_entry'>
         data.list_id == selectedList?.id && albumsOnList()
     }
@@ -97,8 +96,7 @@ export default function Lists() {
                     }))
                 }
             }
-        )
-        ();
+        )();
     }
 
     const {control, reset} = useForm<IFormInput>()

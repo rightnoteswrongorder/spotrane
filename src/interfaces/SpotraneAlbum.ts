@@ -8,7 +8,8 @@ export type SpotraneAlbum = {
     imageUri?: string
     albumUri?: string
     label?:string
+    artistId?: string
     artistName?: string
-    artistGenres?: string[]
+    artistGenres?: string
     saved?: boolean
 }

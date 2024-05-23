@@ -50,8 +50,8 @@ export default function SpotifySearch({sdk, addToList}: SpotifySearchProps) {
                         label: album?.label,
                         imageUri: simplifiedAlbum.images[0].url,
                         albumUri: simplifiedAlbum.uri,
+                        artistId: artist?.id,
                         artistName: artist?.name,
-                        artistGenres: artist?.genres,
                         artist: {name: artist?.name, id: artist?.id, genres: artist?.genres},
                         saved: isSaved
                     }

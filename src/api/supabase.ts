@@ -50,7 +50,7 @@ export const SupabaseApi = {
                 {
                     id: album.id,
                     name: album.name,
-                    artist: album.artist?.id,
+                    artist: album.artistId,
                     image: album.imageUri,
                     release_date: album.releaseDate,
                     label: album.label,
@@ -80,20 +80,7 @@ export const SupabaseApi = {
     saveAlbum: (album: SpotraneAlbum) => {
         (async () => {
             album.artist && await SupabaseApi.upsertArtist(album.artist);
-            await supabase.from('albums')
-                .upsert([
-                    {
-                        id: album.id,
-                        name: album.name,
-                        artist: album.artist?.id,
-                        image: album.imageUri,
-                        release_date: album.releaseDate,
-                        label: album.label,
-                        spotify_uri: album.albumUri
-
-                    },
-                ])
-                .select()
+            await SupabaseApi.upsertAlbum(album)
         })();
     },
 
@@ -105,11 +92,15 @@ export const SupabaseApi = {
         return !!(data && data.length > 0)
     },
 
-    getAlbumsOnList: async (listName: string) : Promise<Tables<'all_albums'>[] | null> => {
+    getAlbumsOnList: async (listName: string) : Promise<Tables<'albums_on_lists'>[] | null> => {
+        // const {data} = await supabase
+        //     .rpc('albums_on_list', {
+        //         list_name: listName
+        //     })
         const {data} = await supabase
-            .rpc('albums_on_list', {
-                list_name: listName
-            })
+            .from('albums_on_lists')
+            .select("*")
+            .eq("list_name", listName)
         return data
     },
 
@@ -122,6 +113,7 @@ export const SupabaseApi = {
 
     addToList: (list: Tables<'lists'>, album: SpotraneAlbum) => {
         (async () => {
+            console.log(album)
             album.artist && await SupabaseApi.upsertArtist(album.artist)
             await SupabaseApi.upsertAlbum(album)
             await supabase

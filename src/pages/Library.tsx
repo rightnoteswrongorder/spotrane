@@ -33,8 +33,9 @@ export default function Library({sdk}: { sdk: SpotifyApi | null }) {
             return {
                 id: dbAlbum.id,
                 name: dbAlbum.name,
+                artistId: dbAlbum.artist_id,
                 artistName: dbAlbum.artist,
-                artistGenres: dbAlbum.genres ?? [],
+                artistGenres: dbAlbum.genres ?? "",
                 label: dbAlbum.label,
                 releaseDate: dbAlbum.release_date,
                 imageUri: dbAlbum.image,
