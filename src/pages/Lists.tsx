@@ -37,6 +37,7 @@ export default function Lists() {
 
     const handleDbChange = (payload: RealtimePostgresChangesPayload<Tables<'list_entry'>>) => {
         const data = payload.new as Tables<'list_entry'>
+        console.log("Websocket update from list entry update: " + data.list_id + " " + selectedList?.id)
         data.list_id == selectedList?.id && albumsOnList()
     }
 
