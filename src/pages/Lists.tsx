@@ -37,8 +37,7 @@ export default function Lists() {
 
     const handleDbChange = (payload: RealtimePostgresChangesPayload<Tables<'list_entry'>>) => {
         const data = payload.new as Tables<'list_entry'>
-        console.log("Websocket update from list entry update: " + data.list_id + " " + selectedList?.id)
-        data.list_id == selectedList?.id && albumsOnList()
+        console.log("Websocket update from list entry update: " + data.list_id)
     }
 
 
@@ -54,7 +53,7 @@ export default function Lists() {
 
     useEffect(() => {
         albumsOnList()
-    }, [selectedList]);
+    }, [selectedList, handleDbChange]);
 
     const sdk = useSpotify(
         import.meta.env.VITE_SPOTIFY_CLIENT_ID,
@@ -119,8 +118,10 @@ export default function Lists() {
     }
 
     const runListLoad = (listName: string) => {
-        const list = lists.find(list => list?.name === listName)
+        const list = lists.find(list => list?.name == listName)
+        console.log(list)
         list && setSelectedList(list)
+        console.log(selectedList)
     }
 
     const onShowSpotifySearch = () => {
@@ -165,7 +166,6 @@ export default function Lists() {
                                             value={value ?? ""}
                                             onChange={(e) => {
                                                 onChange(e)
-                                                getAllLists()
                                                 runListLoad(e.target.value)
                                             }}
                                             label="List"
