@@ -52,6 +52,7 @@ export default function SpotifySearch({sdk, addToList}: SpotifySearchProps) {
                         albumUri: simplifiedAlbum.uri,
                         artistId: artist?.id,
                         artistName: artist?.name,
+                        artistGenres: artist?.genres.join(" "),
                         artist: {name: artist?.name, id: artist?.id, genres: artist?.genres},
                         saved: isSaved
                     }
