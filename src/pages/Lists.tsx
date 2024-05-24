@@ -84,7 +84,7 @@ export default function Lists() {
                     const tryme = await SupabaseApi.getAlbumsOnList(selectedList?.name)
                     tryme && setAlbums(tryme.map((dbAlbum) => {
                         return {
-                            id: dbAlbum.id,
+                            id: dbAlbum.spotify_id,
                             name: dbAlbum.name,
                             artistName: dbAlbum.artist,
                             artistGenres: dbAlbum.genres ?? [],

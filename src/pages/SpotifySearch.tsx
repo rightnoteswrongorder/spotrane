@@ -17,8 +17,8 @@ interface IFormInput {
 }
 
 type SpotifySearchProps = {
-   sdk: SpotifyApi | null,
-   addToList?: (album: SpotraneAlbum)  => void
+    sdk: SpotifyApi | null,
+    addToList?: (album: SpotraneAlbum) => void
 }
 export default function SpotifySearch({sdk, addToList}: SpotifySearchProps) {
     const [results, setResults] = useState<SpotraneAlbum[]>([]);
@@ -57,31 +57,31 @@ export default function SpotifySearch({sdk, addToList}: SpotifySearchProps) {
                         saved: isSaved
                     }
                 })))
-
             }
         })();
     }
 
     return (
         <>
-                <Grid container spacing={2}>
-                    <Grid xs={12} item={true}>
-                        <form onSubmit={handleSubmit(onSubmit)}>
-                            <Stack margin={2}>
-                                <TextField variant='outlined' InputLabelProps={{shrink: true}} margin="dense"
-                                           type='text' {...register("searchText", {required: true})} />
-                                <Button type='submit' variant='outlined' color='secondary'>Search</Button>
-                            </Stack>
-                        </form>
-                    </Grid>
-                    <Grid xs={12} item={true} margin={2}>
-                        <Grid container justifyContent="center" spacing={4}>
-                            {results.map((album) => (
-                                <Grid item={true} key={album.id}><AlbumCard album={album} saveAlbum={saveAlbum} addToList={addToList}
-                                ></AlbumCard></Grid>
-                            ))} </Grid>
-                    </Grid>
+            <Grid container spacing={2}>
+                <Grid xs={12} item={true}>
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                        <Stack margin={2}>
+                            <TextField variant='outlined' InputLabelProps={{shrink: true}} margin="dense"
+                                       type='text' {...register("searchText", {required: true})} />
+                            <Button type='submit' variant='outlined' color='secondary'>Search</Button>
+                        </Stack>
+                    </form>
                 </Grid>
+                <Grid xs={12} item={true} margin={2}>
+                    <Grid container justifyContent="center" spacing={4}>
+                        {results.map((album) => (
+                            <Grid item={true} key={album.id}><AlbumCard album={album} saveAlbum={saveAlbum}
+                                                                        addToList={addToList}
+                            ></AlbumCard></Grid>
+                        ))} </Grid>
+                </Grid>
+            </Grid>
         </>
     )
 }

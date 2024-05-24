@@ -31,7 +31,7 @@ export default function Library({sdk}: { sdk: SpotifyApi | null }) {
     const dbAlbumToSpotrane = (dbAlbums: Tables<'all_albums'>[]): SpotraneAlbum[] => {
         return dbAlbums.map(dbAlbum => {
             return {
-                id: dbAlbum.id,
+                id: dbAlbum.spotify_id,
                 name: dbAlbum.name,
                 artistId: dbAlbum.artist_id,
                 artistName: dbAlbum.artist,

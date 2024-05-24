@@ -1,5 +1,5 @@
 create or replace function search_all_albums(keyword text)
-returns setof all_abums
+returns setof all_albums
 as
 $func$
 select

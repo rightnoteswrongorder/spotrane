@@ -12,29 +12,35 @@ export type Database = {
       albums: {
         Row: {
           artist: string | null
-          id: string
+          created_at: string | null
+          id: number
           image: string | null
           label: string | null
           name: string
           release_date: string | null
+          spotify_id: string
           spotify_uri: string | null
         }
         Insert: {
           artist?: string | null
-          id: string
+          created_at?: string | null
+          id?: number
           image?: string | null
           label?: string | null
           name: string
           release_date?: string | null
+          spotify_id: string
           spotify_uri?: string | null
         }
         Update: {
           artist?: string | null
-          id?: string
+          created_at?: string | null
+          id?: number
           image?: string | null
           label?: string | null
           name?: string
           release_date?: string | null
+          spotify_id?: string
           spotify_uri?: string | null
         }
         Relationships: [
@@ -57,25 +63,31 @@ export type Database = {
             columns: ["artist"]
             isOneToOne: false
             referencedRelation: "artists"
-            referencedColumns: ["id"]
+            referencedColumns: ["spotify_id"]
           },
         ]
       }
       artists: {
         Row: {
+          created_at: string | null
           genres: string[] | null
-          id: string
+          id: number
           name: string | null
+          spotify_id: string
         }
         Insert: {
+          created_at?: string | null
           genres?: string[] | null
-          id: string
+          id?: number
           name?: string | null
+          spotify_id: string
         }
         Update: {
+          created_at?: string | null
           genres?: string[] | null
-          id?: string
+          id?: number
           name?: string | null
+          spotify_id?: string
         }
         Relationships: []
       }
@@ -104,21 +116,21 @@ export type Database = {
             columns: ["album_id"]
             isOneToOne: false
             referencedRelation: "albums"
-            referencedColumns: ["id"]
+            referencedColumns: ["spotify_id"]
           },
           {
             foreignKeyName: "list_entry_album_id_fkey"
             columns: ["album_id"]
             isOneToOne: false
             referencedRelation: "albums_on_lists"
-            referencedColumns: ["id"]
+            referencedColumns: ["spotify_id"]
           },
           {
             foreignKeyName: "list_entry_album_id_fkey"
             columns: ["album_id"]
             isOneToOne: false
             referencedRelation: "all_albums"
-            referencedColumns: ["id"]
+            referencedColumns: ["spotify_id"]
           },
           {
             foreignKeyName: "list_entry_list_id_fkey"
@@ -189,12 +201,12 @@ export type Database = {
           artist: string | null
           artist_id: string | null
           genres: string | null
-          id: string | null
           image: string | null
           label: string | null
           list_name: string | null
           name: string | null
           release_date: string | null
+          spotify_id: string | null
           spotify_uri: string | null
         }
         Relationships: []
@@ -204,11 +216,11 @@ export type Database = {
           artist: string | null
           artist_id: string | null
           genres: string | null
-          id: string | null
           image: string | null
           label: string | null
           name: string | null
           release_date: string | null
+          spotify_id: string | null
           spotify_uri: string | null
         }
         Relationships: []
@@ -223,11 +235,11 @@ export type Database = {
           artist: string | null
           artist_id: string | null
           genres: string | null
-          id: string | null
           image: string | null
           label: string | null
           name: string | null
           release_date: string | null
+          spotify_id: string | null
           spotify_uri: string | null
         }[]
       }
