@@ -13,7 +13,6 @@ import {Controller, useForm} from "react-hook-form";
 import * as React from "react";
 import CreateListDialog from "./components/CreateListDialog.tsx";
 import {AlbumCard} from "./components/AlbumCard.tsx";
-import {SpotraneAlbum} from "../interfaces/SpotraneAlbum.ts";
 import {SupabaseApi} from "../api/supabase.ts";
 import Dialog from "@mui/material/Dialog";
 import SpotifySearch from "./SpotifySearch.tsx";
@@ -21,6 +20,7 @@ import {Scopes} from "@spotify/web-api-ts-sdk";
 import {useSpotify} from "../hooks/useSpotfy.ts";
 import supabase from "../api/supaBaseClient.ts";
 import {RealtimePostgresChangesPayload} from "@supabase/supabase-js";
+import {SpotraneAlbumCardView} from "../interfaces/SpotraneAlbum.ts";
 
 interface IFormInput {
     listName: string
@@ -28,7 +28,7 @@ interface IFormInput {
 
 export default function Lists() {
 
-    const [albums, setAlbums] = useState<SpotraneAlbum[]>([]);
+    const [albums, setAlbums] = useState<SpotraneAlbumCardView[]>([]);
     const [selectedList, setSelectedList] = useState<Tables<'lists'>>()
     const [lists, setLists] = React.useState<(Tables<'lists'> | null)[]>([]);
     const nextId = useRef(0);
@@ -93,7 +93,7 @@ export default function Lists() {
                             imageUri: dbAlbum.image,
                             albumUri: dbAlbum.spotify_uri,
                             saved: true
-                        } as SpotraneAlbum
+                        } as SpotraneAlbumCardView
 
                     }))
                 }
@@ -136,10 +136,6 @@ export default function Lists() {
         setShowSpotifyDialog(false);
     };
 
-    const addToList = (album: SpotraneAlbum) => {
-        selectedList && SupabaseApi.addToList(selectedList, album)
-    }
-
     return (
         <div className="container" style={{padding: '0 0 100px 0'}}>
             <Grid container spacing={2}>
@@ -151,7 +147,7 @@ export default function Lists() {
                             onClose={handleClose}
                             fullWidth
                     >
-                        <SpotifySearch sdk={sdk} addToList={addToList}/>
+                        {selectedList && <SpotifySearch sdk={sdk} list={selectedList}/>}
                     </Dialog>
                     <form>
                         <Stack sx={{paddingLeft: 5, paddingRight: 5}} spacing={1}>
@@ -198,7 +194,7 @@ export default function Lists() {
                 <Grid xs={12} item={true}>
                     <Grid container justifyContent="center" spacing={3}>
                         {albums?.map(album => (
-                            <Grid key={nextId.current++} item={true}><AlbumCard album={album}
+                            <Grid key={nextId.current++} item={true}><AlbumCard albumCardView={album} saved={true}
                                                                                 deleteAlbumFromList={deleteAlbumFromList}/></Grid>))}
                     </Grid>
                 </Grid>

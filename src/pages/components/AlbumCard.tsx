@@ -2,20 +2,36 @@ import {useState} from "react";
 import {Box, Card, CardContent, CardMedia, Typography} from "@mui/material";
 import {AlbumCardIcons} from "./AlbumCardIcons.tsx";
 import AddToListDialog from "./AddToListDialog.tsx";
-import {SpotraneAlbum} from "../../interfaces/SpotraneAlbum.ts";
+import {SpotraneAlbumCardView, SpotraneAlbumDto, SpotraneArtistDto} from "../../interfaces/SpotraneAlbum.ts";
+import {Tables} from "../../interfaces/database.types.ts";
 
 type AlbumCardProps = {
-    album: SpotraneAlbum
-    saveAlbum?: (album: SpotraneAlbum) => void
+    albumCardView: SpotraneAlbumCardView
+    album?: SpotraneAlbumDto
+    artist?: SpotraneArtistDto
+    list?: Tables<'lists'>
+    saved?: boolean
+    saveAlbum?: (artist: SpotraneArtistDto, album: SpotraneAlbumDto) => void
     deleteAlbumFromLibrary?: (albumId: string) => void
     deleteAlbumFromList?: (albumId: string) => void
-    addToList?: (album: SpotraneAlbum) => void
+    addToListFromSearch?: (list: Tables<'lists'>, artist: SpotraneArtistDto, album: SpotraneAlbumDto) => void
 }
 
-export const AlbumCard = ({album, saveAlbum, deleteAlbumFromLibrary, deleteAlbumFromList, addToList}: AlbumCardProps) => {
+export const AlbumCard = ({
+                              albumCardView,
+                              album,
+                              artist,
+                              list,
+                              saved,
+                              saveAlbum,
+                              deleteAlbumFromLibrary,
+                              deleteAlbumFromList,
+                              addToListFromSearch,
+                          }: AlbumCardProps) => {
     const [listDialogOpen, setListDialogOpen] = useState<boolean>(false);
 
     const toggleListDialog = () => {
+        console.log(!listDialogOpen)
         setListDialogOpen(!listDialogOpen)
     }
 
@@ -27,29 +43,33 @@ export const AlbumCard = ({album, saveAlbum, deleteAlbumFromLibrary, deleteAlbum
         <Box sx={{display: 'flex', flexDirection: 'column'}}>
             <CardContent sx={{flex: '1 0 auto', padding: 0.5}}>
                 <Typography noWrap sx={{width: '175px'}} component="div" variant="h6">
-                    {`${album?.name}`}
+                    {`${albumCardView.name}`}
                 </Typography>
                 <Typography noWrap sx={{width: '175px'}} variant="subtitle1" color="text.secondary" component="div">
-                    {`${album?.artistName}`}
+                    {`${albumCardView.artistName}`}
                 </Typography>
                 <Typography noWrap sx={{width: '175px'}} variant="subtitle1" color="text.secondary" component="div">
-                    {`${album?.releaseDate?.substr(0, 4)} ${album?.label}`}
+                    {`${albumCardView?.releaseDate?.substr(0, 4)} ${album?.label}`}
                 </Typography>
                 <Typography noWrap sx={{width: '175px'}} variant="subtitle1" color="text.secondary" component="div">
-                    {`${album?.artistGenres}`}
+                    {`${albumCardView?.artistGenres}`}
                 </Typography>
             </CardContent>
-            {album && <AlbumCardIcons album={album} saveAlbum={saveAlbum} deleteAlbumFromLibrary={deleteAlbumFromLibrary} deleteAlbumFromList={deleteAlbumFromList}
-                                                addToList={addToList} toggleListDialog={toggleListDialog}/>}
+            <AlbumCardIcons albumCardView={albumCardView} album={album} artist={artist} list={list}
+                            saveAlbum={saveAlbum}
+                            saved={saved} deleteAlbumFromLibrary={deleteAlbumFromLibrary}
+                            deleteAlbumFromList={deleteAlbumFromList}
+                            addToListFromSearch={addToListFromSearch}
+                            toggleListDialog={toggleListDialog}/>
         </Box>
         <CardMedia
             component="img"
             sx={{width: 80, height: 80, padding: 0.5}}
-            image={album?.imageUri}
+            image={albumCardView?.imageUri}
             alt="album cover"
         />
-        {listDialogOpen && album?.id &&
+        {listDialogOpen && albumCardView?.id &&
             <AddToListDialog isOpen={true} handleAddToListDialogClose={handleAddToListDialogClose}
-                             album={album}/>}
+                             albumId={albumCardView.id}/>}
     </Card>)
 }

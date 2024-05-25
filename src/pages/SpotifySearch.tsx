@@ -8,9 +8,14 @@ import {
 import {SubmitHandler, useForm} from 'react-hook-form';
 import Grid from "@mui/material/Grid";
 import {AlbumCard} from "./components/AlbumCard.tsx";
-import {SpotraneAlbum} from "../interfaces/SpotraneAlbum.ts";
+import {
+    SpotraneAlbumCardView,
+    SpotraneAlbumDto, SpotraneArtistDto,
+    SpotraneSearchResultContainer
+} from "../interfaces/SpotraneAlbum.ts";
 import {SpotifyApiProxy} from "../api/spotify.ts";
 import {SupabaseApi} from "../api/supabase.ts";
+import {Tables} from "../interfaces/database.types.ts";
 
 interface IFormInput {
     searchText: string
@@ -18,44 +23,62 @@ interface IFormInput {
 
 type SpotifySearchProps = {
     sdk: SpotifyApi | null,
-    addToList?: (album: SpotraneAlbum) => void
+    list?: Tables<'lists'>
 }
-export default function SpotifySearch({sdk, addToList}: SpotifySearchProps) {
-    const [results, setResults] = useState<SpotraneAlbum[]>([]);
+export default function SpotifySearch({sdk, list}: SpotifySearchProps) {
+    const [searchResults, setSearchResults] = useState<SpotraneSearchResultContainer[]>([]);
     const {register, handleSubmit} = useForm<IFormInput>()
 
-    const saveAlbum = async (album: SpotraneAlbum) => {
-        SupabaseApi.saveAlbum(album)
-        const newRes = results.map((albumInResults) => {
-            if (albumInResults.id == album.id) {
-                albumInResults.saved = true
-            }
-            return albumInResults
-        })
-        setResults(newRes)
+    const addToListFromSearch = (list: Tables<'lists'>, artist: SpotraneArtistDto, album: SpotraneAlbumDto) => {
+        SupabaseApi.addToListFromSearch(list, artist, album)
+    }
+    const saveAlbum = async (artist: SpotraneArtistDto, album: SpotraneAlbumDto) => {
+        SupabaseApi.saveAlbum(album, artist)
     }
 
     const onSubmit: SubmitHandler<IFormInput> = (data) => {
         (async () => {
             const searchResults = await SpotifyApiProxy.searchForAlbum(sdk, data.searchText)
             if (searchResults) {
-                setResults(await Promise.all(searchResults.albums?.items.map(async (simplifiedAlbum) => {
+
+                setSearchResults(await Promise.all(searchResults.albums?.items.map(async (simplifiedAlbum) => {
                     const artist = await SpotifyApiProxy.getArtist(sdk, simplifiedAlbum.artists[0].id)
+                    const spotraneArtist = {
+                        id: artist?.id,
+                        name: artist?.name,
+                        genres: artist?.genres
+                    } as SpotraneArtistDto
                     const album = await SpotifyApiProxy.getAlbum(sdk, simplifiedAlbum.id)
-                    const isSaved = await SupabaseApi.isSaved(simplifiedAlbum.id)
-                    return {
-                        id: simplifiedAlbum.id,
-                        name: simplifiedAlbum.name,
-                        releaseDate: simplifiedAlbum.release_date,
+                    const spotraneAlbum = {
+                        id: album?.id,
+                        name: album?.name,
+                        releaseDate: album?.release_date,
+                        imageUri: album?.images[0].url,
+                        albumUri: album?.uri,
                         label: album?.label,
-                        imageUri: simplifiedAlbum.images[0].url,
-                        albumUri: simplifiedAlbum.uri,
+                        artist: artist?.id
+                    } as SpotraneAlbumDto
+                    const isSaved = await SupabaseApi.isSaved(simplifiedAlbum.id)
+                    const cardView = {
+                        id: album?.id,
+                        name: album?.name,
+                        releaseDate: album?.release_date,
+                        imageUri: album?.images[0].url,
+                        albumUri: album?.uri,
+                        label: album?.label,
                         artistId: artist?.id,
                         artistName: artist?.name,
-                        artistGenres: artist?.genres.join(" "),
-                        artist: {name: artist?.name, id: artist?.id, genres: artist?.genres},
-                        saved: isSaved
-                    }
+                        artistGenres: artist?.genres.join(" ")
+
+                    } as SpotraneAlbumCardView
+
+                    return {
+                        artist: spotraneArtist,
+                        album: spotraneAlbum,
+                        isSaved: isSaved,
+                        view: cardView
+                    } as SpotraneSearchResultContainer
+
                 })))
             }
         })();
@@ -75,9 +98,11 @@ export default function SpotifySearch({sdk, addToList}: SpotifySearchProps) {
                 </Grid>
                 <Grid xs={12} item={true} margin={2}>
                     <Grid container justifyContent="center" spacing={4}>
-                        {results.map((album) => (
-                            <Grid item={true} key={album.id}><AlbumCard album={album} saveAlbum={saveAlbum}
-                                                                        addToList={addToList}
+                        {searchResults.map((container) => (
+                            <Grid item={true} key={container.album.id}><AlbumCard albumCardView={container.view} artist={container.artist}
+                                                                                  album={container.album} saved={container.isSaved}
+                                                                                  list={list} addToListFromSearch={addToListFromSearch} saveAlbum={saveAlbum}
+
                             ></AlbumCard></Grid>
                         ))} </Grid>
                 </Grid>

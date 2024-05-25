@@ -9,18 +9,18 @@ import {MouseEvent, ChangeEvent, useEffect, useRef, useState} from "react";
 import {Tables} from "../interfaces/database.types.ts";
 import {SubmitHandler, useForm} from "react-hook-form";
 import {AlbumCard} from "./components/AlbumCard.tsx";
-import {SpotraneAlbum} from "../interfaces/SpotraneAlbum.ts";
 import {SupabaseApi} from "../api/supabase.ts";
 import SpotifySearch from "./SpotifySearch.tsx";
 import Dialog from "@mui/material/Dialog";
 import {SpotifyApi} from "@spotify/web-api-ts-sdk";
+import {SpotraneAlbumCardView} from "../interfaces/SpotraneAlbum.ts";
 
 interface IFormInput {
     searchText: string
 }
 
 export default function Library({sdk}: { sdk: SpotifyApi | null }) {
-    const [albums, setAlbums] = useState<SpotraneAlbum[]>([]);
+    const [albums, setAlbums] = useState<SpotraneAlbumCardView[]>([]);
     const [searchTotal, setSearchTotal] = useState<number>(0)
     const [totalAlbums, setTotalAlbums] = useState<number>(0)
     const nextId = useRef(0);
@@ -28,7 +28,7 @@ export default function Library({sdk}: { sdk: SpotifyApi | null }) {
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [showSearchSpotifyDialog, setShowSpotifyDialog] = useState(false)
 
-    const dbAlbumToSpotrane = (dbAlbums: Tables<'all_albums'>[]): SpotraneAlbum[] => {
+    const dbAlbumToSpotrane = (dbAlbums: Tables<'all_albums'>[]): SpotraneAlbumCardView[] => {
         return dbAlbums.map(dbAlbum => {
             return {
                 id: dbAlbum.spotify_id,
@@ -41,17 +41,14 @@ export default function Library({sdk}: { sdk: SpotifyApi | null }) {
                 imageUri: dbAlbum.image,
                 albumUri: dbAlbum.spotify_uri,
                 saved: true
-            } as SpotraneAlbum
+            } as SpotraneAlbumCardView
         })
     }
 
     const deleteAlbumFromLibrary = (albumId: string) => {
-        const album = albums.find(album => album.id == albumId)
-        if(album) {
-            SupabaseApi.deleteAlbum(album)
-            const updated = albums?.filter(libAlum => libAlum.id != albumId)
-            setAlbums(updated)
-        }
+        SupabaseApi.deleteAlbum(albumId)
+        const updated = albums?.filter(libAlum => libAlum.id != albumId)
+        setAlbums(updated)
     }
 
     const allAlbums = (from: number, to: number) => {
@@ -137,8 +134,10 @@ export default function Library({sdk}: { sdk: SpotifyApi | null }) {
                         <Stack sx={{paddingLeft: 5, paddingRight: 5}} spacing={1}>
                             <TextField variant='outlined' InputLabelProps={{shrink: true}} margin="dense"
                                        type='text' {...register("searchText", {required: true})} />
-                            <Button type='submit' onClick={handleSubmit(onSubmit)} variant='outlined' color='secondary'>Search</Button>
-                            <Button variant='outlined' onClick={onShowSpotifySearch} color='secondary'>Search Spotify</Button>
+                            <Button type='submit' onClick={handleSubmit(onSubmit)} variant='outlined'
+                                    color='secondary'>Search</Button>
+                            <Button variant='outlined' onClick={onShowSpotifySearch} color='secondary'>Search
+                                Spotify</Button>
                             <Button variant='outlined' onClick={onReset} color='secondary'>Reset</Button>
                         </Stack>
                     </form>
@@ -146,7 +145,8 @@ export default function Library({sdk}: { sdk: SpotifyApi | null }) {
                 <Grid xs={12} item={true}>
                     <Grid container justifyContent="center" spacing={3}>
                         {albums?.map(album => (
-                            <Grid key={nextId.current++} item={true}><AlbumCard album={album} deleteAlbumFromLibrary={deleteAlbumFromLibrary}/></Grid>))}
+                            <Grid key={nextId.current++} item={true}><AlbumCard albumCardView={album} saved={true}
+                                                                                deleteAlbumFromLibrary={deleteAlbumFromLibrary}/></Grid>))}
                     </Grid>
                 </Grid>
                 <Grid container justifyContent="right" spacing={2}>

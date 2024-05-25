@@ -11,15 +11,14 @@ import supabase from "../../api/supaBaseClient.ts";
 import {Tables} from "../../interfaces/database.types.ts";
 import {useEffect} from "react";
 import {SupabaseApi} from "../../api/supabase.ts";
-import {SpotraneAlbum} from "../../interfaces/SpotraneAlbum.ts";
 
 type AddToListDialogProps = {
     isOpen: boolean
     handleAddToListDialogClose: () => void
-    album: SpotraneAlbum
+    albumId: string
 }
 
-export default function AddToListDialog({isOpen, handleAddToListDialogClose, album}: AddToListDialogProps) {
+export default function AddToListDialog({isOpen, handleAddToListDialogClose, albumId}: AddToListDialogProps) {
 
     const [lists, setLists] = React.useState<(Tables<'lists'> | null)[]>([]);
     const [open, setOpen] = React.useState(false);
@@ -63,7 +62,7 @@ export default function AddToListDialog({isOpen, handleAddToListDialogClose, alb
                     onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
                         console.log(event)
                         if(selectedList) {
-                            SupabaseApi.addToList(selectedList, album)
+                            SupabaseApi.addToListFromLibrary(selectedList, albumId)
                             handleClose()
                         }
                     },

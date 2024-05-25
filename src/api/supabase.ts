@@ -1,7 +1,6 @@
 import supabase from "./supaBaseClient.ts";
 import {Tables} from "../interfaces/database.types.ts";
-import {SpotraneAlbum} from "../interfaces/SpotraneAlbum.ts";
-import {SpotraneArtist} from "../interfaces/SpotraneArtist.ts";
+import {SpotraneAlbumDto, SpotraneArtistDto} from "../interfaces/SpotraneAlbum.ts";
 
 
 export const SupabaseApi = {
@@ -16,11 +15,11 @@ export const SupabaseApi = {
         return count || 0
     },
 
-    deleteAlbum: (album: SpotraneAlbum) => {
+    deleteAlbum: (albumId: string) => {
         (async () => {
             await supabase.from('albums')
                 .delete()
-                .eq('id', album.id)
+                .eq('id', albumId)
         })();
     },
 
@@ -33,7 +32,7 @@ export const SupabaseApi = {
         })();
     },
 
-    upsertArtist: async (artist: SpotraneArtist) => {
+    upsertArtist: async (artist: SpotraneArtistDto) => {
         await supabase.from('artists')
             .upsert([
                 {
@@ -44,7 +43,7 @@ export const SupabaseApi = {
             ])
     },
 
-    upsertAlbum: async (album: SpotraneAlbum) => {
+    upsertAlbum: async (album: SpotraneAlbumDto) => {
         await supabase.from('albums')
             .upsert([
                 {
@@ -77,9 +76,9 @@ export const SupabaseApi = {
         return data || []
     },
 
-    saveAlbum: (album: SpotraneAlbum) => {
+    saveAlbum: (album: SpotraneAlbumDto, artist: SpotraneArtistDto) => {
         (async () => {
-            album.artist && await SupabaseApi.upsertArtist(album.artist);
+            await SupabaseApi.upsertArtist(artist);
             await SupabaseApi.upsertAlbum(album)
         })();
     },
@@ -93,10 +92,6 @@ export const SupabaseApi = {
     },
 
     getAlbumsOnList: async (listName: string) : Promise<Tables<'albums_on_lists'>[] | null> => {
-        // const {data} = await supabase
-        //     .rpc('albums_on_list', {
-        //         list_name: listName
-        //     })
         const {data} = await supabase
             .from('albums_on_lists')
             .select("*")
@@ -111,10 +106,19 @@ export const SupabaseApi = {
         return data
     },
 
-    addToList: (list: Tables<'lists'>, album: SpotraneAlbum) => {
+    addToListFromLibrary: (list: Tables<'lists'>, albumId: string) => {
         (async () => {
-            console.log(album)
-            album.artist && await SupabaseApi.upsertArtist(album.artist)
+            await supabase
+                .from('list_entry')
+                .insert([
+                    { list_id: list.id, album_id: albumId },
+                ])
+        })();
+    },
+
+    addToListFromSearch: (list: Tables<'lists'>, artist: SpotraneArtistDto, album: SpotraneAlbumDto) => {
+        (async () => {
+            await SupabaseApi.upsertArtist(artist)
             await SupabaseApi.upsertAlbum(album)
             await supabase
                 .from('list_entry')
