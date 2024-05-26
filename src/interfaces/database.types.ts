@@ -49,14 +49,14 @@ export type Database = {
             columns: ["artist"]
             isOneToOne: false
             referencedRelation: "albums_on_lists"
-            referencedColumns: ["artist_id"]
+            referencedColumns: ["artist_spotify_id"]
           },
           {
             foreignKeyName: "albums_artist_fkey"
             columns: ["artist"]
             isOneToOne: false
-            referencedRelation: "all_albums"
-            referencedColumns: ["artist_id"]
+            referencedRelation: "all_albums_view"
+            referencedColumns: ["artist_spotify_id"]
           },
           {
             foreignKeyName: "albums_artist_fkey"
@@ -129,7 +129,7 @@ export type Database = {
             foreignKeyName: "list_entry_album_id_fkey"
             columns: ["album_id"]
             isOneToOne: false
-            referencedRelation: "all_albums"
+            referencedRelation: "all_albums_view"
             referencedColumns: ["spotify_id"]
           },
           {
@@ -199,8 +199,9 @@ export type Database = {
       albums_on_lists: {
         Row: {
           artist: string | null
-          artist_id: string | null
-          genres: string | null
+          artist_genres: string[] | null
+          artist_genres_searchable: string | null
+          artist_spotify_id: string | null
           image: string | null
           label: string | null
           list_name: string | null
@@ -211,11 +212,12 @@ export type Database = {
         }
         Relationships: []
       }
-      all_albums: {
+      all_albums_view: {
         Row: {
           artist: string | null
-          artist_id: string | null
-          genres: string | null
+          artist_genres: string[] | null
+          artist_genres_searchable: string | null
+          artist_spotify_id: string | null
           image: string | null
           label: string | null
           name: string | null
@@ -233,8 +235,9 @@ export type Database = {
         }
         Returns: {
           artist: string | null
-          artist_id: string | null
-          genres: string | null
+          artist_genres: string[] | null
+          artist_genres_searchable: string | null
+          artist_spotify_id: string | null
           image: string | null
           label: string | null
           name: string | null

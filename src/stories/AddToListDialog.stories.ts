@@ -1,6 +1,6 @@
 import type {Meta, StoryObj} from "@storybook/react";
 import AddToListDialog from "../pages/components/AddToListDialog.tsx";
-import {SpotraneAlbum} from "../interfaces/SpotraneAlbum.ts";
+import {SpotraneAlbum} from "../interfaces/SpotraneTypes.ts";
 
 const meta = {
     title: 'AddToListDialog',

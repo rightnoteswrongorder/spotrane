@@ -20,7 +20,7 @@ import {Scopes} from "@spotify/web-api-ts-sdk";
 import {useSpotify} from "../hooks/useSpotfy.ts";
 import supabase from "../api/supaBaseClient.ts";
 import {RealtimePostgresChangesPayload} from "@supabase/supabase-js";
-import {SpotraneAlbumCardView} from "../interfaces/SpotraneAlbum.ts";
+import {SpotraneAlbumCardView} from "../interfaces/SpotraneTypes.ts";
 
 interface IFormInput {
     listName: string
@@ -42,6 +42,11 @@ export default function Lists() {
         console.log("Websocket update from list entry update: " + data.list_id)
     }
 
+    const addToList = (albumCardView: SpotraneAlbumCardView) => {
+        return (list: Tables<'lists'>) => {
+            list && SupabaseApi.addToListFromSearch(list, albumCardView)
+        }
+    }
 
     useEffect(() => {
         supabase.channel('list_entry').on<Tables<'list_entry'>>('postgres_changes', {
@@ -86,13 +91,14 @@ export default function Lists() {
                         return {
                             id: dbAlbum.spotify_id,
                             name: dbAlbum.name,
+                            artistId: dbAlbum.artist_spotify_id,
                             artistName: dbAlbum.artist,
-                            artistGenres: dbAlbum.genres ?? [],
+                            artistGenres: dbAlbum.artist_genres,
                             label: dbAlbum.label,
                             releaseDate: dbAlbum.release_date,
                             imageUri: dbAlbum.image,
                             albumUri: dbAlbum.spotify_uri,
-                            saved: true
+                            isSaved: true
                         } as SpotraneAlbumCardView
 
                     }))
@@ -194,7 +200,7 @@ export default function Lists() {
                 <Grid xs={12} item={true}>
                     <Grid container justifyContent="center" spacing={3}>
                         {albums?.map(album => (
-                            <Grid key={nextId.current++} item={true}><AlbumCard albumCardView={album} saved={true}
+                            <Grid key={nextId.current++} item={true}><AlbumCard albumCardView={album} addToList={addToList(album)}
                                                                                 deleteAlbumFromList={deleteAlbumFromList}/></Grid>))}
                     </Grid>
                 </Grid>

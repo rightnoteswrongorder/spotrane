@@ -3,37 +3,28 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
 import SpotifyIcon from "../../static/images/spotify.svg?react"
 import {PlaylistAdd, PlaylistAddCheck} from "@mui/icons-material";
-import {SpotraneAlbumCardView, SpotraneAlbumDto, SpotraneArtistDto} from "../../interfaces/SpotraneAlbum.ts";
-import {Tables} from "../../interfaces/database.types.ts";
+import {SpotraneAlbumCardView} from "../../interfaces/SpotraneTypes.ts";
 
 type AlbumCardIconProps = {
     albumCardView: SpotraneAlbumCardView
-    album?: SpotraneAlbumDto
-    artist?: SpotraneArtistDto
-    list?: Tables<'lists'>
-    saved?: boolean
-    saveAlbum?: (artist: SpotraneArtistDto, album: SpotraneAlbumDto) => void
+    saveAlbum?: () => void
     deleteAlbumFromLibrary?: (albumId: string) => void
     deleteAlbumFromList?: (albumId: string) => void
-    addToListFromSearch?: (list: Tables<'lists'>, artist: SpotraneArtistDto, album: SpotraneAlbumDto) => void
+    addToVisibleList?: () => void
     toggleListDialog: () => void
 }
 
 export const AlbumCardIcons = ({
                                    albumCardView,
-                                   album,
-                                   artist,
-                                   list,
-                                   saved,
                                    saveAlbum,
                                    deleteAlbumFromLibrary,
                                    deleteAlbumFromList,
-                                   addToListFromSearch,
+                                   addToVisibleList,
                                    toggleListDialog
                                }: AlbumCardIconProps) => {
 
     const saveClickHandler = () => {
-        saveAlbum && artist && album && saveAlbum(artist, album)
+        saveAlbum && saveAlbum()
     }
 
     const deleteClickHandler = () => {
@@ -49,22 +40,22 @@ export const AlbumCardIcons = ({
     }
 
     const addToListHandler = () => {
-        addToListFromSearch && artist && album && list && addToListFromSearch(list, artist, album)
+        addToVisibleList && addToVisibleList()
     }
 
     return (
         <Box sx={{display: 'flex', alignItems: 'center'}}>
             {(deleteAlbumFromLibrary || deleteAlbumFromList) &&
-                <IconButton onClick={deleteClickHandler} sx={{color: saved ? 'red' : 'gray'}}
+                <IconButton onClick={deleteClickHandler} sx={{color: albumCardView.isSaved ? 'red' : 'gray'}}
                             aria-label="unfollow">
                     <DeleteIcon></DeleteIcon>
                 </IconButton>}
             {saveAlbum && <IconButton onClick={saveClickHandler}
-                                      sx={{color: saved ? (theme) => theme.palette.primary.main : 'gray'}}
+                                      sx={{color: albumCardView.isSaved ? (theme) => theme.palette.primary.main : 'gray'}}
                                       aria-label="save">
                 <SaveIcon></SaveIcon>
             </IconButton>}
-            {addToListFromSearch && <IconButton onClick={addToListHandler}
+            {addToVisibleList && <IconButton onClick={addToListHandler}
                                       aria-label="add-to-list">
                 <PlaylistAddCheck></PlaylistAddCheck>
             </IconButton>}

@@ -2,31 +2,25 @@ import {useState} from "react";
 import {Box, Card, CardContent, CardMedia, Typography} from "@mui/material";
 import {AlbumCardIcons} from "./AlbumCardIcons.tsx";
 import AddToListDialog from "./AddToListDialog.tsx";
-import {SpotraneAlbumCardView, SpotraneAlbumDto, SpotraneArtistDto} from "../../interfaces/SpotraneAlbum.ts";
+import {SpotraneAlbumCardView} from "../../interfaces/SpotraneTypes.ts";
 import {Tables} from "../../interfaces/database.types.ts";
 
 type AlbumCardProps = {
     albumCardView: SpotraneAlbumCardView
-    album?: SpotraneAlbumDto
-    artist?: SpotraneArtistDto
-    list?: Tables<'lists'>
-    saved?: boolean
-    saveAlbum?: (artist: SpotraneArtistDto, album: SpotraneAlbumDto) => void
+    saveAlbum?: () => void
     deleteAlbumFromLibrary?: (albumId: string) => void
     deleteAlbumFromList?: (albumId: string) => void
-    addToListFromSearch?: (list: Tables<'lists'>, artist: SpotraneArtistDto, album: SpotraneAlbumDto) => void
+    addToVisibleList?: () => void
+    addToList: (list: Tables<'lists'>) => void
 }
 
 export const AlbumCard = ({
                               albumCardView,
-                              album,
-                              artist,
-                              list,
-                              saved,
                               saveAlbum,
                               deleteAlbumFromLibrary,
                               deleteAlbumFromList,
-                              addToListFromSearch,
+                              addToVisibleList,
+                              addToList
                           }: AlbumCardProps) => {
     const [listDialogOpen, setListDialogOpen] = useState<boolean>(false);
 
@@ -49,17 +43,17 @@ export const AlbumCard = ({
                     {`${albumCardView.artistName}`}
                 </Typography>
                 <Typography noWrap sx={{width: '175px'}} variant="subtitle1" color="text.secondary" component="div">
-                    {`${albumCardView?.releaseDate?.substr(0, 4)} ${album?.label}`}
+                    {`${albumCardView?.releaseDate?.substr(0, 4)} ${albumCardView?.label}`}
                 </Typography>
                 <Typography noWrap sx={{width: '175px'}} variant="subtitle1" color="text.secondary" component="div">
                     {`${albumCardView?.artistGenres}`}
                 </Typography>
             </CardContent>
-            <AlbumCardIcons albumCardView={albumCardView} album={album} artist={artist} list={list}
+            <AlbumCardIcons albumCardView={albumCardView}
                             saveAlbum={saveAlbum}
-                            saved={saved} deleteAlbumFromLibrary={deleteAlbumFromLibrary}
+                            deleteAlbumFromLibrary={deleteAlbumFromLibrary}
                             deleteAlbumFromList={deleteAlbumFromList}
-                            addToListFromSearch={addToListFromSearch}
+                            addToVisibleList={addToVisibleList}
                             toggleListDialog={toggleListDialog}/>
         </Box>
         <CardMedia
@@ -68,8 +62,8 @@ export const AlbumCard = ({
             image={albumCardView?.imageUri}
             alt="album cover"
         />
-        {listDialogOpen && albumCardView?.id &&
+        {listDialogOpen &&
             <AddToListDialog isOpen={true} handleAddToListDialogClose={handleAddToListDialogClose}
-                             albumId={albumCardView.id}/>}
+                             addToList={addToList}/>}
     </Card>)
 }
