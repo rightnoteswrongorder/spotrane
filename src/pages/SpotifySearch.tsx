@@ -8,10 +8,9 @@ import {
 import {SubmitHandler, useForm} from 'react-hook-form';
 import Grid from "@mui/material/Grid";
 import {AlbumCard} from "./components/AlbumCard.tsx";
-import { SpotraneAlbumCardView } from "../interfaces/SpotraneTypes.ts";
+import {SpotraneAlbumCard} from "../interfaces/SpotraneTypes.ts";
 import {SpotifyApiProxy} from "../api/spotify.ts";
 import {SupabaseApi} from "../api/supabase.ts";
-import {Tables} from "../interfaces/database.types.ts";
 
 interface IFormInput {
     searchText: string
@@ -19,24 +18,25 @@ interface IFormInput {
 
 type SpotifySearchProps = {
     sdk: SpotifyApi | null,
-    list?: Tables<'lists'>
+    listId?: number,
+    listVisible?: boolean
 }
-export default function SpotifySearch({sdk, list}: SpotifySearchProps) {
-    const [searchResults, setSearchResults] = useState<SpotraneAlbumCardView[]>([]);
+export default function SpotifySearch({sdk, listId, listVisible}: SpotifySearchProps) {
+    const [searchResults, setSearchResults] = useState<SpotraneAlbumCard[]>([]);
     const {register, handleSubmit} = useForm<IFormInput>()
 
-    const addToList = (albumCardView: SpotraneAlbumCardView) => {
-        return (list: Tables<'lists'>) => {
-            list && SupabaseApi.addToListFromSearch(list, albumCardView)
+    const addToList = (albumCardView: SpotraneAlbumCard) => {
+        return (listId: number) => {
+            listId && SupabaseApi.addToListFromSearch(listId, albumCardView)
         }
     }
 
-    const addToVisibleList = (albumCardView: SpotraneAlbumCardView, list?: Tables<'lists'>,) => {
+    const addToVisibleList = (albumCardView: SpotraneAlbumCard, listId?: number) => {
         return () => {
-            list && SupabaseApi.addToListFromSearch(list, albumCardView)
+            listId && SupabaseApi.addToListFromSearch(listId, albumCardView)
         }
     }
-    const saveAlbum = (albumCardView: SpotraneAlbumCardView) => {
+    const saveAlbum = (albumCardView: SpotraneAlbumCard) => {
         return () => {
             SupabaseApi.saveAlbum(albumCardView)
         }
@@ -62,7 +62,7 @@ export default function SpotifySearch({sdk, list}: SpotifySearchProps) {
                         artistName: artist?.name,
                         artistGenres: artist?.genres,
                         isSaved: isSaved
-                    } as SpotraneAlbumCardView
+                    } as SpotraneAlbumCard
                 })))
             }
         })();
@@ -84,9 +84,10 @@ export default function SpotifySearch({sdk, list}: SpotifySearchProps) {
                     <Grid container justifyContent="center" spacing={4}>
                         {searchResults.map((album) => (
                             <Grid item={true} key={album.id}><AlbumCard albumCardView={album}
-                                                                                  addToVisibleList={addToVisibleList(album, list)}
-                                                                                  addToList={addToList(album)}
-                                                                                  saveAlbum={saveAlbum(album)}
+                                                                        addToVisibleList={addToVisibleList(album, listId)}
+                                                                        listVisible={listVisible}
+                                                                        addToList={addToList(album)}
+                                                                        saveAlbum={saveAlbum(album)}
 
                             ></AlbumCard></Grid>
                         ))} </Grid>

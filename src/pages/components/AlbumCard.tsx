@@ -2,20 +2,21 @@ import {useState} from "react";
 import {Box, Card, CardContent, CardMedia, Typography} from "@mui/material";
 import {AlbumCardIcons} from "./AlbumCardIcons.tsx";
 import AddToListDialog from "./AddToListDialog.tsx";
-import {SpotraneAlbumCardView} from "../../interfaces/SpotraneTypes.ts";
-import {Tables} from "../../interfaces/database.types.ts";
+import {SpotraneAlbumCard} from "../../interfaces/SpotraneTypes.ts";
 
 type AlbumCardProps = {
-    albumCardView: SpotraneAlbumCardView
+    albumCardView: SpotraneAlbumCard
+    listVisible?: boolean,
     saveAlbum?: () => void
-    deleteAlbumFromLibrary?: (albumId: string) => void
-    deleteAlbumFromList?: (albumId: string) => void
+    deleteAlbumFromLibrary?: () => void
+    deleteAlbumFromList?: () => void
     addToVisibleList?: () => void
-    addToList: (list: Tables<'lists'>) => void
+    addToList: (listId: number) => void
 }
 
 export const AlbumCard = ({
                               albumCardView,
+                              listVisible,
                               saveAlbum,
                               deleteAlbumFromLibrary,
                               deleteAlbumFromList,
@@ -25,7 +26,6 @@ export const AlbumCard = ({
     const [listDialogOpen, setListDialogOpen] = useState<boolean>(false);
 
     const toggleListDialog = () => {
-        console.log(!listDialogOpen)
         setListDialogOpen(!listDialogOpen)
     }
 
@@ -50,6 +50,7 @@ export const AlbumCard = ({
                 </Typography>
             </CardContent>
             <AlbumCardIcons albumCardView={albumCardView}
+                            listVisible={listVisible}
                             saveAlbum={saveAlbum}
                             deleteAlbumFromLibrary={deleteAlbumFromLibrary}
                             deleteAlbumFromList={deleteAlbumFromList}

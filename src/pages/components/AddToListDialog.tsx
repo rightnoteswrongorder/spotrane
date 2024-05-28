@@ -14,7 +14,7 @@ import {useEffect} from "react";
 type AddToListDialogProps = {
     isOpen: boolean
     handleAddToListDialogClose: () => void
-    addToList: (list: Tables<'lists'>) => void
+    addToList: (listId: number) => void
 }
 
 export default function AddToListDialog({isOpen, handleAddToListDialogClose, addToList}: AddToListDialogProps) {
@@ -58,10 +58,9 @@ export default function AddToListDialog({isOpen, handleAddToListDialogClose, add
                 onClose={handleClose}
                 PaperProps={{
                     component: 'form',
-                    onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
-                        console.log(event)
+                    onSubmit: () => {
                         if(selectedList) {
-                            addToList(selectedList)
+                            addToList(selectedList.id)
                             handleClose()
                         }
                     },

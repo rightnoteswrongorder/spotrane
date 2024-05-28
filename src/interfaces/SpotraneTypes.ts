@@ -1,4 +1,4 @@
-export type SpotraneAlbumCardView = {
+export type SpotraneAlbumCard = {
     id: string;
     name: string;
     releaseDate: string;

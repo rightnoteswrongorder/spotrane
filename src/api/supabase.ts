@@ -1,6 +1,6 @@
 import supabase from "./supaBaseClient.ts";
 import {Tables} from "../interfaces/database.types.ts";
-import {SpotraneAlbumCardView} from "../interfaces/SpotraneTypes.ts";
+import {SpotraneAlbumCard} from "../interfaces/SpotraneTypes.ts";
 
 
 export const SupabaseApi = {
@@ -32,7 +32,7 @@ export const SupabaseApi = {
         })();
     },
 
-    upsertArtist: async (albumCardView: SpotraneAlbumCardView) => {
+    upsertArtist: async (albumCardView: SpotraneAlbumCard) => {
         await supabase.from('artists')
             .upsert([
                 {
@@ -43,7 +43,7 @@ export const SupabaseApi = {
             ], { onConflict: 'spotify_id'})
     },
 
-    upsertAlbum: async (albumCardView: SpotraneAlbumCardView) => {
+    upsertAlbum: async (albumCardView: SpotraneAlbumCard) => {
         console.log(albumCardView)
         await supabase.from('albums')
             .upsert([
@@ -77,7 +77,7 @@ export const SupabaseApi = {
         return data || []
     },
 
-    saveAlbum: (albumCardView: SpotraneAlbumCardView) => {
+    saveAlbum: (albumCardView: SpotraneAlbumCard) => {
         (async () => {
             await SupabaseApi.upsertArtist(albumCardView);
             await SupabaseApi.upsertAlbum(albumCardView)
@@ -107,14 +107,14 @@ export const SupabaseApi = {
         return data
     },
 
-    addToListFromSearch: (list: Tables<'lists'>, albumCardView: SpotraneAlbumCardView) => {
+    addToListFromSearch: (listId: number, albumCardView: SpotraneAlbumCard) => {
         (async () => {
             await SupabaseApi.upsertArtist(albumCardView)
             await SupabaseApi.upsertAlbum(albumCardView)
             await supabase
                 .from('list_entry')
                 .insert([
-                    { list_id: list.id, album_id: albumCardView.id },
+                    { list_id: listId, album_id: albumCardView.id },
                 ])
         })();
     },

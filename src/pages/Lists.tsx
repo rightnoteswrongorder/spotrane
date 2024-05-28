@@ -20,7 +20,7 @@ import {Scopes} from "@spotify/web-api-ts-sdk";
 import {useSpotify} from "../hooks/useSpotfy.ts";
 import supabase from "../api/supaBaseClient.ts";
 import {RealtimePostgresChangesPayload} from "@supabase/supabase-js";
-import {SpotraneAlbumCardView} from "../interfaces/SpotraneTypes.ts";
+import {SpotraneAlbumCard} from "../interfaces/SpotraneTypes.ts";
 
 interface IFormInput {
     listName: string
@@ -28,7 +28,7 @@ interface IFormInput {
 
 export default function Lists() {
 
-    const [albums, setAlbums] = useState<SpotraneAlbumCardView[]>([]);
+    const [albums, setAlbums] = useState<SpotraneAlbumCard[]>([]);
     const [selectedList, setSelectedList] = useState<Tables<'lists'>>()
     const [lists, setLists] = React.useState<(Tables<'lists'> | null)[]>([]);
     const nextId = useRef(0);
@@ -42,9 +42,9 @@ export default function Lists() {
         console.log("Websocket update from list entry update: " + data.list_id)
     }
 
-    const addToList = (albumCardView: SpotraneAlbumCardView) => {
-        return (list: Tables<'lists'>) => {
-            list && SupabaseApi.addToListFromSearch(list, albumCardView)
+    const addToList = (albumCardView: SpotraneAlbumCard) => {
+        return (listId: number) => {
+            SupabaseApi.addToListFromSearch(listId, albumCardView)
         }
     }
 
@@ -69,10 +69,12 @@ export default function Lists() {
     );
 
     const deleteAlbumFromList = (albumId: string) => {
-        if (selectedList) {
-            SupabaseApi.deleteAlbumFromList(selectedList, albumId)
-            const updated = albums?.filter(listAlbums => listAlbums.id != albumId)
-            setAlbums(updated)
+        return () => {
+            if (selectedList) {
+                SupabaseApi.deleteAlbumFromList(selectedList, albumId)
+                const updated = albums?.filter(listAlbums => listAlbums.id != albumId)
+                setAlbums(updated)
+            }
         }
     }
 
@@ -99,7 +101,7 @@ export default function Lists() {
                             imageUri: dbAlbum.image,
                             albumUri: dbAlbum.spotify_uri,
                             isSaved: true
-                        } as SpotraneAlbumCardView
+                        } as SpotraneAlbumCard
 
                     }))
                 }
@@ -111,6 +113,7 @@ export default function Lists() {
 
     const handleReset = () => {
         setAlbums([])
+        setSelectedList(undefined)
         reset()
         getAllLists()
     }
@@ -153,7 +156,7 @@ export default function Lists() {
                             onClose={handleClose}
                             fullWidth
                     >
-                        {selectedList && <SpotifySearch sdk={sdk} list={selectedList}/>}
+                        {selectedList && <SpotifySearch sdk={sdk} listId={selectedList.id} listVisible={true}/>}
                     </Dialog>
                     <form>
                         <Stack sx={{paddingLeft: 5, paddingRight: 5}} spacing={1}>
@@ -186,10 +189,10 @@ export default function Lists() {
                                     </FormControl>
                                 )}
                             />
-                            <Button variant='outlined' onClick={handleReset} color='secondary'>Reset</Button>
+                            <Button variant='outlined' disabled={!selectedList} onClick={handleReset} color='secondary'>Reset</Button>
                             <Button variant='outlined' onClick={handleCreateList} color='secondary'>Create New
                                 List</Button>
-                            <Button variant='outlined' onClick={onShowSpotifySearch} color='secondary'>Search
+                            <Button variant='outlined' disabled={!selectedList} onClick={onShowSpotifySearch} color='secondary'>Search
                                 Spotify</Button>
                             {listDialogOpen &&
                                 <CreateListDialog isOpen={true}
@@ -201,7 +204,7 @@ export default function Lists() {
                     <Grid container justifyContent="center" spacing={3}>
                         {albums?.map(album => (
                             <Grid key={nextId.current++} item={true}><AlbumCard albumCardView={album} addToList={addToList(album)}
-                                                                                deleteAlbumFromList={deleteAlbumFromList}/></Grid>))}
+                                                                                deleteAlbumFromList={deleteAlbumFromList(album.id)}/></Grid>))}
                     </Grid>
                 </Grid>
             </Grid>

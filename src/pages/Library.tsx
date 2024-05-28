@@ -13,14 +13,14 @@ import {SupabaseApi} from "../api/supabase.ts";
 import SpotifySearch from "./SpotifySearch.tsx";
 import Dialog from "@mui/material/Dialog";
 import {SpotifyApi} from "@spotify/web-api-ts-sdk";
-import {SpotraneAlbumCardView} from "../interfaces/SpotraneTypes.ts";
+import {SpotraneAlbumCard} from "../interfaces/SpotraneTypes.ts";
 
 interface IFormInput {
     searchText: string
 }
 
 export default function Library({sdk}: { sdk: SpotifyApi | null }) {
-    const [albums, setAlbums] = useState<SpotraneAlbumCardView[]>([]);
+    const [albums, setAlbums] = useState<SpotraneAlbumCard[]>([]);
     const [searchTotal, setSearchTotal] = useState<number>(0)
     const [totalAlbums, setTotalAlbums] = useState<number>(0)
     const nextId = useRef(0);
@@ -28,7 +28,7 @@ export default function Library({sdk}: { sdk: SpotifyApi | null }) {
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [showSearchSpotifyDialog, setShowSpotifyDialog] = useState(false)
 
-    const dbAlbumToSpotrane = (dbAlbums: Tables<'all_albums_view'>[]): SpotraneAlbumCardView[] => {
+    const spotraneAlbum = (dbAlbums: Tables<'all_albums_view'>[]): SpotraneAlbumCard[] => {
         return dbAlbums.map(dbAlbum => {
             return {
                 id: dbAlbum.spotify_id,
@@ -41,26 +41,28 @@ export default function Library({sdk}: { sdk: SpotifyApi | null }) {
                 imageUri: dbAlbum.image,
                 albumUri: dbAlbum.spotify_uri,
                 isSaved: true
-            } as SpotraneAlbumCardView
+            } as SpotraneAlbumCard
         })
     }
 
-    const addToList = (albumCardView: SpotraneAlbumCardView) => {
-        return (list: Tables<'lists'>) => {
-            list && SupabaseApi.addToListFromSearch(list, albumCardView)
+    const addToList = (albumCardView: SpotraneAlbumCard) => {
+        return (listId: number) => {
+            SupabaseApi.addToListFromSearch(listId, albumCardView)
         }
     }
 
     const deleteAlbumFromLibrary = (albumId: string) => {
-        SupabaseApi.deleteAlbum(albumId)
-        const updated = albums?.filter(libAlum => libAlum.id != albumId)
-        setAlbums(updated)
+        return () => {
+            SupabaseApi.deleteAlbum(albumId)
+            const updated = albums?.filter(libraryAlum => libraryAlum.id != albumId)
+            setAlbums(updated)
+        }
     }
 
     const allAlbums = (from: number, to: number) => {
         (async () => {
             const data = await SupabaseApi.getAllAlbums(from, to)
-            setAlbums(dbAlbumToSpotrane(data))
+            setAlbums(spotraneAlbum(data))
         })();
     }
 
@@ -107,7 +109,7 @@ export default function Library({sdk}: { sdk: SpotifyApi | null }) {
             const data = await SupabaseApi.searchAllAlbums(searchText);
             setPage(0)
             setSearchTotal(data.length)
-            setAlbums(dbAlbumToSpotrane(data))
+            setAlbums(spotraneAlbum(data))
         })();
     }
 
@@ -152,7 +154,7 @@ export default function Library({sdk}: { sdk: SpotifyApi | null }) {
                     <Grid container justifyContent="center" spacing={3}>
                         {albums?.map(album => (
                             <Grid key={nextId.current++} item={true}><AlbumCard albumCardView={album} addToList={addToList(album)}
-                                                                                deleteAlbumFromLibrary={deleteAlbumFromLibrary}/></Grid>))}
+                                                                                deleteAlbumFromLibrary={deleteAlbumFromLibrary(album.id)}/></Grid>))}
                     </Grid>
                 </Grid>
                 <Grid container justifyContent="right" spacing={2}>
