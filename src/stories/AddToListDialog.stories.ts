@@ -1,6 +1,5 @@
 import type {Meta, StoryObj} from "@storybook/react";
 import AddToListDialog from "../pages/components/AddToListDialog.tsx";
-import {SpotraneAlbum} from "../interfaces/SpotraneTypes.ts";
 
 const meta = {
     title: 'AddToListDialog',
@@ -20,22 +19,6 @@ export const Vanilla: Story = {
     args: {
         isOpen: true,
         handleAddToListDialogClose: noop,
-        album: {
-            id: '',
-            name: '',
-            artist: {
-                id: '',
-                name: '',
-                genres: []
-            },
-            artistId: '',
-            albumUri: '',
-            artistGenres: '',
-            artistName: '',
-            label: '',
-            releaseDate: '',
-            imageUri: '',
-            saved: false
-        } as SpotraneAlbum
+        addToList: noop,
     }
 };
