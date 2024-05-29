@@ -3,13 +3,10 @@ import {Scopes} from "@spotify/web-api-ts-sdk";
 import LoginForm from "./LoginForm.tsx";
 import Library from "./Library.tsx";
 import PageLoadSpinner from "./components/PageLoadSpinner.tsx";
-import {Session} from "@supabase/supabase-js";
+import {useSession} from "../providers/SessionProvider.tsx";
 
-type LandingProps = {
-    session: Session | undefined
-    loading: boolean
-}
-const Landing = ({session, loading} : LandingProps) => {
+const Landing = () => {
+    const {session, loading} = useSession()
 
     const sdk = useSpotify(
         import.meta.env.VITE_SPOTIFY_CLIENT_ID,

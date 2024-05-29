@@ -3,12 +3,11 @@ import MenuIcon from '@mui/icons-material/Menu';
 import {AccountCircle} from "@mui/icons-material";
 import React from "react";
 import {SupabaseApi} from "../../api/supabase.ts";
-import {Session} from "@supabase/supabase-js";
+import {useSession} from "../../providers/SessionProvider.tsx";
 
-type MenuBarProps = {
-    session: Session | undefined
-}
-const MenuBar = ({session} : MenuBarProps) => {
+const MenuBar = () => {
+    const session = useSession().session
+
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {

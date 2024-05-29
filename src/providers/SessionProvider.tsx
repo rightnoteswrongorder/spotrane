@@ -20,8 +20,11 @@ const SessionProvider: React.FC<Props> = ({children}) => {
     const [loading, isLoading] = useState<boolean>(true)
 
     useEffect(() => {
+        console.log('get auth')
         supabase.auth.getSession().then(({data: {session}}) => {
+            console.log('get auth 2')
             if (session) {
+                console.log(session)
                 setSession(session)
             } else {
                 console.log("no session found")

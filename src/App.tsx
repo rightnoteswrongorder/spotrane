@@ -1,7 +1,7 @@
 import {
     CssBaseline, StyledEngineProvider, ThemeProvider
 } from '@mui/material';
-import SessionProvider, {useSession} from "./providers/SessionProvider.tsx";
+import SessionProvider from "./providers/SessionProvider.tsx";
 import {createHashRouter, RouterProvider} from "react-router-dom";
 import Lists from "./pages/Lists.tsx";
 import theme from "./theme.ts";
@@ -10,18 +10,17 @@ import Layout from "./pages/Layout.tsx";
 
 const App = () => {
 
-    const {session, loading} = useSession()
 
     const router = createHashRouter(
         [
             {
-                element: <Layout session={session}/>,
+                element: <Layout/>,
                 children: [
-                    {path: "", element: <Landing loading={loading} session={session}/>}
+                    {path: "", element: <Landing/>}
                 ]
             },
             {
-                element: <Layout session={session}/>,
+                element: <Layout/>,
                 children: [
                     {path: "/lists", element: <Lists/>}
                 ]
