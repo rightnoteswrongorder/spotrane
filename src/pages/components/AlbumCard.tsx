@@ -1,8 +1,8 @@
 import {useState} from "react";
 import {Box, Card, CardContent, CardMedia, Typography} from "@mui/material";
-import {AlbumCardIcons} from "./AlbumCardIcons.tsx";
 import AddToListDialog from "./AddToListDialog.tsx";
-import {SpotraneAlbumCard} from "../../interfaces/SpotraneTypes.ts";
+import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
+import AlbumCardIcons from "./AlbumCardIcons.tsx";
 
 type AlbumCardProps = {
     albumCardView: SpotraneAlbumCard

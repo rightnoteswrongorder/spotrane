@@ -5,7 +5,7 @@ import {useSession} from "../../providers/SessionProvider.tsx";
 import React from "react";
 import {SupabaseApi} from "../../api/supabase.ts";
 
-export default function MenuBar() {
+const MenuBar = () => {
     const session = useSession().session
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
@@ -62,3 +62,5 @@ export default function MenuBar() {
         </Box>
     )
 }
+
+export default MenuBar

@@ -17,7 +17,7 @@ type AddToListDialogProps = {
     addToList: (listId: number) => void
 }
 
-export default function AddToListDialog({isOpen, handleAddToListDialogClose, addToList}: AddToListDialogProps) {
+const AddToListDialog = ({isOpen, handleAddToListDialogClose, addToList}: AddToListDialogProps) => {
 
     const [lists, setLists] = React.useState<(Tables<'lists'> | null)[]>([]);
     const [open, setOpen] = React.useState(false);
@@ -97,3 +97,5 @@ export default function AddToListDialog({isOpen, handleAddToListDialogClose, add
         </React.Fragment>
     );
 }
+
+export default AddToListDialog

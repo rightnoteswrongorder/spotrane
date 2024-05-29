@@ -3,7 +3,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
 import SpotifyIcon from "../../static/images/spotify.svg?react"
 import {PlaylistAdd, PlaylistAddCheck} from "@mui/icons-material";
-import {SpotraneAlbumCard} from "../../interfaces/SpotraneTypes.ts";
+import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
 
 type AlbumCardIconProps = {
     albumCardView: SpotraneAlbumCard
@@ -15,7 +15,7 @@ type AlbumCardIconProps = {
     toggleListDialog: () => void
 }
 
-export const AlbumCardIcons = ({
+const AlbumCardIcons = ({
                                    albumCardView,
                                    listVisible,
                                    saveAlbum,
@@ -71,3 +71,5 @@ export const AlbumCardIcons = ({
         </Box>
     )
 }
+
+export default AlbumCardIcons

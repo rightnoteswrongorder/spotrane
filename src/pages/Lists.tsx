@@ -1,4 +1,3 @@
-import MenuBar from "./components/MenuBar.tsx";
 import Grid from "@mui/material/Grid";
 import {
     Button,
@@ -15,18 +14,18 @@ import CreateListDialog from "./components/CreateListDialog.tsx";
 import {AlbumCard} from "./components/AlbumCard.tsx";
 import {SupabaseApi} from "../api/supabase.ts";
 import Dialog from "@mui/material/Dialog";
-import SpotifySearch from "./SpotifySearch.tsx";
+import SpotifySearchDialog from "./components/SpotifySearchDialog.tsx";
 import {Scopes} from "@spotify/web-api-ts-sdk";
 import {useSpotify} from "../hooks/useSpotfy.ts";
 import supabase from "../api/supaBaseClient.ts";
 import {RealtimePostgresChangesPayload} from "@supabase/supabase-js";
-import {SpotraneAlbumCard} from "../interfaces/SpotraneTypes.ts";
+import {SpotraneAlbumCard} from "../interfaces/spotrane.types.ts";
 
 interface IFormInput {
     listName: string
 }
 
-export default function Lists() {
+const Lists = () => {
 
     const [albums, setAlbums] = useState<SpotraneAlbumCard[]>([]);
     const [selectedList, setSelectedList] = useState<Tables<'lists'>>()
@@ -146,69 +145,68 @@ export default function Lists() {
     };
 
     return (
-        <div className="container" style={{padding: '0 0 100px 0'}}>
-            <Grid container spacing={2}>
-                <Grid xs={12} item={true}>
-                    <MenuBar/>
-                </Grid>
-                <Grid xs={12} item={true}>
-                    <Dialog open={showSearchSpotifyDialog}
-                            onClose={handleClose}
-                            fullWidth
-                    >
-                        {selectedList && <SpotifySearch sdk={sdk} listId={selectedList.id} listVisible={true}/>}
-                    </Dialog>
-                    <form>
-                        <Stack sx={{paddingLeft: 5, paddingRight: 5}} spacing={1}>
-                            <Controller
-                                control={control}
-                                name="listName"
-                                render={({field: {onChange, value}}) => (
-                                    <FormControl fullWidth>
-                                        <InputLabel id="demo-simple-select-label">List</InputLabel>
-                                        <Select
-                                            labelId="demo-simple-select-label"
-                                            id="demo-simple-select"
-                                            type="submit"
-                                            value={value ?? ""}
-                                            onChange={(e) => {
-                                                onChange(e)
-                                                runListLoad(e.target.value)
-                                            }}
-                                            label="List"
-                                        >
-                                            {
-                                                lists.map(item => {
-                                                    if (item && item.name) {
-                                                        return <MenuItem key={item.name}
-                                                                         value={item.name}>{item.name}</MenuItem>
-                                                    }
-                                                })
-                                            }
-                                        </Select>
-                                    </FormControl>
-                                )}
-                            />
-                            <Button variant='outlined' disabled={!selectedList} onClick={handleReset} color='secondary'>Reset</Button>
-                            <Button variant='outlined' onClick={handleCreateList} color='secondary'>Create New
-                                List</Button>
-                            <Button variant='outlined' disabled={!selectedList} onClick={onShowSpotifySearch} color='secondary'>Search
-                                Spotify</Button>
-                            {listDialogOpen &&
-                                <CreateListDialog isOpen={true}
-                                                  handleAddToListDialogClose={handleAddToListDialogClose}/>}
-                        </Stack>
-                    </form>
-                </Grid>
-                <Grid xs={12} item={true}>
-                    <Grid container justifyContent="center" spacing={3}>
-                        {albums?.map(album => (
-                            <Grid key={nextId.current++} item={true}><AlbumCard albumCardView={album} addToList={addToList(album)}
-                                                                                deleteAlbumFromList={deleteAlbumFromList(album.id)}/></Grid>))}
-                    </Grid>
+        <>
+            <Grid xs={12} item={true}>
+                <Dialog open={showSearchSpotifyDialog}
+                        onClose={handleClose}
+                        fullWidth
+                >
+                    {selectedList && <SpotifySearchDialog sdk={sdk} listId={selectedList.id} listVisible={true}/>}
+                </Dialog>
+                <form>
+                    <Stack sx={{paddingLeft: 5, paddingRight: 5}} spacing={1}>
+                        <Controller
+                            control={control}
+                            name="listName"
+                            render={({field: {onChange, value}}) => (
+                                <FormControl fullWidth>
+                                    <InputLabel id="demo-simple-select-label">List</InputLabel>
+                                    <Select
+                                        labelId="demo-simple-select-label"
+                                        id="demo-simple-select"
+                                        type="submit"
+                                        value={value ?? ""}
+                                        onChange={(e) => {
+                                            onChange(e)
+                                            runListLoad(e.target.value)
+                                        }}
+                                        label="List"
+                                    >
+                                        {
+                                            lists.map(item => {
+                                                if (item && item.name) {
+                                                    return <MenuItem key={item.name}
+                                                                     value={item.name}>{item.name}</MenuItem>
+                                                }
+                                            })
+                                        }
+                                    </Select>
+                                </FormControl>
+                            )}
+                        />
+                        <Button variant='outlined' disabled={!selectedList} onClick={handleReset}
+                                color='secondary'>Reset</Button>
+                        <Button variant='outlined' onClick={handleCreateList} color='secondary'>Create New
+                            List</Button>
+                        <Button variant='outlined' disabled={!selectedList} onClick={onShowSpotifySearch}
+                                color='secondary'>Search
+                            Spotify</Button>
+                        {listDialogOpen &&
+                            <CreateListDialog isOpen={true}
+                                              handleAddToListDialogClose={handleAddToListDialogClose}/>}
+                    </Stack>
+                </form>
+            </Grid>
+            <Grid xs={12} item={true} marginTop={2}>
+                <Grid container justifyContent="center" spacing={3}>
+                    {albums?.map(album => (
+                        <Grid key={nextId.current++} item={true}><AlbumCard albumCardView={album}
+                                                                            addToList={addToList(album)}
+                                                                            deleteAlbumFromList={deleteAlbumFromList(album.id)}/></Grid>))}
                 </Grid>
             </Grid>
-        </div>
+        </>
     )
 }
 
+export default Lists

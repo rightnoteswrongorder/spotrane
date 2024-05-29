@@ -14,7 +14,7 @@ const actions = [
     { icon: <ShareIcon />, name: 'Share' },
 ];
 
-export default function AlbumCardSpeedDial() {
+const AlbumCardSpeedDial = () => {
     return (
         <Box sx={{ height: 320, transform: 'translateZ(0px)', flexGrow: 1 }}>
             <SpeedDial
@@ -33,3 +33,5 @@ export default function AlbumCardSpeedDial() {
         </Box>
     );
 }
+
+export default AlbumCardSpeedDial

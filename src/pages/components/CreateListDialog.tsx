@@ -15,18 +15,18 @@ type AddToListDialogProps = {
     handleAddToListDialogClose: () => void
 }
 
-export default function CreateListDialog({isOpen, handleAddToListDialogClose}: AddToListDialogProps) {
+const CreateListDialog = ({isOpen, handleAddToListDialogClose}: AddToListDialogProps) => {
     const [open, setOpen] = React.useState(false);
 
     useEffect(() => {
         setOpen(isOpen)
-    }, []);
+    }, [])
 
 
     const handleClose = () => {
         setOpen(false);
         handleAddToListDialogClose();
-    };
+    }
 
     return (
         <React.Fragment>
@@ -70,3 +70,5 @@ export default function CreateListDialog({isOpen, handleAddToListDialogClose}: A
         </React.Fragment>
     );
 }
+
+export default CreateListDialog

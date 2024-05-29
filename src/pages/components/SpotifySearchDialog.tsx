@@ -7,10 +7,10 @@ import {
 } from '@mui/material';
 import {SubmitHandler, useForm} from 'react-hook-form';
 import Grid from "@mui/material/Grid";
-import {AlbumCard} from "./components/AlbumCard.tsx";
-import {SpotraneAlbumCard} from "../interfaces/SpotraneTypes.ts";
-import {SpotifyApiProxy} from "../api/spotify.ts";
-import {SupabaseApi} from "../api/supabase.ts";
+import {AlbumCard} from "./AlbumCard.tsx";
+import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
+import {SpotifyApiProxy} from "../../api/spotify.ts";
+import {SupabaseApi} from "../../api/supabase.ts";
 
 interface IFormInput {
     searchText: string
@@ -21,7 +21,8 @@ type SpotifySearchProps = {
     listId?: number,
     listVisible?: boolean
 }
-export default function SpotifySearch({sdk, listId, listVisible}: SpotifySearchProps) {
+
+const SpotifySearchDialog = ({sdk, listId, listVisible}: SpotifySearchProps) => {
     const [searchResults, setSearchResults] = useState<SpotraneAlbumCard[]>([]);
     const {register, handleSubmit} = useForm<IFormInput>()
 
@@ -36,6 +37,7 @@ export default function SpotifySearch({sdk, listId, listVisible}: SpotifySearchP
             listId && SupabaseApi.addToListFromSearch(listId, albumCardView)
         }
     }
+
     const saveAlbum = (albumCardView: SpotraneAlbumCard) => {
         return () => {
             SupabaseApi.saveAlbum(albumCardView)
@@ -96,3 +98,5 @@ export default function SpotifySearch({sdk, listId, listVisible}: SpotifySearchP
         </>
     )
 }
+
+export default SpotifySearchDialog

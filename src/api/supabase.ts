@@ -1,6 +1,6 @@
 import supabase from "./supaBaseClient.ts";
 import {Tables} from "../interfaces/database.types.ts";
-import {SpotraneAlbumCard} from "../interfaces/SpotraneTypes.ts";
+import {SpotraneAlbumCard} from "../interfaces/spotrane.types.ts";
 
 
 export const SupabaseApi = {

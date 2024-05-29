@@ -3,7 +3,7 @@ import supabase from "../api/supaBaseClient.ts";
 import {Avatar, Box, Button, TextField, Typography} from "@mui/material";
 import {LockOutlined} from "@mui/icons-material";
 
-export default function LoginForm() {
+const LoginForm =() => {
     const [loading, setLoading] = useState(false)
     const [email, setEmail] = useState('')
 
@@ -64,3 +64,5 @@ export default function LoginForm() {
         </Box>
     )
 }
+
+export default LoginForm

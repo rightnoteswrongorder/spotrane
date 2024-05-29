@@ -1,46 +1,43 @@
-import {useSpotify} from "./hooks/useSpotfy.ts";
-import {Scopes} from "@spotify/web-api-ts-sdk";
 import {
-    Box, CircularProgress
+    CssBaseline, StyledEngineProvider, ThemeProvider
 } from '@mui/material';
-import LoginForm from "./pages/LoginForm.tsx";
-import {useSession} from "./providers/SessionProvider.tsx";
-import Library from "./pages/Library.tsx";
+import SessionProvider from "./providers/SessionProvider.tsx";
+import {createHashRouter, RouterProvider} from "react-router-dom";
+import Lists from "./pages/Lists.tsx";
+import theme from "./theme.ts";
+import Landing from "./pages/Landing.tsx";
+import Layout from "./pages/Layout.tsx";
 
-function App() {
+const App = () => {
 
-    const {session, loading} = useSession()
+    const router = createHashRouter(
+        [
+            {
+                element: <Layout/>,
+                children: [
+                    {path: "", element: <Landing/>}
+                ]
+            },
+            {
+                element: <Layout/>,
+                children: [
+                    {path: "/lists", element: <Lists/>}
+                ]
+            }
 
-    const sdk = useSpotify(
-        import.meta.env.VITE_SPOTIFY_CLIENT_ID,
-        import.meta.env.VITE_REDIRECT_TARGET,
-        Scopes.all
-    );
-
-
-    let landing = <></>
-
-    if (loading) {
-        landing = <Box
-            sx={{
-                marginTop: 10,
-                width: '100%',
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-            }}
-        >
-            <CircularProgress/>
-        </Box>
-    } else {
-        landing = !session ? <LoginForm/> : <Box sx={{flexGrow: 1}}>
-            <Library sdk={sdk}/></Box>
-    }
+        ]
+    )
 
     return (
-        <div className="container" style={{padding: '0 0 100px 0'}}>
-            {landing}
-        </div>
+        <CssBaseline>
+            <StyledEngineProvider injectFirst>
+                <ThemeProvider theme={theme}>
+                    <SessionProvider>
+                        <RouterProvider router={router}/>
+                    </SessionProvider>
+                </ThemeProvider>
+            </StyledEngineProvider>
+        </CssBaseline>
     )
 }
 
