@@ -1,6 +1,7 @@
 import type {Preview} from "@storybook/react";
 import {ThemeProvider} from "@emotion/react";
 import theme from "../src/theme";
+import SessionProvider from "../src/stories/config/MockSessionProvider";
 
 const preview: Preview = {
     decorators: [
@@ -9,7 +10,9 @@ const preview: Preview = {
             console.log(parameters)
             return (
                 <ThemeProvider theme={theme}>
-                    <Story/>
+                    <SessionProvider>
+                        <Story/>
+                    </SessionProvider>
                 </ThemeProvider>
             );
         },

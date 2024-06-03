@@ -10,15 +10,22 @@ import {SubmitHandler, useForm} from "react-hook-form";
 import {AlbumCard} from "./components/AlbumCard.tsx";
 import {SupabaseApi} from "../api/supabase.ts";
 import SpotifySearchDialog from "./components/SpotifySearchDialog.tsx";
-import Dialog from "@mui/material/Dialog";
-import {SpotifyApi} from "@spotify/web-api-ts-sdk";
+import {Scopes} from "@spotify/web-api-ts-sdk";
 import {SpotraneAlbumCard} from "../interfaces/spotrane.types.ts";
+import AlertDialog from "./components/AlertDialog.tsx";
+import {useSpotify} from "../hooks/useSpotfy.ts";
 
 interface IFormInput {
     searchText: string
 }
 
-const Library = ({sdk}: { sdk: SpotifyApi | null }) => {
+const Library = () => {
+    const sdk = useSpotify(
+        import.meta.env.VITE_SPOTIFY_CLIENT_ID,
+        import.meta.env.VITE_REDIRECT_TARGET,
+        Scopes.all
+    );
+
     const [albums, setAlbums] = useState<SpotraneAlbumCard[]>([]);
     const [searchTotal, setSearchTotal] = useState<number>(0)
     const [totalAlbums, setTotalAlbums] = useState<number>(0)
@@ -26,6 +33,7 @@ const Library = ({sdk}: { sdk: SpotifyApi | null }) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [showSearchSpotifyDialog, setShowSpotifyDialog] = useState(false)
+    const [showCannotDeleteMessage, setShowCannotDeleteMessage] = useState("")
 
     const spotraneAlbum = (dbAlbums: Tables<'all_albums_view'>[]): SpotraneAlbumCard[] => {
         return dbAlbums.map(dbAlbum => {
@@ -51,11 +59,16 @@ const Library = ({sdk}: { sdk: SpotifyApi | null }) => {
     }
 
     const deleteAlbumFromLibrary = (albumId: string) => {
-        return () => {
-            SupabaseApi.deleteAlbum(albumId)
-            const updated = albums?.filter(libraryAlum => libraryAlum.id != albumId)
-            setAlbums(updated)
-        }
+        return (async () => {
+            const result = await SupabaseApi.deleteAlbum(albumId)
+            if (result.status == 409) {
+                const msg = "Cannot delete: " + result.error?.details
+                setShowCannotDeleteMessage(msg)
+            } else {
+                const updated = albums?.filter(libraryAlum => libraryAlum.id != albumId)
+                setAlbums(updated)
+            }
+        });
     }
 
     const allAlbums = (from: number, to: number) => {
@@ -93,7 +106,7 @@ const Library = ({sdk}: { sdk: SpotifyApi | null }) => {
         setPage(0);
     };
 
-    const {register, handleSubmit, reset} = useForm<IFormInput>()
+    const {register, handleSubmit, reset, getValues} = useForm<IFormInput>()
 
     const onReset = () => {
         reset();
@@ -127,12 +140,7 @@ const Library = ({sdk}: { sdk: SpotifyApi | null }) => {
     return (
         <>
             <Grid xs={12} item={true}>
-                <Dialog open={showSearchSpotifyDialog}
-                        onClose={handleClose}
-                        fullWidth
-                >
-                    <SpotifySearchDialog sdk={sdk}/>
-                </Dialog>
+                {showSearchSpotifyDialog && <SpotifySearchDialog isOpen={showSearchSpotifyDialog} sdk={sdk} handleClose={handleClose} startText={getValues("searchText")}/>}
                 <form>
                     <Stack sx={{paddingLeft: 5, paddingRight: 5}} spacing={1}>
                         <TextField variant='outlined' InputLabelProps={{shrink: true}} margin="dense"
@@ -163,6 +171,7 @@ const Library = ({sdk}: { sdk: SpotifyApi | null }) => {
                                                                        onRowsPerPageChange={handleChangeRowsPerPage}/> :
                     <Typography>Search Results: {searchTotal}</Typography>}</Grid>
             </Grid>
+            {showCannotDeleteMessage != "" && <AlertDialog message={showCannotDeleteMessage}/> }
         </>
     )
 }

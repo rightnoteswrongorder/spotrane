@@ -13,7 +13,6 @@ import * as React from "react";
 import CreateListDialog from "./components/CreateListDialog.tsx";
 import {AlbumCard} from "./components/AlbumCard.tsx";
 import {SupabaseApi} from "../api/supabase.ts";
-import Dialog from "@mui/material/Dialog";
 import SpotifySearchDialog from "./components/SpotifySearchDialog.tsx";
 import {Scopes} from "@spotify/web-api-ts-sdk";
 import {useSpotify} from "../hooks/useSpotfy.ts";
@@ -147,12 +146,9 @@ const Lists = () => {
     return (
         <>
             <Grid xs={12} item={true}>
-                <Dialog open={showSearchSpotifyDialog}
-                        onClose={handleClose}
-                        fullWidth
-                >
-                    {selectedList && <SpotifySearchDialog sdk={sdk} listId={selectedList.id} listVisible={true}/>}
-                </Dialog>
+                {selectedList && showSearchSpotifyDialog &&
+                    <SpotifySearchDialog sdk={sdk} isOpen={showSearchSpotifyDialog} handleClose={handleClose}
+                                         listId={selectedList.id} listVisible={true}/>}
                 <form>
                     <Stack sx={{paddingLeft: 5, paddingRight: 5}} spacing={1}>
                         <Controller

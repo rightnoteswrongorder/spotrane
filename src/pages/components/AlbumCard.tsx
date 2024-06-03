@@ -6,12 +6,12 @@ import AlbumCardIcons from "./AlbumCardIcons.tsx";
 
 type AlbumCardProps = {
     albumCardView: SpotraneAlbumCard
+    addToList: (listId: number) => void
     listVisible?: boolean,
     saveAlbum?: () => void
-    deleteAlbumFromLibrary?: () => void
+    deleteAlbumFromLibrary?: () => Promise<void>
     deleteAlbumFromList?: () => void
     addToVisibleList?: () => void
-    addToList: (listId: number) => void
 }
 
 export const AlbumCard = ({

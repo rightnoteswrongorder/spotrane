@@ -1,11 +1,10 @@
 import supabase from "./supaBaseClient.ts";
 import {Tables} from "../interfaces/database.types.ts";
-import {SpotraneAlbumCard} from "../interfaces/spotrane.types.ts";
-
+import {SpotraneAlbumCard, SupabaseSatusResponse} from "../interfaces/spotrane.types.ts";
 
 export const SupabaseApi = {
-    signOut: () => {
-        supabase.auth.signOut();
+    signOut: async () => {
+        await supabase.auth.signOut();
     },
 
     countAlbums: async (): Promise<number> => {
@@ -15,12 +14,10 @@ export const SupabaseApi = {
         return count || 0
     },
 
-    deleteAlbum: (albumId: string) => {
-        (async () => {
-            await supabase.from('albums')
-                .delete()
-                .eq('spotify_id', albumId)
-        })();
+    deleteAlbum: async (albumId: string):  Promise<SupabaseSatusResponse> => {
+        return supabase.from('albums')
+            .delete()
+            .eq('spotify_id', albumId);
     },
 
     deleteAlbumFromList: (list: Tables<'lists'>, albumId: string) => {

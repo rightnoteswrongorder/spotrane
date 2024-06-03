@@ -4,12 +4,12 @@ A pet project to make Spotify work for me...
 
 ## TODO:
 
-* Message user when attempting to delete from library when item is referenced on list
-* Focus cursor in input when spotify search launched
 * Toggle save button state when clicked in Spotify Search view
-* Loading state on spotify search
 * Dark Mode
-
+* Stories for main components
+* Handle 401s from supabase when jwt times out - do logout
+* Admin page (rename list, delete list etc - with protection)
+* Notes secion on album card (post it styled)
 
 
 ## React + TypeScript + Vite

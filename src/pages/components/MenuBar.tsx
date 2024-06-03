@@ -2,24 +2,31 @@ import {AppBar, Box, Button, IconButton, Link, Menu, MenuItem, Toolbar, Tooltip,
 import MenuIcon from '@mui/icons-material/Menu';
 import {AccountCircle} from "@mui/icons-material";
 import React from "react";
-import {SupabaseApi} from "../../api/supabase.ts";
 import {useSession} from "../../providers/SessionProvider.tsx";
 
-const MenuBar = () => {
+type MenuBarProps = {
+    logout: () => void
+}
+
+const MenuBar = ({logout} : MenuBarProps) => {
     const session = useSession().session
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
+
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
     };
+
     const handleClose = () => {
         setAnchorEl(null);
     };
+
     const handleLogout = () => {
-        SupabaseApi.signOut()
+        logout();
         setAnchorEl(null);
     };
+
     return (
         <Box sx={{flexGrow: 1}}>
             <AppBar position="static">

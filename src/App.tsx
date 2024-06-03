@@ -5,8 +5,9 @@ import SessionProvider from "./providers/SessionProvider.tsx";
 import {createHashRouter, RouterProvider} from "react-router-dom";
 import Lists from "./pages/Lists.tsx";
 import theme from "./theme.ts";
-import Landing from "./pages/Landing.tsx";
 import Layout from "./pages/Layout.tsx";
+import NoOp from "./pages/NoOp.tsx";
+import Library from "./pages/Library.tsx";
 
 const App = () => {
 
@@ -16,16 +17,17 @@ const App = () => {
             {
                 element: <Layout/>,
                 children: [
-                    {path: "", element: <Landing/>}
-                ]
+                    {path: "", element: <Library/>}
+                ],
+                errorElement: <NoOp/>
             },
             {
                 element: <Layout/>,
                 children: [
                     {path: "/lists", element: <Lists/>}
-                ]
+                ],
+                errorElement: <NoOp/>
             }
-
         ]
     )
 

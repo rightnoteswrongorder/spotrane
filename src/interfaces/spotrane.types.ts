@@ -10,3 +10,15 @@ export type SpotraneAlbumCard = {
     artistGenres: string[]
     isSaved: boolean
 }
+
+export type SupabaseError = {
+    details: string;
+    message: string;
+}
+
+export type SupabaseSatusResponse = {
+    error: SupabaseError | null,
+    status: number,
+    statusText: string
+
+}
