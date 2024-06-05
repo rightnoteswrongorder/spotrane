@@ -35,9 +35,7 @@ const Lists = () => {
 
 
     const handleDbChange = (payload: RealtimePostgresChangesPayload<Tables<'list_entry'>>) => {
-        const data = payload.new as Tables<'list_entry'>
         setWebSocketUpdate(payload.commit_timestamp)
-        console.log("Websocket update from list entry update: " + data.list_id)
     }
 
     const addToList = (albumCardView: SpotraneAlbumCard) => {
@@ -128,9 +126,7 @@ const Lists = () => {
 
     const runListLoad = (listName: string) => {
         const list = lists.find(list => list?.name == listName)
-        console.log(list)
         list && setSelectedList(list)
-        console.log(selectedList)
     }
 
     const onShowSpotifySearch = () => {

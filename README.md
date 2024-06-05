@@ -4,7 +4,6 @@ A pet project to make Spotify work for me...
 
 ## TODO:
 
-* Custom alert for magic link sending
 * Stories for main components
 * Handle 401s from supabase when jwt times out - do logout
 * Admin page (rename list, delete list etc - with protection)

@@ -4,7 +4,6 @@ import SaveIcon from "@mui/icons-material/Save";
 import SpotifyIcon from "../../static/images/spotify.svg?react"
 import {PlaylistAdd, PlaylistAddCheck} from "@mui/icons-material";
 import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
-import {useEffect} from "react";
 
 type AlbumCardIconProps = {
     albumCardView: SpotraneAlbumCard
@@ -46,9 +45,6 @@ const AlbumCardIcons = ({
         addToVisibleList && addToVisibleList()
     }
 
-    useEffect(() => {
-        console.log(albumCardView)
-    }, []);
     return (
         <Box sx={{display: 'flex', alignItems: 'center'}}>
             {(deleteAlbumFromLibrary || deleteAlbumFromList) &&

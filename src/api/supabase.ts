@@ -41,7 +41,6 @@ export const SupabaseApi = {
     },
 
     upsertAlbum: async (albumCardView: SpotraneAlbumCard) => {
-        console.log(albumCardView)
         await supabase.from('albums')
             .upsert([
                 {

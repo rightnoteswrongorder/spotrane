@@ -2,10 +2,12 @@ import React, {useState} from 'react'
 import supabase from "../api/supaBaseClient.ts";
 import {Avatar, Box, Button, TextField, Typography} from "@mui/material";
 import {LockOutlined} from "@mui/icons-material";
+import AlertDialog from "./components/AlertDialog.tsx";
 
 const LoginForm =() => {
     const [loading, setLoading] = useState(false)
     const [email, setEmail] = useState('')
+    const [message, setMessage] = useState('')
 
     const handleLogin = async (event: React.FormEvent) => {
         event.preventDefault()
@@ -18,11 +20,15 @@ const LoginForm =() => {
         })
 
         if (error) {
-            alert(error.message)
+            setMessage(error.message)
         } else {
-            alert('Check your email for the login link!')
+            setMessage('Check your email for the login link!')
         }
         setLoading(false)
+    }
+
+    const onClose = () => {
+        setMessage('')
     }
 
     return (
@@ -61,6 +67,7 @@ const LoginForm =() => {
                     Login
                 </Button>
             </Box>
+            {message != '' && <AlertDialog message={message} onClose={onClose}/>}
         </Box>
     )
 }

@@ -5,9 +5,8 @@ import SessionProvider from "../src/stories/config/MockSessionProvider";
 
 const preview: Preview = {
     decorators: [
-        (Story, {parameters}) => {
+        (Story) => {
             // 👇 Make it configurable by reading the theme value from parameters
-            console.log(parameters)
             return (
                 <ThemeProvider theme={theme}>
                     <SessionProvider>

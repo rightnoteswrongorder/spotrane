@@ -94,7 +94,7 @@ const Library = () => {
         event: MouseEvent<HTMLButtonElement> | null,
         newPage: number,
     ) => {
-        console.log(event?.target)
+        console.log(event)
         allAlbums(newPage * rowsPerPage, newPage * rowsPerPage + rowsPerPage)
         setPage(newPage);
     };

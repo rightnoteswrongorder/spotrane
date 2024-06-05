@@ -44,9 +44,7 @@ const SpotifySearchDialog = ({sdk, isOpen, handleClose, listId, listVisible, sta
     }, [websocketUpdate]);
 
     const handleDbChange = (payload: RealtimePostgresChangesPayload<Tables<'albums'>>) => {
-        const data = payload.new as Tables<'albums'>
         setWebSocketUpdate(payload.commit_timestamp)
-        console.log("Websocket update from album update: " + data.name)
     }
 
     const addToList = (albumCardView: SpotraneAlbumCard) => {

@@ -7,14 +7,16 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
 type alertProps = {
-    message: string
+    message: string,
+    onClose?: () => void
 }
 
-export default function AlertDialog({message}: alertProps) {
+export default function AlertDialog({message, onClose}: alertProps) {
     const [open, setOpen] = React.useState(true);
 
     const handleClose = () => {
         setOpen(false);
+        onClose && onClose();
     };
 
     return (
