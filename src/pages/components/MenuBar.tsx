@@ -98,7 +98,7 @@ const MenuBar = ({logout}: MenuBarProps) => {
                     </Box>
                     {session ?
                         <Box sx={{mt: 1}}><Tooltip title={session.user.email}><span><IconButton disabled><AccountCircle
-                            sx={{color: 'white'}}/></IconButton></span></Tooltip></Box> :
+                            sx={{color: theme.palette.mode === 'dark' ? 'white' : 'black'}}/></IconButton></span></Tooltip></Box> :
                         <Button color="inherit">Login</Button>}
                 </Toolbar>
             </AppBar>
