@@ -14,6 +14,9 @@ import {SupabaseApi} from "../../api/supabase.ts";
 import * as React from "react";
 import Dialog from "@mui/material/Dialog";
 import PageLoadSpinner from "./PageLoadSpinner.tsx";
+import {RealtimePostgresChangesPayload} from "@supabase/supabase-js";
+import {Tables} from "../../interfaces/database.types.ts";
+import supabase from "../../api/supaBaseClient.ts";
 
 interface IFormInput {
     searchText: string
@@ -34,6 +37,17 @@ const SpotifySearchDialog = ({sdk, isOpen, handleClose, listId, listVisible, sta
     const {register, handleSubmit, setValue} = useForm<IFormInput>()
     const [searchLoading, setSearchLoading] = useState(false)
 
+    const [websocketUpdate, setWebSocketUpdate] = useState("")
+
+    useEffect(() => {
+        handleSubmit(onSubmit)()
+    }, [websocketUpdate]);
+
+    const handleDbChange = (payload: RealtimePostgresChangesPayload<Tables<'albums'>>) => {
+        const data = payload.new as Tables<'albums'>
+        setWebSocketUpdate(payload.commit_timestamp)
+        console.log("Websocket update from album update: " + data.name)
+    }
 
     const addToList = (albumCardView: SpotraneAlbumCard) => {
         return (listId: number) => {
@@ -59,7 +73,14 @@ const SpotifySearchDialog = ({sdk, isOpen, handleClose, listId, listVisible, sta
     };
 
     useEffect(() => {
+        supabase.channel('albums').on<Tables<'albums'>>('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'albums'
+        }, handleDbChange).subscribe()
+
         setOpen(isOpen)
+
         if (startText && startText != "") {
             setValue("searchText", startText)
             handleSubmit(onSubmit)()

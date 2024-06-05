@@ -21,7 +21,7 @@ type MenuBarProps = {
     logout: () => void
 }
 
-const MenuBar = ({logout} : MenuBarProps) => {
+const MenuBar = ({logout}: MenuBarProps) => {
     const session = useSession().session
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -41,7 +41,7 @@ const MenuBar = ({logout} : MenuBarProps) => {
     };
 
     const theme = useTheme();
-    const { switchColorMode } = useContext(ThemeContext);
+    const {switchColorMode} = useContext(ThemeContext);
     const activateName = useMemo(
         () => (theme.palette.mode === "dark" ? "Light" : "Dark"),
         [theme]
@@ -82,21 +82,23 @@ const MenuBar = ({logout} : MenuBarProps) => {
                     }}>
                         spotrane
                     </Typography>
-                    <Box sx={{ mt:1}}>
+                    <Box sx={{mt: 1}}>
                         <Tooltip title={`Activate ${activateName} Mode`}>
                             <IconButton
                                 onClick={switchColorMode}
                                 color="inherit"
                             >
                                 {theme.palette.mode === "dark" ? (
-                                    <LightModeOutlined />
+                                    <LightModeOutlined/>
                                 ) : (
-                                    <DarkModeOutlined color="action" />
+                                    <DarkModeOutlined color="action"/>
                                 )}
                             </IconButton>
                         </Tooltip>
                     </Box>
-                    {session ? <Box sx={{mt: 1}} ><Tooltip title={session.user.email}><IconButton><AccountCircle/></IconButton></Tooltip></Box> :
+                    {session ?
+                        <Box sx={{mt: 1}}><Tooltip title={session.user.email}><span><IconButton disabled><AccountCircle
+                            sx={{color: 'white'}}/></IconButton></span></Tooltip></Box> :
                         <Button color="inherit">Login</Button>}
                 </Toolbar>
             </AppBar>
