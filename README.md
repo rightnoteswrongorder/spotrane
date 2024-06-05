@@ -5,7 +5,6 @@ A pet project to make Spotify work for me...
 ## TODO:
 
 * Toggle save button state when clicked in Spotify Search view
-* Dark Mode
 * Stories for main components
 * Handle 401s from supabase when jwt times out - do logout
 * Admin page (rename list, delete list etc - with protection)

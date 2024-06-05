@@ -1,13 +1,10 @@
-import {
-    CssBaseline, StyledEngineProvider, ThemeProvider
-} from '@mui/material';
 import SessionProvider from "./providers/SessionProvider.tsx";
 import {createHashRouter, RouterProvider} from "react-router-dom";
 import Lists from "./pages/Lists.tsx";
-import theme from "./theme.ts";
 import Layout from "./pages/Layout.tsx";
 import NoOp from "./pages/NoOp.tsx";
 import Library from "./pages/Library.tsx";
+
 
 const App = () => {
 
@@ -32,15 +29,9 @@ const App = () => {
     )
 
     return (
-        <CssBaseline>
-            <StyledEngineProvider injectFirst>
-                <ThemeProvider theme={theme}>
-                    <SessionProvider>
-                        <RouterProvider router={router}/>
-                    </SessionProvider>
-                </ThemeProvider>
-            </StyledEngineProvider>
-        </CssBaseline>
+        <SessionProvider>
+            <RouterProvider router={router}/>
+        </SessionProvider>
     )
 }
 

@@ -15,16 +15,17 @@ declare module '@mui/material/styles' {
         };
     }
 }
-const theme = createTheme({
+const baseTheme = createTheme({
     typography: {
-        fontFamily: 'Helvetica',
+        fontFamily: ['Nunito', 'serif'].join(','),
     },
     palette: {
+        mode: 'dark',
         primary: {
             main: '#1db954',
         },
         secondary: {
-            main: '#212121',
+            main: '#f50057',
         },
     },
     status: {
@@ -32,4 +33,4 @@ const theme = createTheme({
     },
 });
 
-export default theme;
+export default baseTheme;

@@ -1,8 +1,21 @@
-import {AppBar, Box, Button, IconButton, Link, Menu, MenuItem, Toolbar, Tooltip, Typography} from "@mui/material";
+import {
+    AppBar,
+    Box,
+    Button,
+    IconButton,
+    Link,
+    Menu,
+    MenuItem,
+    Toolbar,
+    Tooltip,
+    Typography,
+    useTheme
+} from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
-import {AccountCircle} from "@mui/icons-material";
-import React from "react";
+import {AccountCircle, DarkModeOutlined, LightModeOutlined} from "@mui/icons-material";
+import React, {useContext, useMemo} from "react";
 import {useSession} from "../../providers/SessionProvider.tsx";
+import {ThemeContext} from "../../providers/ThemeContextProvider.tsx";
 
 type MenuBarProps = {
     logout: () => void
@@ -26,6 +39,13 @@ const MenuBar = ({logout} : MenuBarProps) => {
         logout();
         setAnchorEl(null);
     };
+
+    const theme = useTheme();
+    const { switchColorMode } = useContext(ThemeContext);
+    const activateName = useMemo(
+        () => (theme.palette.mode === "dark" ? "Light" : "Dark"),
+        [theme]
+    );
 
     return (
         <Box sx={{flexGrow: 1}}>
@@ -54,16 +74,29 @@ const MenuBar = ({logout} : MenuBarProps) => {
                         <MenuItem component={Link} href='#lists'>My Lists</MenuItem>
                         <MenuItem onClick={handleLogout}>Logout</MenuItem>
                     </Menu>
-                    <Typography component="a" href='/spotrane' variant="h6" sx={{
+                    <Typography component="a" href='#' variant="h6" sx={{
                         flexGrow: 1,
-                        fontFamily: 'Helvetica',
                         fontWeight: 700,
                         color: 'inherit',
                         textDecoration: 'none',
                     }}>
                         spotrane
                     </Typography>
-                    {session ? <Box sx={{mt: 1}} ><Tooltip title={session.user.email}><AccountCircle/></Tooltip></Box> :
+                    <Box sx={{ mt:1}}>
+                        <Tooltip title={`Activate ${activateName} Mode`}>
+                            <IconButton
+                                onClick={switchColorMode}
+                                color="inherit"
+                            >
+                                {theme.palette.mode === "dark" ? (
+                                    <LightModeOutlined />
+                                ) : (
+                                    <DarkModeOutlined color="action" />
+                                )}
+                            </IconButton>
+                        </Tooltip>
+                    </Box>
+                    {session ? <Box sx={{mt: 1}} ><Tooltip title={session.user.email}><IconButton><AccountCircle/></IconButton></Tooltip></Box> :
                         <Button color="inherit">Login</Button>}
                 </Toolbar>
             </AppBar>

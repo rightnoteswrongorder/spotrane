@@ -27,7 +27,7 @@ export default function Layout() {
             <Grid xs={12} item={true}>
                 <MenuBar logout={logout}/>
             </Grid>
-            <Grid xs={12} item={true}>
+            <Grid xs={12} item={true} >
                 {outlet}
             </Grid>
         </Grid>

@@ -48,24 +48,24 @@ const AlbumCardIcons = ({
     return (
         <Box sx={{display: 'flex', alignItems: 'center'}}>
             {(deleteAlbumFromLibrary || deleteAlbumFromList) &&
-                <IconButton onClick={deleteClickHandler} sx={{color: albumCardView.isSaved ? 'red' : 'gray'}}
+                <IconButton onClick={deleteClickHandler} sx={{paddingTop: 0, paddingLeft: 0, color: albumCardView.isSaved ? (theme) => theme.palette.secondary.main : 'gray'}}
                             aria-label="unfollow">
                     <DeleteIcon></DeleteIcon>
                 </IconButton>}
             {saveAlbum && <IconButton onClick={saveClickHandler}
-                                      sx={{color: albumCardView.isSaved ? (theme) => theme.palette.primary.main : 'gray'}}
+                                      sx={{paddingTop: 0, color: albumCardView.isSaved ? (theme) => theme.palette.primary.main : 'gray'}}
                                       aria-label="save">
                 <SaveIcon></SaveIcon>
             </IconButton>}
-            {listVisible && addToVisibleList && <IconButton onClick={addToListHandler}
+            {listVisible && addToVisibleList && <IconButton sx={{paddingTop: 0}} onClick={addToListHandler}
                                       aria-label="add-to-list">
                 <PlaylistAddCheck></PlaylistAddCheck>
             </IconButton>}
-            <IconButton onClick={addToListClickHandler}
+            <IconButton sx={{paddingTop: 0}} onClick={addToListClickHandler}
                         aria-label="add-to-list">
                 <PlaylistAdd></PlaylistAdd>
             </IconButton>
-            <IconButton component={Link} href={albumCardView?.albumUri}>
+            <IconButton sx={{paddingTop: 0}} component={Link} href={albumCardView?.albumUri}>
                 <SvgIcon component={SpotifyIcon} inheritViewBox/>
             </IconButton>
         </Box>
