@@ -14,17 +14,17 @@ export const SupabaseApi = {
         return count || 0
     },
 
-    deleteAlbum: async (albumId: string):  Promise<SupabaseSatusResponse> => {
+    deleteAlbum: async (albumId: string): Promise<SupabaseSatusResponse> => {
         return supabase.from('albums')
             .delete()
             .eq('spotify_id', albumId);
     },
 
-    deleteAlbumFromList: (list: Tables<'lists'>, albumId: string) => {
+    deleteAlbumFromList: (listId: number, albumId: string) => {
         (async () => {
             await supabase.from('list_entry')
                 .delete()
-                .eq('list_id', list.id)
+                .eq('list_id', listId)
                 .eq('album_id', albumId)
         })();
     },
@@ -37,7 +37,7 @@ export const SupabaseApi = {
                     name: albumCardView.artistName,
                     genres: albumCardView.artistGenres,
                 }
-            ], { onConflict: 'spotify_id'})
+            ], {onConflict: 'spotify_id'})
     },
 
     upsertAlbum: async (albumCardView: SpotraneAlbumCard) => {
@@ -88,7 +88,7 @@ export const SupabaseApi = {
         return !!(data && data.length > 0)
     },
 
-    getAlbumsOnList: async (listName: string) : Promise<Tables<'albums_on_lists'>[] | null> => {
+    getAlbumsOnList: async (listName: string): Promise<Tables<'albums_on_lists'>[] | null> => {
         const {data} = await supabase
             .from('albums_on_lists')
             .select("*")
@@ -96,7 +96,7 @@ export const SupabaseApi = {
         return data
     },
 
-    getLists: async () : Promise<Tables<'lists'>[] | null> => {
+    getLists: async (): Promise<Tables<'lists'>[] | null> => {
         const {data} = await supabase
             .from('lists')
             .select('*')
@@ -110,19 +110,31 @@ export const SupabaseApi = {
             await supabase
                 .from('list_entry')
                 .insert([
-                    { list_id: listId, album_id: albumCardView.id },
+                    {list_id: listId, album_id: albumCardView.id},
                 ])
         })();
     },
 
-    createList: (listName: string) => {
-        (async () => {
-            await supabase
-                .from('lists')
-                .insert([
-                    {name: listName},
-                ])
-                .select()
-        })();
+    createList: async (listName: string) => {
+        await supabase
+            .from('lists')
+            .insert([
+                {name: listName},
+            ])
+            .select()
+    },
+
+    deleteList: async (listId: number) => {
+        await supabase
+            .from('lists')
+            .delete()
+            .eq('id', listId)
+    },
+
+    renameList: async (listId: number, newName: string) => {
+        await supabase
+            .from('lists')
+            .update({'name' : newName})
+            .eq('id', listId)
     }
 }

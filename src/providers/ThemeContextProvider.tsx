@@ -20,7 +20,7 @@ export const ThemeContext = createContext<ThemeContextType>({
 });
 
 export function ThemeContextProvider({children}: ThemeProviderProps) {
-    const [mode, setMode] = useState<"light" | "dark">("light");
+    const [mode, setMode] = useState<"light" | "dark">("dark");
 
     const switchColorMode = () => {
         setMode((prevMode) => (prevMode === "light" ? "dark" : "light"));

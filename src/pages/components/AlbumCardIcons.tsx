@@ -57,7 +57,7 @@ const AlbumCardIcons = ({
                                       aria-label="save">
                 <SaveIcon sx={{color: albumCardView.isSaved ? (theme) => theme.palette.primary.main : 'gray'}}></SaveIcon>
             </IconButton>}
-            {listVisible && addToVisibleList && <IconButton sx={{paddingTop: 0}} onClick={addToListHandler}
+            {listVisible && addToVisibleList && <IconButton onClick={addToListHandler}
                                       aria-label="add-to-list">
                 <PlaylistAddCheck></PlaylistAddCheck>
             </IconButton>}

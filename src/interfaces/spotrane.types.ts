@@ -22,3 +22,8 @@ export type SupabaseSatusResponse = {
     statusText: string
 
 }
+
+export type SpotraneList = {
+    id: number
+    name: string
+}

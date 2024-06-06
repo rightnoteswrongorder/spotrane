@@ -1,16 +1,9 @@
 import Grid from "@mui/material/Grid";
-import {
-    Button,
-    FormControl,
-    InputLabel, MenuItem,
-    Select,
-    Stack,
-} from "@mui/material";
+import {Button, FormControl, InputLabel, MenuItem, Select, Stack,} from "@mui/material";
+import * as React from "react";
 import {useEffect, useRef, useState} from "react";
 import {Tables} from "../interfaces/database.types.ts";
 import {Controller, useForm} from "react-hook-form";
-import * as React from "react";
-import CreateListDialog from "./components/CreateListDialog.tsx";
 import {AlbumCard} from "./components/AlbumCard.tsx";
 import {SupabaseApi} from "../api/supabase.ts";
 import SpotifySearchDialog from "./components/SpotifySearchDialog.tsx";
@@ -18,7 +11,8 @@ import {Scopes} from "@spotify/web-api-ts-sdk";
 import {useSpotify} from "../hooks/useSpotfy.ts";
 import supabase from "../api/supaBaseClient.ts";
 import {RealtimePostgresChangesPayload} from "@supabase/supabase-js";
-import {SpotraneAlbumCard} from "../interfaces/spotrane.types.ts";
+import {SpotraneAlbumCard, SpotraneList} from "../interfaces/spotrane.types.ts";
+import YesNoDialog from "./components/YesNoDialog.tsx";
 
 interface IFormInput {
     listName: string
@@ -27,15 +21,21 @@ interface IFormInput {
 const Lists = () => {
 
     const [albums, setAlbums] = useState<SpotraneAlbumCard[]>([]);
-    const [selectedList, setSelectedList] = useState<Tables<'lists'>>()
-    const [lists, setLists] = React.useState<(Tables<'lists'> | null)[]>([]);
+    const [selectedList, setSelectedList] = useState<SpotraneList>()
+    const [lists, setLists] = React.useState<SpotraneList[]>([]);
     const nextId = useRef(0);
     const [showSearchSpotifyDialog, setShowSpotifyDialog] = useState(false)
     const [websocketUpdate, setWebSocketUpdate] = useState("")
+    const [websocketListUpdate, setWebSocketListUpdate] = useState("")
 
 
     const handleDbChange = (payload: RealtimePostgresChangesPayload<Tables<'list_entry'>>) => {
         setWebSocketUpdate(payload.commit_timestamp)
+    }
+
+    const handleDbChangeToLists = (payload: RealtimePostgresChangesPayload<Tables<'lists'>>) => {
+        const list = payload.new as Tables<'lists'>
+        setWebSocketListUpdate(list.name ? list.name : "")
     }
 
     const addToList = (albumCardView: SpotraneAlbumCard) => {
@@ -51,8 +51,15 @@ const Lists = () => {
             table: 'list_entry'
         }, handleDbChange).subscribe()
 
+        supabase.channel('lists').on<Tables<'lists'>>('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'lists'
+        }, handleDbChangeToLists).subscribe()
+
         getAllLists()
-    }, []);
+    }, [websocketListUpdate]);
+
 
     useEffect(() => {
         albumsOnList()
@@ -67,19 +74,32 @@ const Lists = () => {
     const deleteAlbumFromList = (albumId: string) => {
         return () => {
             if (selectedList) {
-                SupabaseApi.deleteAlbumFromList(selectedList, albumId)
+                SupabaseApi.deleteAlbumFromList(selectedList.id, albumId)
                 const updated = albums?.filter(listAlbums => listAlbums.id != albumId)
                 setAlbums(updated)
             }
         }
     }
 
-    const getAllLists = () => {
-        (async () => {
-            const data = await SupabaseApi.getLists()
-            data && setLists(data)
-        })();
+    const getAllLists = async () => {
+        const data = await SupabaseApi.getLists()
+        const spotraneLists = data && data.map(dbList => {
+            return {
+                id: dbList.id,
+                name: dbList.name
+            } as SpotraneList
+        })
+
+        if(lists.length != 0) {
+            const res = spotraneLists?.find(list => newList(list.name))
+
+            res && setSelectedList(res)
+        }
+
+        spotraneLists && setLists(spotraneLists)
+
     }
+
 
     const albumsOnList = () => {
         (async () => {
@@ -107,21 +127,61 @@ const Lists = () => {
 
     const {control, reset} = useForm<IFormInput>()
 
+    const resetMe = () => {
+        handleReset();
+    }
+
     const handleReset = () => {
-        setAlbums([])
-        setSelectedList(undefined)
-        reset()
-        getAllLists()
+        (async () => {
+            setAlbums([])
+            setSelectedList(undefined)
+            reset()
+            await getAllLists()
+        })()
     }
 
     const [listDialogOpen, setListDialogOpen] = useState<boolean>(false);
+    const [deleteListDialogOpen, setDeleteListDialogOpen] = useState<boolean>(false);
+    const [renameListDialogOpen, setRenameListDialogOpen] = useState<boolean>(false);
 
     const handleCreateList = () => {
         setListDialogOpen(true)
     }
 
-    const handleAddToListDialogClose = () => {
+    const handleDeleteList = () => {
+        setDeleteListDialogOpen(true)
+    }
+
+    const createListSubmitEnabled = (data: string) => {
+        return newList(data) && data != ""
+    }
+
+    const deleteListSubmitEnabled = (data: string) => {
+        return !!(selectedList && data == selectedList?.name)
+    }
+
+    const handleDeleteListDialogClose = () => {
+        setDeleteListDialogOpen(false)
+    }
+
+    const handleCreateListDialogClose = () => {
         setListDialogOpen(false)
+    }
+
+    const renameListSubmitEnabled = (data: string) => {
+        return !!(selectedList && data != selectedList?.name) && newList(data) && data != ""
+    }
+
+    const newList = (listName: string) : boolean => {
+         return lists.map(list => list.name).find(list => list == listName) == undefined
+    }
+
+    const handleRenameList = () => {
+        setRenameListDialogOpen(true)
+    }
+
+    const handleRenameListDialogClose = () => {
+        setRenameListDialogOpen(false)
     }
 
     const runListLoad = (listName: string) => {
@@ -139,6 +199,43 @@ const Lists = () => {
         setShowSpotifyDialog(false);
     };
 
+    const createList = (name: string) => {
+        (async () => {
+            await SupabaseApi.createList(name)
+        })();
+    }
+
+    const createListDialogTitle = "Create List: "
+
+    const createListDialogSubTitle = "Enter a unique name..."
+
+    const deleteList = (name: string) => {
+        (async () => {
+            if (selectedList && name == selectedList.name) {
+                await SupabaseApi.deleteList(selectedList.id)
+            }
+            handleReset()
+        })();
+    }
+
+    const deleteListDialogTitle = "Delete List: "
+
+    const deleteListDialogSubTitle = "Enter name to confirm permanent deletion"
+
+    const renameList = (newName: string) => {
+        (async () => {
+            if (selectedList) {
+                await SupabaseApi.renameList(selectedList.id, newName)
+            }
+            handleReset()
+        })();
+    }
+
+    const renameListDialogTitle = "Rename List: "
+
+    const renameListDialogSubTitle = "Enter a unique new name..."
+
+
     return (
         <>
             <Grid xs={12} item={true}>
@@ -150,14 +247,14 @@ const Lists = () => {
                         <Controller
                             control={control}
                             name="listName"
-                            render={({field: {onChange, value}}) => (
+                            render={({field: {onChange}}) => (
                                 <FormControl fullWidth>
                                     <InputLabel id="demo-simple-select-label">List</InputLabel>
                                     <Select
                                         labelId="demo-simple-select-label"
                                         id="demo-simple-select"
                                         type="submit"
-                                        value={value ?? ""}
+                                        value={selectedList ? selectedList.name : ""}
                                         onChange={(e) => {
                                             onChange(e)
                                             runListLoad(e.target.value)
@@ -165,7 +262,9 @@ const Lists = () => {
                                         label="List"
                                     >
                                         {
-                                            lists.map(item => {
+                                            lists.sort((a, b) =>
+                                                a.name > b.name ? 1 : -1
+                                            ).map(item => {
                                                 if (item && item.name) {
                                                     return <MenuItem key={item.name}
                                                                      value={item.name}>{item.name}</MenuItem>
@@ -176,16 +275,32 @@ const Lists = () => {
                                 </FormControl>
                             )}
                         />
-                        <Button variant='outlined' disabled={!selectedList} onClick={handleReset}
+                        <Button variant='outlined' disabled={!selectedList} onClick={resetMe}
                                 color='secondary'>Reset</Button>
                         <Button variant='outlined' onClick={handleCreateList} color='secondary'>Create New
                             List</Button>
+                        <Button variant='outlined' disabled={!selectedList} onClick={handleDeleteList}
+                                color='secondary'>Delete List</Button>
+                        <Button variant='outlined' disabled={!selectedList} onClick={handleRenameList}
+                                color='secondary'>Rename List</Button>
                         <Button variant='outlined' disabled={!selectedList} onClick={onShowSpotifySearch}
                                 color='secondary'>Search
                             Spotify</Button>
                         {listDialogOpen &&
-                            <CreateListDialog isOpen={true}
-                                              handleAddToListDialogClose={handleAddToListDialogClose}/>}
+                            <YesNoDialog title={createListDialogTitle} label={"List name"} confirmButtonLabel={"Create"}
+                                         confirmEnabled={createListSubmitEnabled}
+                                         subTitle={createListDialogSubTitle} isOpen={true}
+                                         handleSubmit={createList} handleClose={handleCreateListDialogClose}/>}
+                        {deleteListDialogOpen && selectedList &&
+                            <YesNoDialog title={deleteListDialogTitle} label={"List name"} confirmButtonLabel={"Delete"}
+                                         confirmEnabled={deleteListSubmitEnabled}
+                                         subTitle={deleteListDialogSubTitle} isOpen={true}
+                                         handleSubmit={deleteList} handleClose={handleDeleteListDialogClose}/>}
+                        {renameListDialogOpen && selectedList &&
+                            <YesNoDialog title={renameListDialogTitle} label={"List name"} confirmButtonLabel={"Rename"}
+                                         confirmEnabled={renameListSubmitEnabled}
+                                         subTitle={renameListDialogSubTitle} isOpen={true}
+                                         handleSubmit={renameList} handleClose={handleRenameListDialogClose}/>}
                     </Stack>
                 </form>
             </Grid>
