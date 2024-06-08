@@ -160,7 +160,7 @@ const Library = () => {
                                                                             deleteAlbumFromLibrary={deleteAlbumFromLibrary(album.id)}/></Grid>))}
                 </Grid>
             </Grid>
-            <Grid container justifyContent="right" spacing={2}>
+            <Grid container justifyContent="right" spacing={2} marginTop={2}>
                 <Grid marginRight={5} item={true}>{searchTotal == 0 ? <TablePagination component='div'
                                                                        labelRowsPerPage="Results: "
                                                                        rowsPerPageOptions={[5, 10, 15, 20, 50, 100, 200, 300, 400]}
