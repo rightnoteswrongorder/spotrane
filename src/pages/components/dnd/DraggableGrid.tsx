@@ -19,82 +19,18 @@ import Item from "./Item.tsx";
 import SortableItem from "./SortableItem.tsx";
 import Grid from "@mui/material/Grid";
 import {Button, Stack} from "@mui/material";
-import {SpotraneAlbumCard} from "../../../interfaces/spotrane.types.ts";
-import {AlbumCard} from "../AlbumCard.tsx";
+import {ListEntry} from "./ListPlayground.tsx";
 
-export type TItem = {
-    id: number
-    imageUrl: string
+type DraggableGridProps = {
+    start: ListEntry[]
+    save: (entryId: number, position: number) => () => void
 }
 
-const createAlbumCard = (id: number, imageUri: string): SpotraneAlbumCard => {
-    return {
-        id: String(id),
-        name: "Timeless",
-        releaseDate: "01-01-1900",
-        imageUri: imageUri,
-        albumUri: "http://foo.png",
-        label: "ECM",
-        artistId: "1234",
-        artistName: "John Abercrombie",
-        artistGenres: ["jazz", "chamber", "european"],
-        isSaved: true
-    } as SpotraneAlbumCard
-}
-
-
-const defaultItems = [
-    {
-            id: 1,
-            imageUrl: `https://picsum.photos/id/2/300/200`
-    },
-    {
-        id: 2,
-            imageUrl: `https://picsum.photos/id/15/300/200`
-    },
-    {
-        id: 3,
-            imageUrl: `https://picsum.photos/id/20/300/200`
-    },
-    {
-        id: 4,
-            imageUrl: `https://picsum.photos/id/24/300/200`
-    },
-    {
-        id: 5,
-            imageUrl: `https://picsum.photos/id/13/300/200`
-    },
-    {
-        id: 6,
-            imageUrl: `https://picsum.photos/id/48/300/200`
-    },
-    {
-        id: 7,
-            imageUrl: `https://picsum.photos/id/40/300/200`
-    },
-    {
-        id: 8,
-        imageUrl: `https://picsum.photos/id/43/300/200`
-    },
-    {
-        id: 9,
-        imageUrl: `https://picsum.photos/id/46/300/200`
-    },
-    {
-        id: 10,
-        imageUrl: `https://picsum.photos/id/52/300/200`
-    },
-    {
-        id: 11,
-        imageUrl: `https://picsum.photos/id/60/300/200`
-    }
-]
-
-const DraggableGrid = () => {
-    const [items, setItems] = useState<TItem[]>(defaultItems)
+const DraggableGrid = ({start, save}: DraggableGridProps) => {
+    const [items, setItems] = useState<ListEntry[]>(start)
 
     // for drag overlay
-    const [activeItem, setActiveItem] = useState<TItem>()
+    const [activeItem, setActiveItem] = useState<ListEntry>()
 
     // for input methods detection
     const sensors = useSensors(useSensor(PointerSensor), useSensor(TouchSensor))
@@ -121,7 +57,7 @@ const DraggableGrid = () => {
         const overIndex = items.findIndex((item) => item.id === over.id)
 
         if (activeIndex !== overIndex) {
-            setItems((prev) => arrayMove<TItem>(prev, activeIndex, overIndex))
+            setItems((prev) => arrayMove<ListEntry>(prev, activeIndex, overIndex))
         }
         setActiveItem(undefined)
     }
@@ -131,8 +67,7 @@ const DraggableGrid = () => {
     }
 
     const handleButtonClick = () => {
-        const itemIds = items.map((item) => item.id)
-        alert(itemIds)
+        items.map((item, index) => save(item.id, index+1)())
     }
 
     return (
@@ -147,7 +82,8 @@ const DraggableGrid = () => {
                 <Grid marginBottom={2}>
                     <Grid container justifyContent="center" spacing={3}>
                         {items.map((item) => (
-                            <Grid item key={item.id}><SortableItem renderAlbumCard={() => <AlbumCard albumCardView={createAlbumCard(item?.id, item.imageUrl)} addToList={() => {}} />} key={item.id} itemId={item.id}/></Grid>
+                            <Grid item key={item.id}><SortableItem renderAlbumCard={item.item} key={item.id}
+                                                                   itemId={item.id}/></Grid>
                         ))}
                     </Grid>
                 </Grid>
@@ -157,7 +93,7 @@ const DraggableGrid = () => {
                 </Stack>
             </SortableContext>
             <DragOverlay adjustScale style={{transformOrigin: "0 0 "}}>
-                {activeItem ? <Item renderAlbumCard={() => <AlbumCard albumCardView={createAlbumCard(activeItem.id,activeItem?.imageUrl)} addToList={() => {}}/>} isDragging/> : null}
+                {activeItem ? <Item renderAlbumCard={activeItem.item} isDragging/> : null}
             </DragOverlay>
         </DndContext>
     )

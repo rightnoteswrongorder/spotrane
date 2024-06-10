@@ -4,7 +4,7 @@ import Lists from "./pages/Lists.tsx";
 import Layout from "./pages/Layout.tsx";
 import NoOp from "./pages/NoOp.tsx";
 import Library from "./pages/Library.tsx";
-import DraggableGrid from "./pages/components/dnd/DraggableGrid.tsx";
+import ListPlayground from "./pages/components/dnd/ListPlayground.tsx";
 
 
 const App = () => {
@@ -22,7 +22,7 @@ const App = () => {
             {
                 element: <Layout/>,
                 children: [
-                    {path: "/drag", element: <DraggableGrid/>}
+                    {path: "/drag", element: <ListPlayground/>}
                 ],
                 errorElement: <NoOp/>
             },
