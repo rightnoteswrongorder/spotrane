@@ -19,41 +19,57 @@ import Item from "./Item.tsx";
 import SortableItem from "./SortableItem.tsx";
 import Grid from "@mui/material/Grid";
 import {Button, Stack} from "@mui/material";
+import {SpotraneAlbumCard} from "../../../interfaces/spotrane.types.ts";
+import {AlbumCard} from "../AlbumCard.tsx";
 
 export type TItem = {
     id: number
     imageUrl: string
 }
 
+const createAlbumCard = (id: number, imageUri: string): SpotraneAlbumCard => {
+    return {
+        id: String(id),
+        name: "Timeless",
+        releaseDate: "01-01-1900",
+        imageUri: imageUri,
+        albumUri: "http://foo.png",
+        label: "ECM",
+        artistId: "1234",
+        artistName: "John Abercrombie",
+        artistGenres: ["jazz", "chamber", "european"],
+        isSaved: true
+    } as SpotraneAlbumCard
+}
 
 
 const defaultItems = [
     {
-            id: 2,
+            id: 1,
             imageUrl: `https://picsum.photos/id/2/300/200`
     },
     {
-        id: 15,
+        id: 2,
             imageUrl: `https://picsum.photos/id/15/300/200`
     },
     {
-        id: 20,
+        id: 3,
             imageUrl: `https://picsum.photos/id/20/300/200`
     },
     {
-        id: 24,
+        id: 4,
             imageUrl: `https://picsum.photos/id/24/300/200`
     },
     {
-        id: 32,
+        id: 5,
             imageUrl: `https://picsum.photos/id/13/300/200`
     },
     {
-        id: 35,
+        id: 6,
             imageUrl: `https://picsum.photos/id/48/300/200`
     },
     {
-        id: 39,
+        id: 7,
             imageUrl: `https://picsum.photos/id/40/300/200`
     },
     {
@@ -131,7 +147,7 @@ const DraggableGrid = () => {
                 <Grid marginBottom={2}>
                     <Grid container justifyContent="center" spacing={3}>
                         {items.map((item) => (
-                            <Grid item key={item.id}><SortableItem key={item.id} item={item}/></Grid>
+                            <Grid item key={item.id}><SortableItem renderAlbumCard={() => <AlbumCard albumCardView={createAlbumCard(item?.id, item.imageUrl)} addToList={() => {}} />} key={item.id} itemId={item.id}/></Grid>
                         ))}
                     </Grid>
                 </Grid>
@@ -141,7 +157,7 @@ const DraggableGrid = () => {
                 </Stack>
             </SortableContext>
             <DragOverlay adjustScale style={{transformOrigin: "0 0 "}}>
-                {activeItem ? <Item item={activeItem} isDragging/> : null}
+                {activeItem ? <Item renderAlbumCard={() => <AlbumCard albumCardView={createAlbumCard(activeItem.id,activeItem?.imageUrl)} addToList={() => {}}/>} isDragging/> : null}
             </DragOverlay>
         </DndContext>
     )

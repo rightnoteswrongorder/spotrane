@@ -4,7 +4,7 @@ import AddToListDialog from "./AddToListDialog.tsx";
 import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
 import AlbumCardIcons from "./AlbumCardIcons.tsx";
 
-type AlbumCardProps = {
+export type AlbumCardProps = {
     albumCardView: SpotraneAlbumCard
     addToList: (listId: number) => void
     listVisible?: boolean,

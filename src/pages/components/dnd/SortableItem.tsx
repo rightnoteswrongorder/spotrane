@@ -1,16 +1,17 @@
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import Item from "./Item"
-import { HTMLAttributes } from "react"
-import {TItem} from "./DraggableGrid.tsx";
+import {HTMLAttributes, ReactElement} from "react"
+import {AlbumCardProps} from "../AlbumCard.tsx";
 
 type Props = {
-    item: TItem
+    renderAlbumCard: () => ReactElement<AlbumCardProps>
+    itemId: number
 } & HTMLAttributes<HTMLDivElement>
 
-const SortableItem = ({ item, ...props }: Props) => {
+const SortableItem = ({ itemId, renderAlbumCard, ...props }: Props) => {
     const { attributes, isDragging, listeners, setNodeRef, transform, transition } = useSortable({
-        id: item.id,
+        id: itemId,
     })
 
     const styles = {
@@ -20,7 +21,7 @@ const SortableItem = ({ item, ...props }: Props) => {
 
     return (
         <Item
-            item={item}
+            renderAlbumCard={renderAlbumCard}
             ref={setNodeRef}
             style={styles}
             isOpacityEnabled={isDragging}
