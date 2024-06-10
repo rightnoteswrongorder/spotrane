@@ -136,5 +136,12 @@ export const SupabaseApi = {
             .from('lists')
             .update({'name' : newName})
             .eq('id', listId)
+    },
+
+    updateListEntryPriority: async (listEntryId: number, newPosition: number) => {
+        await supabase
+            .from('list_entry')
+            .update({'position' : newPosition})
+            .eq('id', listEntryId)
     }
 }

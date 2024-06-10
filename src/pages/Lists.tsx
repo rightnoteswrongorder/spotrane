@@ -135,7 +135,7 @@ const Lists = () => {
                                                      deleteAlbumFromList={deleteAlbumFromList(album.id)}/>
                         } as ListEntry;
 
-                    }))
+                    }).sort((a, b) => a.position > b.position ? 1 : -1))
                 }
             }
         )();
@@ -253,8 +253,8 @@ const Lists = () => {
 
 
     const saveListEntry = (entryId: number, position: number) => {
-        return () => {
-            console.log('list entry with id ' + entryId + ' update to position ' + position);
+        return async () => {
+            await SupabaseApi.updateListEntryPriority(entryId, position)
         }
 
     }
