@@ -97,18 +97,21 @@ export type Database = {
           created_at: string
           id: number
           list_id: number | null
+          position: number | null
         }
         Insert: {
           album_id?: string | null
           created_at?: string
           id?: number
           list_id?: number | null
+          position?: number | null
         }
         Update: {
           album_id?: string | null
           created_at?: string
           id?: number
           list_id?: number | null
+          position?: number | null
         }
         Relationships: [
           {
@@ -145,17 +148,17 @@ export type Database = {
         Row: {
           created_at: string
           id: number
-          name: string | null
+          name: string
         }
         Insert: {
           created_at?: string
           id?: number
-          name?: string | null
+          name: string
         }
         Update: {
           created_at?: string
           id?: number
-          name?: string | null
+          name?: string
         }
         Relationships: []
       }
@@ -204,6 +207,8 @@ export type Database = {
           artist_spotify_id: string | null
           image: string | null
           label: string | null
+          list_entry_id: number | null
+          list_entry_position: number | null
           list_name: string | null
           name: string | null
           release_date: string | null

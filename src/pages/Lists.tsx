@@ -1,10 +1,10 @@
 import Grid from "@mui/material/Grid";
 import {Button, FormControl, InputLabel, MenuItem, Select, Stack,} from "@mui/material";
 import * as React from "react";
-import {useEffect, useRef, useState} from "react";
+import {ReactElement, useEffect, useState} from "react";
 import {Tables} from "../interfaces/database.types.ts";
 import {Controller, useForm} from "react-hook-form";
-import {AlbumCard} from "./components/AlbumCard.tsx";
+import {AlbumCard, AlbumCardProps} from "./components/AlbumCard.tsx";
 import {SupabaseApi} from "../api/supabase.ts";
 import SpotifySearchDialog from "./components/SpotifySearchDialog.tsx";
 import {Scopes} from "@spotify/web-api-ts-sdk";
@@ -13,17 +13,24 @@ import supabase from "../api/supaBaseClient.ts";
 import {RealtimePostgresChangesPayload} from "@supabase/supabase-js";
 import {SpotraneAlbumCard, SpotraneList} from "../interfaces/spotrane.types.ts";
 import YesNoDialog from "./components/YesNoDialog.tsx";
+import DraggableGrid from "./components/dnd/DraggableGrid.tsx";
 
 interface IFormInput {
     listName: string
 }
 
+export type ListEntry = {
+    item: SpotraneAlbumCard
+    id: number
+    position: number
+    render: () => ReactElement<AlbumCardProps>
+
+}
 const Lists = () => {
 
-    const [albums, setAlbums] = useState<SpotraneAlbumCard[]>([]);
+    const [albums, setAlbums] = useState<ListEntry[]>([]);
     const [selectedList, setSelectedList] = useState<SpotraneList>()
     const [lists, setLists] = React.useState<SpotraneList[]>([]);
-    const nextId = useRef(0);
     const [showSearchSpotifyDialog, setShowSpotifyDialog] = useState(false)
     const [websocketUpdate, setWebSocketUpdate] = useState("")
     const [websocketListUpdate, setWebSocketListUpdate] = useState("")
@@ -75,7 +82,7 @@ const Lists = () => {
         return () => {
             if (selectedList) {
                 SupabaseApi.deleteAlbumFromList(selectedList.id, albumId)
-                const updated = albums?.filter(listAlbums => listAlbums.id != albumId)
+                const updated = albums?.filter(listAlbums => listAlbums.item.id != albumId)
                 setAlbums(updated)
             }
         }
@@ -90,7 +97,7 @@ const Lists = () => {
             } as SpotraneList
         })
 
-        if(lists.length != 0) {
+        if (lists.length != 0) {
             const res = spotraneLists?.find(list => newList(list.name))
 
             res && setSelectedList(res)
@@ -106,7 +113,7 @@ const Lists = () => {
                 if (selectedList && selectedList.name) {
                     const tryme = await SupabaseApi.getAlbumsOnList(selectedList?.name)
                     tryme && setAlbums(tryme.map((dbAlbum) => {
-                        return {
+                        const album = {
                             id: dbAlbum.spotify_id,
                             name: dbAlbum.name,
                             artistId: dbAlbum.artist_spotify_id,
@@ -118,6 +125,15 @@ const Lists = () => {
                             albumUri: dbAlbum.spotify_uri,
                             isSaved: true
                         } as SpotraneAlbumCard
+
+                        return {
+                            item: album,
+                            id: dbAlbum.list_entry_id,
+                            position: dbAlbum.list_entry_position,
+                            render: () => <AlbumCard albumCardView={album}
+                                                     addToList={addToList(album)}
+                                                     deleteAlbumFromList={deleteAlbumFromList(album.id)}/>
+                        } as ListEntry;
 
                     }))
                 }
@@ -172,8 +188,8 @@ const Lists = () => {
         return !!(selectedList && data != selectedList?.name) && newList(data) && data != ""
     }
 
-    const newList = (listName: string) : boolean => {
-         return lists.map(list => list.name).find(list => list == listName) == undefined
+    const newList = (listName: string): boolean => {
+        return lists.map(list => list.name).find(list => list == listName) == undefined
     }
 
     const handleRenameList = () => {
@@ -236,6 +252,13 @@ const Lists = () => {
     const renameListDialogSubTitle = "Enter a unique new name..."
 
 
+    const saveListEntry = (entryId: number, position: number) => {
+        return () => {
+            console.log('list entry with id ' + entryId + ' update to position ' + position);
+        }
+
+    }
+
     return (
         <>
             <Grid xs={12} item={true}>
@@ -243,7 +266,7 @@ const Lists = () => {
                     <SpotifySearchDialog sdk={sdk} isOpen={showSearchSpotifyDialog} handleClose={handleClose}
                                          listId={selectedList.id} listVisible={true}/>}
                 <form>
-                    <Stack sx={{paddingLeft: 5, paddingRight: 5}} spacing={1}>
+                    <Stack sx={{paddingLeft: 5, paddingRight: 5}} spacing={1} marginBottom={2}>
                         <Controller
                             control={control}
                             name="listName"
@@ -304,14 +327,7 @@ const Lists = () => {
                     </Stack>
                 </form>
             </Grid>
-            <Grid xs={12} item={true} marginTop={2}>
-                <Grid container justifyContent="center" spacing={3}>
-                    {albums?.map(album => (
-                        <Grid key={nextId.current++} item={true}><AlbumCard albumCardView={album}
-                                                                            addToList={addToList(album)}
-                                                                            deleteAlbumFromList={deleteAlbumFromList(album.id)}/></Grid>))}
-                </Grid>
-            </Grid>
+            <DraggableGrid start={albums} save={saveListEntry}/>
         </>
     )
 }

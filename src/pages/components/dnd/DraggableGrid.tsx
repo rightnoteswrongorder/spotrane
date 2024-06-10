@@ -1,4 +1,4 @@
-import {useState} from "react"
+import {useEffect, useState} from "react"
 import {
     DndContext,
     DragOverlay,
@@ -19,7 +19,7 @@ import Item from "./Item.tsx";
 import SortableItem from "./SortableItem.tsx";
 import Grid from "@mui/material/Grid";
 import {Button, Stack} from "@mui/material";
-import {ListEntry} from "./ListPlayground.tsx";
+import {ListEntry} from "../../Lists.tsx";
 
 type DraggableGridProps = {
     start: ListEntry[]
@@ -27,7 +27,11 @@ type DraggableGridProps = {
 }
 
 const DraggableGrid = ({start, save}: DraggableGridProps) => {
-    const [items, setItems] = useState<ListEntry[]>(start)
+    const [items, setItems] = useState<ListEntry[]>([])
+
+    useEffect(() => {
+        setItems(start)
+    }, [start]);
 
     // for drag overlay
     const [activeItem, setActiveItem] = useState<ListEntry>()
@@ -82,7 +86,7 @@ const DraggableGrid = ({start, save}: DraggableGridProps) => {
                 <Grid marginBottom={2}>
                     <Grid container justifyContent="center" spacing={3}>
                         {items.map((item) => (
-                            <Grid item key={item.id}><SortableItem renderAlbumCard={item.item} key={item.id}
+                            <Grid item key={item.id}><SortableItem renderAlbumCard={item.render} key={item.id}
                                                                    itemId={item.id}/></Grid>
                         ))}
                     </Grid>
@@ -93,7 +97,7 @@ const DraggableGrid = ({start, save}: DraggableGridProps) => {
                 </Stack>
             </SortableContext>
             <DragOverlay adjustScale style={{transformOrigin: "0 0 "}}>
-                {activeItem ? <Item renderAlbumCard={activeItem.item} isDragging/> : null}
+                {activeItem ? <Item renderAlbumCard={activeItem.render} isDragging/> : null}
             </DragOverlay>
         </DndContext>
     )

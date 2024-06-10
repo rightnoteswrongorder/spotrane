@@ -1,13 +1,7 @@
 import DraggableGrid from "./DraggableGrid.tsx";
 import {SpotraneAlbumCard} from "../../../interfaces/spotrane.types.ts";
-import {AlbumCard, AlbumCardProps} from "../AlbumCard.tsx";
-import {ReactElement} from "react";
+import {AlbumCard} from "../AlbumCard.tsx";
 
-export type ListEntry = {
-    id: number
-    position: number
-    item: () => ReactElement<AlbumCardProps>
-}
 
 const createAlbumCard = (id: number, imageUri: string): SpotraneAlbumCard => {
     return {
@@ -31,27 +25,18 @@ const saveListEntry = (entryId: number, position: number) => {
 
 }
 
-
 const defaultItems = [
     {
         id: 10,
+        item: createAlbumCard(100, `https://picsum.photos/id/2/300/200`),
         position: 1,
-        item: () => <AlbumCard albumCardView={createAlbumCard(100, `https://picsum.photos/id/2/300/200`)} addToList={() => {}}/>
+        render: () => <AlbumCard albumCardView={createAlbumCard(100, `https://picsum.photos/id/2/300/200`)} addToList={() => {}}/>
     },
     {
         id: 20,
+        item: createAlbumCard(200, `https://picsum.photos/id/15/300/200`),
         position: 2,
-        item: () => <AlbumCard albumCardView={createAlbumCard(200, `https://picsum.photos/id/15/300/200`)} addToList={() => {}}/>
-    },
-    {
-        id: 30,
-        position: 3,
-        item: () => <AlbumCard albumCardView={createAlbumCard(300, `https://picsum.photos/id/50/300/200`)} addToList={() => {}}/>
-    },
-    {
-        id: 40,
-        position: 4,
-        item: () => <AlbumCard albumCardView={createAlbumCard(400, `https://picsum.photos/id/26/300/200`)} addToList={() => {}}/>
+        render: () => <AlbumCard albumCardView={createAlbumCard(200, `https://picsum.photos/id/15/300/200`)} addToList={() => {}}/>
     },
 ]
 
