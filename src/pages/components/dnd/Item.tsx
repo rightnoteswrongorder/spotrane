@@ -1,5 +1,8 @@
-import { CSSProperties, forwardRef, HTMLAttributes } from "react"
+import {CSSProperties, forwardRef, HTMLAttributes} from "react"
 import {TItem} from "./DraggableGrid.tsx";
+import {SpotraneAlbumCard} from "../../../interfaces/spotrane.types.ts";
+import {AlbumCard} from "../AlbumCard.tsx";
+import {Box} from "@mui/material";
 
 type Props = {
     item: TItem
@@ -7,8 +10,24 @@ type Props = {
     isDragging?: boolean
 } & HTMLAttributes<HTMLDivElement>
 
+
+const createAlbumCard = (imageUri: string): SpotraneAlbumCard => {
+    return {
+        id: "1234",
+        name: "Timeless",
+        releaseDate: "01-01-1900",
+        imageUri: imageUri,
+        albumUri: "http://foo.png",
+        label: "ECM",
+        artistId: "1234",
+        artistName: "John Abercrombie",
+        artistGenres: ["jazz", "chamber", "european"],
+        isSaved: true
+    } as SpotraneAlbumCard
+}
+
 const Item = forwardRef<HTMLDivElement, Props>(
-    ({ item, isOpacityEnabled, isDragging, style, ...props }, ref) => {
+    ({item, isOpacityEnabled, isDragging, style, ...props}, ref) => {
         const styles: CSSProperties = {
             opacity: isOpacityEnabled ? "0.4" : "1",
             cursor: isDragging ? "grabbing" : "grab",
@@ -18,20 +37,11 @@ const Item = forwardRef<HTMLDivElement, Props>(
         }
 
         return (
-            <div ref={ref} style={styles} {...props}>
-                <img
-                    src={item.imageUrl}
-                    alt={`${item.id}`}
-                    style={{
-                        borderRadius: "8px",
-                        boxShadow: isDragging
-                            ? "none"
-                            : "rgb(63 63 68 / 5%) 0px 0px 0px 1px, rgb(34 33 81 / 15%) 0px 1px 3px 0px",
-                        maxWidth: "100%",
-                        objectFit: "cover"
-                    }}
-                />
-            </div>
+            <Box ref={ref} sx={styles} {...props}>
+                <Box sx={{boxShadow: isDragging ? 0 : 2}}>
+                    <AlbumCard albumCardView={createAlbumCard(item.imageUrl)} addToList={() => { }}/>
+                </Box>
+            </Box>
         )
     }
 )

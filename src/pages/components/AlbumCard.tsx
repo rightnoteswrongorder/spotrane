@@ -33,7 +33,7 @@ export const AlbumCard = ({
         setListDialogOpen(false)
     }
 
-    return (<Card sx={{height: '170px', padding: 0.6, display: 'inline-flex'}}>
+    return (<Card sx={{height: '170px', padding: 0.6, display: 'inline-flex', boxShadow: 0}}>
         <Box sx={{display: 'flex', flexDirection: 'column'}}>
             <CardContent sx={{flex: '1 0 auto', padding: 0.5}}>
                 <Typography noWrap sx={{width: '175px'}}  component="div" variant="h6">
