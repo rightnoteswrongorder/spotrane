@@ -20,13 +20,11 @@ export const SupabaseApi = {
             .eq('spotify_id', albumId);
     },
 
-    deleteAlbumFromList: (listId: number, albumId: string) => {
-        (async () => {
-            await supabase.from('list_entry')
-                .delete()
-                .eq('list_id', listId)
-                .eq('album_id', albumId)
-        })();
+    deleteAlbumFromList: async (listId: number, albumId: string) => {
+        await supabase.from('list_entry')
+            .delete()
+            .eq('list_id', listId)
+            .eq('album_id', albumId)
     },
 
     upsertArtist: async (albumCardView: SpotraneAlbumCard) => {
@@ -134,14 +132,14 @@ export const SupabaseApi = {
     renameList: async (listId: number, newName: string) => {
         await supabase
             .from('lists')
-            .update({'name' : newName})
+            .update({'name': newName})
             .eq('id', listId)
     },
 
     updateListEntryPriority: async (listEntryId: number, newPosition: number) => {
         await supabase
             .from('list_entry')
-            .update({'position' : newPosition})
+            .update({'position': newPosition})
             .eq('id', listEntryId)
     }
 }

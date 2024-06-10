@@ -33,11 +33,16 @@ const Lists = () => {
     const [lists, setLists] = React.useState<SpotraneList[]>([]);
     const [showSearchSpotifyDialog, setShowSpotifyDialog] = useState(false)
     const [websocketUpdate, setWebSocketUpdate] = useState("")
+    const [websocketUpdate2, setWebSocketUpdate2] = useState("")
     const [websocketListUpdate, setWebSocketListUpdate] = useState("")
 
 
     const handleDbChange = (payload: RealtimePostgresChangesPayload<Tables<'list_entry'>>) => {
         setWebSocketUpdate(payload.commit_timestamp)
+    }
+
+    const handleDbChange2 = (payload: RealtimePostgresChangesPayload<Tables<'list_entry'>>) => {
+        setWebSocketUpdate2(payload.commit_timestamp)
     }
 
     const handleDbChangeToLists = (payload: RealtimePostgresChangesPayload<Tables<'lists'>>) => {
@@ -52,11 +57,17 @@ const Lists = () => {
     }
 
     useEffect(() => {
-        supabase.channel('list_entry').on<Tables<'list_entry'>>('postgres_changes', {
+        supabase.channel('list_entry_insert').on<Tables<'list_entry'>>('postgres_changes', {
             event: 'INSERT',
             schema: 'public',
             table: 'list_entry'
         }, handleDbChange).subscribe()
+
+        supabase.channel('list_entry_delete').on<Tables<'list_entry'>>('postgres_changes', {
+            event: 'DELETE',
+            schema: 'public',
+            table: 'list_entry'
+        }, handleDbChange2).subscribe()
 
         supabase.channel('lists').on<Tables<'lists'>>('postgres_changes', {
             event: 'INSERT',
@@ -69,8 +80,10 @@ const Lists = () => {
 
 
     useEffect(() => {
+        console.log(websocketUpdate)
+        console.log(websocketUpdate2)
         albumsOnList()
-    }, [selectedList, websocketUpdate]);
+    }, [selectedList, websocketUpdate, websocketUpdate2]);
 
     const sdk = useSpotify(
         import.meta.env.VITE_SPOTIFY_CLIENT_ID,
@@ -79,9 +92,9 @@ const Lists = () => {
     );
 
     const deleteAlbumFromList = (albumId: string) => {
-        return () => {
+        return async () => {
             if (selectedList) {
-                SupabaseApi.deleteAlbumFromList(selectedList.id, albumId)
+                await SupabaseApi.deleteAlbumFromList(selectedList.id, albumId)
                 const updated = albums?.filter(listAlbums => listAlbums.item.id != albumId)
                 setAlbums(updated)
             }

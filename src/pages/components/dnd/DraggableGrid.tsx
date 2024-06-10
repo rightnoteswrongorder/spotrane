@@ -37,7 +37,18 @@ const DraggableGrid = ({start, save}: DraggableGridProps) => {
     const [activeItem, setActiveItem] = useState<ListEntry>()
 
     // for input methods detection
-    const sensors = useSensors(useSensor(PointerSensor), useSensor(TouchSensor))
+    const sensors = useSensors(useSensor(PointerSensor, {
+        activationConstraint: {
+            delay: 300,
+            tolerance: 5
+        }
+    }), useSensor(TouchSensor, {
+            activationConstraint: {
+                delay: 300,
+                tolerance: 5
+            }
+        }
+    ))
 
     // triggered when dragging starts
     const handleDragStart = (event: DragStartEvent) => {
@@ -71,7 +82,7 @@ const DraggableGrid = ({start, save}: DraggableGridProps) => {
     }
 
     const handleButtonClick = () => {
-        items.map((item, index) => save(item.id, index+1)())
+        items.map((item, index) => save(item.id, index + 1)())
     }
 
     return (
@@ -92,7 +103,7 @@ const DraggableGrid = ({start, save}: DraggableGridProps) => {
                     </Grid>
                 </Grid>
                 <Stack sx={{paddingLeft: 5, paddingRight: 5}} spacing={1}>
-                    <Button variant='outlined' onClick={handleButtonClick}
+                    <Button variant='outlined' onClick={handleButtonClick} disabled={items.length == 0}
                             color='secondary'>Save this order</Button>
                 </Stack>
             </SortableContext>
