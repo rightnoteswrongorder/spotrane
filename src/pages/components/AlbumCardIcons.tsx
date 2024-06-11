@@ -2,6 +2,7 @@ import {Box, IconButton, Link, SvgIcon} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
 import SpotifyIcon from "../../static/images/spotify.svg?react"
+import DiscogsIcon from "../../static/images/discogs.svg?react"
 import {PlaylistAdd, PlaylistAddCheck} from "@mui/icons-material";
 import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
 
@@ -45,6 +46,11 @@ const AlbumCardIcons = ({
         addToVisibleList && addToVisibleList()
     }
 
+    const makeDiscogsUrl = () => {
+        const removeTextInParenthises = albumCardView.name.replace(/ *\([^)]*\) */g, "")
+        return `https://www.discogs.com/search/?q=${removeTextInParenthises}&type=master&format=album`
+    }
+
     return (
         <Box sx={{display: 'flex', alignItems: 'center'}}>
             {(deleteAlbumFromLibrary || deleteAlbumFromList) &&
@@ -67,6 +73,9 @@ const AlbumCardIcons = ({
             </IconButton>
             <IconButton component={Link} href={albumCardView?.albumUri}>
                 <SvgIcon component={SpotifyIcon} inheritViewBox/>
+            </IconButton>
+            <IconButton component={Link} target="_blank" href={makeDiscogsUrl()}>
+                <SvgIcon component={DiscogsIcon} inheritViewBox/>
             </IconButton>
         </Box>
     )

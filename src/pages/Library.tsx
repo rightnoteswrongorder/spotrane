@@ -1,5 +1,6 @@
 import Grid from "@mui/material/Grid";
 import {
+    Box,
     Button,
     Stack,
     TablePagination, TextField, Typography,
@@ -139,7 +140,9 @@ const Library = () => {
     return (
         <>
             <Grid xs={12} item={true}>
-                {showSearchSpotifyDialog && <SpotifySearchDialog isOpen={showSearchSpotifyDialog} sdk={sdk} handleClose={handleClose} startText={getValues("searchText")}/>}
+                {showSearchSpotifyDialog &&
+                    <SpotifySearchDialog isOpen={showSearchSpotifyDialog} sdk={sdk} handleClose={handleClose}
+                                         startText={getValues("searchText")}/>}
                 <form>
                     <Stack sx={{paddingLeft: 5, paddingRight: 5}} spacing={1}>
                         <TextField variant='outlined' InputLabelProps={{shrink: true}} margin="dense"
@@ -155,22 +158,27 @@ const Library = () => {
             <Grid xs={12} item={true} marginTop={2}>
                 <Grid container justifyContent="center" spacing={3}>
                     {albums?.map(album => (
-                        <Grid key={nextId.current++} item={true}><AlbumCard albumCardView={album}
-                                                                            addToList={addToList(album)}
-                                                                            deleteAlbumFromLibrary={deleteAlbumFromLibrary(album.id)}/></Grid>))}
+                        <Grid key={nextId.current++} item={true}>
+                            <Box boxShadow={2}>
+                                <AlbumCard albumCardView={album}
+                                           addToList={addToList(album)}
+                                           deleteAlbumFromLibrary={deleteAlbumFromLibrary(album.id)}/>
+                            </Box>
+                        </Grid>))}
                 </Grid>
             </Grid>
             <Grid container justifyContent="right" spacing={2} marginTop={2}>
                 <Grid marginRight={5} item={true}>{searchTotal == 0 ? <TablePagination component='div'
-                                                                       labelRowsPerPage="Results: "
-                                                                       rowsPerPageOptions={[5, 10, 15, 20, 50, 100, 200, 300, 400]}
-                                                                       count={totalAlbums}
-                                                                       page={page} rowsPerPage={rowsPerPage}
-                                                                       onPageChange={handleChangePage}
-                                                                       onRowsPerPageChange={handleChangeRowsPerPage}/> :
+                                                                                       labelRowsPerPage="Results: "
+                                                                                       rowsPerPageOptions={[5, 10, 15, 20, 50, 100, 200, 300, 400]}
+                                                                                       count={totalAlbums}
+                                                                                       page={page}
+                                                                                       rowsPerPage={rowsPerPage}
+                                                                                       onPageChange={handleChangePage}
+                                                                                       onRowsPerPageChange={handleChangeRowsPerPage}/> :
                     <Typography>Search Results: {searchTotal}</Typography>}</Grid>
             </Grid>
-            {showCannotDeleteMessage != "" && <AlertDialog message={showCannotDeleteMessage}/> }
+            {showCannotDeleteMessage != "" && <AlertDialog message={showCannotDeleteMessage}/>}
         </>
     )
 }
