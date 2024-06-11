@@ -18,7 +18,6 @@ import {
 import Item from "./Item.tsx";
 import SortableItem from "./SortableItem.tsx";
 import Grid from "@mui/material/Grid";
-import {Button, Stack} from "@mui/material";
 import {ListEntry} from "../../Lists.tsx";
 
 type DraggableGridProps = {
@@ -32,6 +31,10 @@ const DraggableGrid = ({start, save}: DraggableGridProps) => {
     useEffect(() => {
         setItems(start)
     }, [start]);
+
+    useEffect(() => {
+        saveOrder()
+    }, [items]);
 
     // for drag overlay
     const [activeItem, setActiveItem] = useState<ListEntry>()
@@ -81,7 +84,7 @@ const DraggableGrid = ({start, save}: DraggableGridProps) => {
         setActiveItem(undefined)
     }
 
-    const handleButtonClick = () => {
+    const saveOrder = () => {
         items.map((item, index) => save(item.id, index + 1)())
     }
 
@@ -102,10 +105,6 @@ const DraggableGrid = ({start, save}: DraggableGridProps) => {
                         ))}
                     </Grid>
                 </Grid>
-                <Stack sx={{paddingLeft: 5, paddingRight: 5}} spacing={1}>
-                    <Button variant='outlined' onClick={handleButtonClick} disabled={items.length == 0}
-                            color='secondary'>Save this order</Button>
-                </Stack>
             </SortableContext>
             <DragOverlay adjustScale style={{transformOrigin: "0 0 "}}>
                 {activeItem ? <Item renderAlbumCard={activeItem.render} isDragging/> : null}

@@ -80,8 +80,6 @@ const Lists = () => {
 
 
     useEffect(() => {
-        console.log(websocketUpdate)
-        console.log(websocketUpdate2)
         albumsOnList()
     }, [selectedList, websocketUpdate, websocketUpdate2]);
 
