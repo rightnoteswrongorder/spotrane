@@ -90,13 +90,7 @@ const Lists = () => {
     );
 
     const deleteAlbumFromList = (albumId: string) => {
-        return async () => {
-            if (selectedList) {
-                await SupabaseApi.deleteAlbumFromList(selectedList.id, albumId)
-                const updated = albums?.filter(listAlbums => listAlbums.item.id != albumId)
-                setAlbums(updated)
-            }
-        }
+        return async () => selectedList && await SupabaseApi.deleteAlbumFromList(selectedList.id, albumId)
     }
 
     const getAllLists = async () => {

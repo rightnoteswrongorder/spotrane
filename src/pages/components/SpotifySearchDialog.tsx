@@ -37,14 +37,33 @@ const SpotifySearchDialog = ({sdk, isOpen, handleClose, listId, listVisible, sta
     const {register, handleSubmit, setValue} = useForm<IFormInput>()
     const [searchLoading, setSearchLoading] = useState(false)
 
-    const [websocketUpdate, setWebSocketUpdate] = useState("")
+    const [websocketUpdate, setWebSocketUpdate] = useState<Tables<'albums'>>()
 
     useEffect(() => {
-        handleSubmit(onSubmit)()
+        const album = websocketUpdate
+        const spotifyAlbum = searchResults.find(result => result.id == album?.spotify_id)
+
+        if (spotifyAlbum) {
+            const newAlbum = {
+                id: spotifyAlbum.id,
+                name: spotifyAlbum.name,
+                releaseDate: spotifyAlbum.releaseDate,
+                imageUri: spotifyAlbum.imageUri,
+                albumUri: spotifyAlbum.albumUri,
+                label: spotifyAlbum.label,
+                artistId: spotifyAlbum.artistId,
+                artistName: spotifyAlbum.artistName,
+                artistGenres: spotifyAlbum.artistGenres,
+                isSaved: true
+            }
+            const newResults = searchResults.map(result => result.id == album?.spotify_id ? newAlbum : result)
+            setSearchResults(newResults)
+        }
     }, [websocketUpdate]);
 
     const handleDbChange = (payload: RealtimePostgresChangesPayload<Tables<'albums'>>) => {
-        setWebSocketUpdate(payload.commit_timestamp)
+        const album = payload.new as Tables<'albums'>
+        setWebSocketUpdate(album)
     }
 
     const addToList = (albumCardView: SpotraneAlbumCard) => {
