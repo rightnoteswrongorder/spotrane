@@ -52,7 +52,7 @@ const Lists = () => {
 
     const addToList = (albumCardView: SpotraneAlbumCard) => {
         return (listId: number) => {
-            SupabaseApi.addToListFromSearch(listId, albumCardView)
+            SupabaseApi.addToList(listId, albumCardView)
         }
     }
 

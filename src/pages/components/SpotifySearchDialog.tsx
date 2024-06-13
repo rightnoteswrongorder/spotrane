@@ -68,13 +68,13 @@ const SpotifySearchDialog = ({sdk, isOpen, handleClose, listId, listVisible, sta
 
     const addToList = (albumCardView: SpotraneAlbumCard) => {
         return (listId: number) => {
-            listId && SupabaseApi.addToListFromSearch(listId, albumCardView)
+            listId && SupabaseApi.addToList(listId, albumCardView)
         }
     }
 
     const addToVisibleList = (albumCardView: SpotraneAlbumCard, listId?: number) => {
         return () => {
-            listId && SupabaseApi.addToListFromSearch(listId, albumCardView)
+            listId && SupabaseApi.addToList(listId, albumCardView)
         }
     }
 

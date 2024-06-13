@@ -3,6 +3,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
 import SpotifyIcon from "../../static/images/spotify.svg?react"
 import DiscogsIcon from "../../static/images/discogs.svg?react"
+import WikipediaIcon from "../../static/images/wikipeida.svg?react"
 import {PlaylistAdd, PlaylistAddCheck} from "@mui/icons-material";
 import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
 
@@ -51,6 +52,11 @@ const AlbumCardIcons = ({
         return `https://www.discogs.com/search/?q=${removeTextInParenthises}&type=master&format=album`
     }
 
+    const makeWikipediaUrl = () => {
+        const removeTextInParenthises = albumCardView.name.replace(/ *\([^)]*\) */g, "")
+        return `https://en.wikipedia.org/w/index.php?search=${removeTextInParenthises} ${albumCardView.artistName}`
+    }
+
     return (
         <Box sx={{display: 'flex', alignItems: 'center'}}>
             {(deleteAlbumFromLibrary || deleteAlbumFromList) &&
@@ -76,6 +82,9 @@ const AlbumCardIcons = ({
             </IconButton>
             <IconButton component={Link} target="_blank" href={makeDiscogsUrl()}>
                 <SvgIcon component={DiscogsIcon} inheritViewBox/>
+            </IconButton>
+            <IconButton  component={Link} target="_blank" href={makeWikipediaUrl()}>
+                <SvgIcon component={WikipediaIcon} inheritViewBox/>
             </IconButton>
         </Box>
     )

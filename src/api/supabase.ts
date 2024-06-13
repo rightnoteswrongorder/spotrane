@@ -101,7 +101,7 @@ export const SupabaseApi = {
         return data
     },
 
-    addToListFromSearch: (listId: number, albumCardView: SpotraneAlbumCard) => {
+    addToList: (listId: number, albumCardView: SpotraneAlbumCard) => {
         (async () => {
             await SupabaseApi.upsertArtist(albumCardView)
             await SupabaseApi.upsertAlbum(albumCardView)

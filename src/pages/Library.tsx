@@ -27,14 +27,21 @@ const Library = () => {
         Scopes.all
     );
 
+    const DEFAULT_PAGE_SIZE = 5
     const [albums, setAlbums] = useState<SpotraneAlbumCard[]>([]);
     const [searchTotal, setSearchTotal] = useState<number>(0)
     const [totalAlbums, setTotalAlbums] = useState<number>(0)
     const nextId = useRef(0);
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(DEFAULT_PAGE_SIZE);
     const [showSearchSpotifyDialog, setShowSpotifyDialog] = useState(false)
     const [showCannotDeleteMessage, setShowCannotDeleteMessage] = useState("")
+
+    useEffect(() => {
+        countAlbums()
+        allAlbums(page, rowsPerPage)
+    }, [rowsPerPage]);
+
 
     const spotraneAlbum = (dbAlbums: Tables<'all_albums_view'>[]): SpotraneAlbumCard[] => {
         return dbAlbums.map(dbAlbum => {
@@ -55,7 +62,7 @@ const Library = () => {
 
     const addToList = (albumCardView: SpotraneAlbumCard) => {
         return (listId: number) => {
-            SupabaseApi.addToListFromSearch(listId, albumCardView)
+            SupabaseApi.addToList(listId, albumCardView)
         }
     }
 
@@ -86,11 +93,6 @@ const Library = () => {
         })();
     }
 
-    useEffect(() => {
-        countAlbums()
-        allAlbums(page, rowsPerPage)
-    }, [rowsPerPage]);
-
     const handleChangePage = (
         event: MouseEvent<HTMLButtonElement> | null,
         newPage: number,
@@ -112,7 +114,7 @@ const Library = () => {
         reset();
         setPage(0)
         setSearchTotal(0)
-        setRowsPerPage(5)
+        setRowsPerPage(DEFAULT_PAGE_SIZE)
         allAlbums(page, rowsPerPage)
     }
 
@@ -133,7 +135,7 @@ const Library = () => {
         setShowSpotifyDialog(true)
     }
 
-    const handleClose = () => {
+    const onCloseSpotifySearch = () => {
         setShowSpotifyDialog(false);
     };
 
@@ -141,7 +143,7 @@ const Library = () => {
         <>
             <Grid xs={12} item={true}>
                 {showSearchSpotifyDialog &&
-                    <SpotifySearchDialog isOpen={showSearchSpotifyDialog} sdk={sdk} handleClose={handleClose}
+                    <SpotifySearchDialog isOpen={showSearchSpotifyDialog} sdk={sdk} handleClose={onCloseSpotifySearch}
                                          startText={getValues("searchText")}/>}
                 <form>
                     <Stack sx={{paddingLeft: 5, paddingRight: 5}} spacing={1}>
