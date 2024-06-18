@@ -5,6 +5,7 @@ import {
 } from "@mui/material/styles";
 import {ReactNode, createContext, useMemo, useState} from "react";
 import {CssBaseline} from "@mui/material";
+import ComponentOverrides from "../theme/overrides/ComponentOverrides.ts";
 
 type ThemeContextType = {
     switchColorMode: () => void;
@@ -44,6 +45,8 @@ export function ThemeContextProvider({children}: ThemeProviderProps) {
             }),
         [mode]
     );
+
+    theme.components = ComponentOverrides
 
     return (
         <StyledEngineProvider injectFirst>

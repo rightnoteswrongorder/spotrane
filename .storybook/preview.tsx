@@ -1,6 +1,6 @@
 import type {Preview} from "@storybook/react";
 import {ThemeProvider} from "@emotion/react";
-import theme from "../src/theme";
+import theme from "../src/theme/theme";
 import SessionProvider from "../src/stories/config/MockSessionProvider";
 
 const preview: Preview = {

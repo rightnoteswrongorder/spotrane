@@ -46,7 +46,7 @@ export const Full: Story = {
             releaseDate: "01-01-1900",
             imageUri: "https://i.scdn.co/image/ab67616d0000b273963f6c9593ac7ed9537de5de",
             albumUri: "http://foo.png",
-            label: "ECM",
+            label: "ECM FOO BAR BAZ QUX",
             artistId: "1234",
             artistName: "John Abercrombie",
             artistGenres: ["jazz", "chamber", "european"],

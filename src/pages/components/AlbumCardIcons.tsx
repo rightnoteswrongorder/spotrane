@@ -58,7 +58,7 @@ const AlbumCardIcons = ({
     }
 
     return (
-        <Box sx={{display: 'flex', alignItems: 'center'}}>
+        <Box sx={{display: 'flex', 'flex-wrap': 'wrap', alignItems: 'center'}}>
             {(deleteAlbumFromLibrary || deleteAlbumFromList) &&
                 <IconButton onClick={deleteClickHandler} sx={{color: albumCardView.isSaved ? (theme) => theme.palette.secondary.main : 'gray'}}
                             aria-label="unfollow">
