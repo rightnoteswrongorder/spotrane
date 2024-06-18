@@ -50,7 +50,7 @@ export const AlbumCard = ({
                     </Typography>
                     <Typography noWrap sx={{width: '175px'}} marginTop={0.2} variant="body1" color="text.secondary"
                                 component="div">
-                        {`${albumCardView?.artistGenres}`}
+                        {albumCardView.artistGenres.length == 0 ? 'Uknown' : `${albumCardView?.artistGenres}`}
                     </Typography>
                 </CardContent>
                 <CardMedia
