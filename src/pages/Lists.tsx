@@ -32,22 +32,22 @@ const Lists = () => {
     const [selectedList, setSelectedList] = useState<SpotraneList>()
     const [lists, setLists] = React.useState<SpotraneList[]>([]);
     const [showSearchSpotifyDialog, setShowSpotifyDialog] = useState(false)
-    const [websocketUpdate, setWebSocketUpdate] = useState("")
-    const [websocketUpdate2, setWebSocketUpdate2] = useState("")
-    const [websocketListUpdate, setWebSocketListUpdate] = useState("")
+    const [newListEntry, setNewListEntry] = useState("")
+    const [listEntryDeleted, setListEntryDeleted] = useState("")
+    const [newListAdded, setNewListAdded] = useState("")
 
 
-    const handleDbChange = (payload: RealtimePostgresChangesPayload<Tables<'list_entry'>>) => {
-        setWebSocketUpdate(payload.commit_timestamp)
+    const handleNewListEntry = (payload: RealtimePostgresChangesPayload<Tables<'list_entry'>>) => {
+        setNewListEntry(payload.commit_timestamp)
     }
 
-    const handleDbChange2 = (payload: RealtimePostgresChangesPayload<Tables<'list_entry'>>) => {
-        setWebSocketUpdate2(payload.commit_timestamp)
+    const handleEntryDeletedFromList = (payload: RealtimePostgresChangesPayload<Tables<'list_entry'>>) => {
+        setListEntryDeleted(payload.commit_timestamp)
     }
 
-    const handleDbChangeToLists = (payload: RealtimePostgresChangesPayload<Tables<'lists'>>) => {
+    const handleNewList = (payload: RealtimePostgresChangesPayload<Tables<'lists'>>) => {
         const list = payload.new as Tables<'lists'>
-        setWebSocketListUpdate(list.name ? list.name : "")
+        setNewListAdded(list.name ? list.name : "")
     }
 
     const addToList = (albumCardView: SpotraneAlbumCard) => {
@@ -61,27 +61,27 @@ const Lists = () => {
             event: 'INSERT',
             schema: 'public',
             table: 'list_entry'
-        }, handleDbChange).subscribe()
+        }, handleNewListEntry).subscribe()
 
         supabase.channel('list_entry_delete').on<Tables<'list_entry'>>('postgres_changes', {
             event: 'DELETE',
             schema: 'public',
             table: 'list_entry'
-        }, handleDbChange2).subscribe()
+        }, handleEntryDeletedFromList).subscribe()
 
         supabase.channel('lists').on<Tables<'lists'>>('postgres_changes', {
             event: 'INSERT',
             schema: 'public',
             table: 'lists'
-        }, handleDbChangeToLists).subscribe()
+        }, handleNewList).subscribe()
 
         getAllLists()
-    }, [websocketListUpdate]);
+    }, [newListAdded]);
 
 
     useEffect(() => {
         albumsOnList()
-    }, [selectedList, websocketUpdate, websocketUpdate2]);
+    }, [selectedList, newListEntry, listEntryDeleted]);
 
     const sdk = useSpotify(
         import.meta.env.VITE_SPOTIFY_CLIENT_ID,
@@ -116,8 +116,8 @@ const Lists = () => {
     const albumsOnList = () => {
         (async () => {
                 if (selectedList && selectedList.name) {
-                    const tryme = await SupabaseApi.getAlbumsOnList(selectedList?.name)
-                    tryme && setAlbums(tryme.map((dbAlbum) => {
+                    const albums = await SupabaseApi.getAlbumsOnList(selectedList?.name)
+                    albums && setAlbums(albums.map((dbAlbum) => {
                         const album = {
                             id: dbAlbum.spotify_id,
                             name: dbAlbum.name,
