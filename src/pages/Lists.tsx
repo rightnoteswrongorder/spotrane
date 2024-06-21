@@ -268,7 +268,7 @@ const Lists = () => {
         <>
             <Grid xs={12} item={true}>
                 {selectedList && showSearchSpotifyDialog &&
-                    <SpotifySearchDialog sdk={sdk} isOpen={showSearchSpotifyDialog} handleClose={handleClose}
+                    <SpotifySearchDialog sdk={sdk} albumsOnList={albums} isOpen={showSearchSpotifyDialog} handleClose={handleClose}
                                          listId={selectedList.id} listVisible={true}/>}
                 <form>
                     <Stack sx={{paddingLeft: 5, paddingRight: 5}} spacing={1} marginBottom={2}>

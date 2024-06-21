@@ -10,6 +10,7 @@ export type AlbumCardProps = {
     listVisible?: boolean,
     saveAlbum?: () => void
     deleteAlbumFromLibrary?: () => Promise<void>
+    isOnVisibleList?: boolean
     deleteAlbumFromList?: () => void
     addToVisibleList?: () => void
 }
@@ -19,6 +20,7 @@ export const AlbumCard = ({
                               listVisible,
                               saveAlbum,
                               deleteAlbumFromLibrary,
+                              isOnVisibleList,
                               deleteAlbumFromList,
                               addToVisibleList,
                               addToList
@@ -65,6 +67,7 @@ export const AlbumCard = ({
                             saveAlbum={saveAlbum}
                             deleteAlbumFromLibrary={deleteAlbumFromLibrary}
                             deleteAlbumFromList={deleteAlbumFromList}
+                            isOnVisibleList={isOnVisibleList}
                             addToVisibleList={addToVisibleList}
                             toggleListDialog={toggleListDialog}/>
         </Box>

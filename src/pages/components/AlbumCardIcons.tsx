@@ -4,12 +4,14 @@ import SaveIcon from "@mui/icons-material/Save";
 import SpotifyIcon from "../../static/images/spotify.svg?react"
 import DiscogsIcon from "../../static/images/discogs.svg?react"
 import WikipediaIcon from "../../static/images/wikipeida.svg?react"
+import EcmIcon from "../../static/images/ecmlogo.svg?react"
 import {PlaylistAdd, PlaylistAddCheck} from "@mui/icons-material";
 import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
 
 type AlbumCardIconProps = {
     albumCardView: SpotraneAlbumCard
     listVisible?: boolean
+    isOnVisibleList?: boolean
     saveAlbum?: () => void
     deleteAlbumFromLibrary?: () => void
     deleteAlbumFromList?: () => void
@@ -20,6 +22,7 @@ type AlbumCardIconProps = {
 const AlbumCardIcons = ({
                                    albumCardView,
                                    listVisible,
+                                   isOnVisibleList,
                                    saveAlbum,
                                    deleteAlbumFromLibrary,
                                    deleteAlbumFromList,
@@ -48,13 +51,19 @@ const AlbumCardIcons = ({
     }
 
     const makeDiscogsUrl = () => {
-        const removeTextInParenthises = albumCardView.name.replace(/ *\([^)]*\) */g, "")
-        return `https://www.discogs.com/search/?q=${removeTextInParenthises}&type=master&format=album`
+        return `https://www.discogs.com/search/?q=${removeTextInParenthises(albumCardView.name)}&type=master&format=album`
     }
 
     const makeWikipediaUrl = () => {
-        const removeTextInParenthises = albumCardView.name.replace(/ *\([^)]*\) */g, "")
-        return `https://en.wikipedia.org/w/index.php?search=${removeTextInParenthises} ${albumCardView.artistName}`
+        return `https://en.wikipedia.org/w/index.php?search=${removeTextInParenthises(albumCardView.name)} ${albumCardView.artistName}`
+    }
+
+    const makeEcmUrl = () => {
+        return `https://ecmreviews.com/?s=${removeTextInParenthises(albumCardView.name)}`
+    }
+
+    const removeTextInParenthises = (dirtyText : string) : string => {
+        return dirtyText.replace(/ *\([^)]*\) */g, "")
     }
 
     return (
@@ -69,9 +78,9 @@ const AlbumCardIcons = ({
                                       aria-label="save">
                 <SaveIcon sx={{color: albumCardView.isSaved ? (theme) => theme.palette.primary.main : 'gray'}}></SaveIcon>
             </IconButton>}
-            {listVisible && addToVisibleList && <IconButton onClick={addToListHandler}
+            {listVisible && addToVisibleList && <IconButton disabled={isOnVisibleList} onClick={addToListHandler}
                                       aria-label="add-to-list">
-                <PlaylistAddCheck></PlaylistAddCheck>
+                <PlaylistAddCheck sx={{color: isOnVisibleList ? (theme) => theme.palette.primary.main : 'gray'}}></PlaylistAddCheck>
             </IconButton>}
             <IconButton onClick={addToListClickHandler}
                         aria-label="add-to-list">
@@ -86,6 +95,9 @@ const AlbumCardIcons = ({
             <IconButton  component={Link} target="_blank" href={makeWikipediaUrl()}>
                 <SvgIcon component={WikipediaIcon} inheritViewBox/>
             </IconButton>
+            {albumCardView.label == "ECM Records" && <IconButton  component={Link} target="_blank" href={makeEcmUrl()}>
+                <SvgIcon component={EcmIcon} inheritViewBox/>
+            </IconButton>}
         </Box>
     )
 }

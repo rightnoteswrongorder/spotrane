@@ -17,6 +17,7 @@ import PageLoadSpinner from "./PageLoadSpinner.tsx";
 import {RealtimePostgresChangesPayload} from "@supabase/supabase-js";
 import {Tables} from "../../interfaces/database.types.ts";
 import supabase from "../../api/supaBaseClient.ts";
+import {ListEntry} from "../Lists.tsx";
 
 interface IFormInput {
     searchText: string
@@ -28,10 +29,11 @@ type SpotifySearchProps = {
     handleClose: () => void,
     listId?: number,
     listVisible?: boolean,
+    albumsOnList?: ListEntry[],
     startText?: string,
 }
 
-const SpotifySearchDialog = ({sdk, isOpen, handleClose, listId, listVisible, startText}: SpotifySearchProps) => {
+const SpotifySearchDialog = ({sdk, isOpen, handleClose, listId, listVisible, albumsOnList, startText}: SpotifySearchProps) => {
     const [open, setOpen] = React.useState(false);
     const [searchResults, setSearchResults] = useState<SpotraneAlbumCard[]>([]);
     const {register, handleSubmit, setValue} = useForm<IFormInput>()
@@ -76,6 +78,10 @@ const SpotifySearchDialog = ({sdk, isOpen, handleClose, listId, listVisible, sta
         return () => {
             listId && SupabaseApi.addToList(listId, albumCardView)
         }
+    }
+
+    const isOnVisibleList = (albumId : string) => {
+        return albumsOnList?.find((album) => album.item.id == albumId) !== undefined
     }
 
     const saveAlbum = (albumCardView: SpotraneAlbumCard) => {
@@ -158,6 +164,7 @@ const SpotifySearchDialog = ({sdk, isOpen, handleClose, listId, listVisible, sta
                                 searchResults.map((album) => (
                                     <Grid item={true} key={album.id}><AlbumCard albumCardView={album}
                                                                                 addToVisibleList={addToVisibleList(album, listId)}
+                                                                                isOnVisibleList={isOnVisibleList(album.id)}
                                                                                 listVisible={listVisible}
                                                                                 addToList={addToList(album)}
                                                                                 saveAlbum={saveAlbum(album)}

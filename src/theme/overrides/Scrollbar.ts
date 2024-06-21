@@ -6,7 +6,7 @@ const Scrollbar: Components = {
             html: {
                 '& :: -webkit-scrollbar': {
                     width: '0.43em',
-                    height: '0.4em'
+                    height: '0.4em',
                 },
                 '& :: -webkit-scrollbar-track': {
                     backgroundColor: '#F3EEBE'
