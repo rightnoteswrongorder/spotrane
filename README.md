@@ -6,7 +6,6 @@ A pet project to make Spotify work for me...
 
 * Stories for main components (and tests?)
 * Handle 401s from supabase when jwt times out - do logout
-* Link to ecm reviews for ecm records
 * Monitor websocket status so when it drops we can do somethign about it
 * Notes section on album card (post it styled)
 

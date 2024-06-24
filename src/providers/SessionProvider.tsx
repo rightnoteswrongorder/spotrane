@@ -1,6 +1,7 @@
 import React, {createContext, ReactNode, useContext, useEffect, useState} from "react";
-import {Session} from "@supabase/supabase-js";
+import {RealtimeChannel, Session} from "@supabase/supabase-js";
 import supabase from "../api/supaBaseClient.ts";
+import {useInterval} from "usehooks-ts";
 
 const defaultSessionConfig: SessionConfig = {session: undefined, loading: false, clearSession: () => {}}
 
@@ -40,6 +41,14 @@ const SessionProvider: React.FC<Props> = ({children}) => {
         })
     }, [])
 
+
+    useInterval(() => {
+        supabase.getChannels().map((channel: RealtimeChannel) => {
+            if(channel.state != "joined") {
+                alert(`Connection to channel ${channel.topic} dropped, state: ${channel.state} - reload to join`)
+            }
+        })
+    }, 30000)
 
     const config: SessionConfig = {
         session: session,
