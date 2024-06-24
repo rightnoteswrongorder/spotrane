@@ -76,11 +76,11 @@ const AlbumCardIcons = ({
             {saveAlbum && <IconButton onClick={saveClickHandler}
                                       disabled={albumCardView.isSaved}
                                       aria-label="save">
-                <SaveIcon sx={{color: albumCardView.isSaved ? (theme) => theme.palette.primary.main : 'gray'}}></SaveIcon>
+                <SaveIcon sx={{color: albumCardView.isSaved ? (theme) => theme.palette.primary.main : 'white'}}></SaveIcon>
             </IconButton>}
             {listVisible && addToVisibleList && <IconButton disabled={isOnVisibleList} onClick={addToListHandler}
                                       aria-label="add-to-list">
-                <PlaylistAddCheck sx={{color: isOnVisibleList ? (theme) => theme.palette.primary.main : 'gray'}}></PlaylistAddCheck>
+                <PlaylistAddCheck sx={{color: isOnVisibleList ? (theme) => theme.palette.primary.main : 'white'}}></PlaylistAddCheck>
             </IconButton>}
             <IconButton onClick={addToListClickHandler}
                         aria-label="add-to-list">
