@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react'
-import {SpotifyApi} from "@spotify/web-api-ts-sdk";
+import {Album, Artist, SpotifyApi} from "@spotify/web-api-ts-sdk";
 import {
     Button,
     Stack,
@@ -33,7 +33,15 @@ type SpotifySearchProps = {
     startText?: string,
 }
 
-const SpotifySearchDialog = ({sdk, isOpen, handleClose, listId, listVisible, albumsOnList, startText}: SpotifySearchProps) => {
+const SpotifySearchDialog = ({
+                                 sdk,
+                                 isOpen,
+                                 handleClose,
+                                 listId,
+                                 listVisible,
+                                 albumsOnList,
+                                 startText
+                             }: SpotifySearchProps) => {
     const [open, setOpen] = React.useState(false);
     const [searchResults, setSearchResults] = useState<SpotraneAlbumCard[]>([]);
     const {register, handleSubmit, setValue} = useForm<IFormInput>()
@@ -80,7 +88,7 @@ const SpotifySearchDialog = ({sdk, isOpen, handleClose, listId, listVisible, alb
         }
     }
 
-    const isOnVisibleList = (albumId : string) => {
+    const isOnVisibleList = (albumId: string) => {
         return albumsOnList?.find((album) => album.item.id == albumId) !== undefined
     }
 
@@ -114,6 +122,20 @@ const SpotifySearchDialog = ({sdk, isOpen, handleClose, listId, listVisible, alb
         setSearchLoading(false)
     }, [searchResults]);
 
+    const findById: SubmitHandler<IFormInput> = (data) => {
+        (async () => {
+            setSearchLoading(true)
+            const result = await SpotifyApiProxy.getAlbum(sdk, data.searchText)
+            if (result) {
+                const artist = await SpotifyApiProxy.getArtist(sdk, result?.artists[0].id)
+                const album = await SpotifyApiProxy.getAlbum(sdk, result?.id)
+                const isSaved = await SupabaseApi.isSaved(result?.id)
+                const spotraneAlbum = spotifyAlbumToSpotraneAlbum(album, artist, isSaved)
+                setSearchResults([spotraneAlbum])
+            }
+        })();
+    }
+
     const onSubmit: SubmitHandler<IFormInput> = (data) => {
         (async () => {
             setSearchLoading(true)
@@ -123,22 +145,26 @@ const SpotifySearchDialog = ({sdk, isOpen, handleClose, listId, listVisible, alb
                     const artist = await SpotifyApiProxy.getArtist(sdk, simplifiedAlbum.artists[0].id)
                     const album = await SpotifyApiProxy.getAlbum(sdk, simplifiedAlbum.id)
                     const isSaved = await SupabaseApi.isSaved(simplifiedAlbum.id)
-                    return {
-                        id: album?.id,
-                        name: album?.name,
-                        releaseDate: album?.release_date,
-                        imageUri: album?.images[0].url,
-                        albumUri: album?.uri,
-                        label: album?.label,
-                        artistId: artist?.id,
-                        artistName: artist?.name,
-                        artistGenres: artist?.genres,
-                        isSaved: isSaved
-                    } as SpotraneAlbumCard
+                    return spotifyAlbumToSpotraneAlbum(album, artist, isSaved)
                 }))
                 setSearchResults(results)
             }
         })();
+    }
+
+    const spotifyAlbumToSpotraneAlbum = (album: Album | undefined, artist: Artist | undefined, isSaved: boolean): SpotraneAlbumCard => {
+        return {
+            id: album?.id,
+            name: album?.name,
+            releaseDate: album?.release_date,
+            imageUri: album?.images[0].url,
+            albumUri: album?.uri,
+            label: album?.label,
+            artistId: artist?.id,
+            artistName: artist?.name,
+            artistGenres: artist?.genres,
+            isSaved: isSaved
+        } as SpotraneAlbumCard
     }
 
     return (
@@ -155,6 +181,8 @@ const SpotifySearchDialog = ({sdk, isOpen, handleClose, listId, listVisible, alb
                                 <TextField autoFocus variant='outlined' InputLabelProps={{shrink: true}} margin="dense"
                                            type='text' {...register("searchText", {required: true})} />
                                 <Button type='submit' variant='outlined' color='secondary'>Search</Button>
+                                <Button type='submit' onClick={handleSubmit(findById)} variant='outlined'
+                                        color='secondary'>Find By Id</Button>
                             </Stack>
                         </form>
                     </Grid>

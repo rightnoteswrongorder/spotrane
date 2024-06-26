@@ -43,11 +43,19 @@ const SessionProvider: React.FC<Props> = ({children}) => {
 
 
     useInterval(() => {
-        supabase.getChannels().map((channel: RealtimeChannel) => {
-            if(channel.state != "joined") {
-                alert(`Connection to channel ${channel.topic} dropped, state: ${channel.state} - reload to join`)
-            }
+        const channels = supabase.getChannels();
+
+        const reload = channels.find((channel: RealtimeChannel) => {
+            return channel.state != "joined"
         })
+
+        const status = channels.map((channel) => `Topic: ${channel.topic} State: ${channel.state}` ).join(" | ")
+        console.log(status)
+
+        if(reload) {
+            console.log("1 or more websockets have disconnected - reloading")
+            window.location.reload()
+        }
     }, 30000)
 
     const config: SessionConfig = {
