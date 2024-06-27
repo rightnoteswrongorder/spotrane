@@ -14,6 +14,14 @@ export const SupabaseApi = {
         return count || 0
     },
 
+    getLastEntryPositionOnList: async (listId: number): Promise<number> => {
+        const {data} = await supabase
+            .from('list_entry')
+            .select('position.max()')
+            .eq('list_id', listId)
+        return data ? data[0].max : 0
+    },
+
     deleteAlbum: async (albumId: string): Promise<SupabaseSatusResponse> => {
         return supabase.from('albums')
             .delete()
@@ -105,10 +113,11 @@ export const SupabaseApi = {
         (async () => {
             await SupabaseApi.upsertArtist(albumCardView)
             await SupabaseApi.upsertAlbum(albumCardView)
+            const position = await SupabaseApi.getLastEntryPositionOnList(listId)
             await supabase
                 .from('list_entry')
                 .insert([
-                    {list_id: listId, album_id: albumCardView.id},
+                    {list_id: listId, album_id: albumCardView.id, position: position + 1},
                 ])
         })();
     },

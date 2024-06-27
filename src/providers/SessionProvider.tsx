@@ -53,6 +53,7 @@ const SessionProvider: React.FC<Props> = ({children}) => {
         console.log(status)
 
         if(reload) {
+            //https://github.com/supabase/realtime-js/issues/121
             console.log("1 or more websockets have disconnected - reloading")
             window.location.reload()
         }
