@@ -16,13 +16,14 @@ import {AccountCircle, DarkModeOutlined, LightModeOutlined} from "@mui/icons-mat
 import React, {useContext, useMemo} from "react";
 import {useSession} from "../../providers/SessionProvider.tsx";
 import {ThemeContext} from "../../providers/ThemeContextProvider.tsx";
+import AlertDialog from "./AlertDialog.tsx";
 
 type MenuBarProps = {
     logout: () => void
 }
 
 const MenuBar = ({logout}: MenuBarProps) => {
-    const session = useSession().session
+    const {session, webSocketDisconnected} = useSession()
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
@@ -39,6 +40,10 @@ const MenuBar = ({logout}: MenuBarProps) => {
         logout();
         setAnchorEl(null);
     };
+
+    const handleSubmit = () => {
+        window.location.reload()
+    }
 
     const theme = useTheme();
     const {switchColorMode} = useContext(ThemeContext);
@@ -102,6 +107,7 @@ const MenuBar = ({logout}: MenuBarProps) => {
                         <Button color="inherit">Login</Button>}
                 </Toolbar>
             </AppBar>
+            {webSocketDisconnected && <AlertDialog message={"WebSocket Disconnected Alert"} onClose={handleSubmit}/>}
         </Box>
     )
 }
