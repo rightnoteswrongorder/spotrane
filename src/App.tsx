@@ -29,7 +29,17 @@ const App = () => {
             {
                 element: <Layout/>,
                 children: [
-                    {path: "/lists", element: <Lists/>}
+                    {
+                        path: "/lists",
+                        element: <Lists/>
+                    }
+                ],
+                errorElement: <NoOp/>
+            },
+            {
+                element: <Layout/>,
+                children: [
+                    {path: "/lists/:listName", element: <Lists/>}
                 ],
                 errorElement: <NoOp/>
             }

@@ -14,6 +14,7 @@ import {RealtimePostgresChangesPayload} from "@supabase/supabase-js";
 import {SpotraneAlbumCard, SpotraneList} from "../interfaces/spotrane.types.ts";
 import YesNoDialog from "./components/YesNoDialog.tsx";
 import DraggableGrid from "./components/dnd/DraggableGrid.tsx";
+import {useNavigate, useParams} from "react-router-dom";
 
 interface IFormInput {
     listName: string
@@ -27,6 +28,7 @@ export type ListEntry = {
 
 }
 const Lists = () => {
+    const navigate = useNavigate()
 
     const [albums, setAlbums] = useState<ListEntry[]>([]);
     const [selectedList, setSelectedList] = useState<SpotraneList>()
@@ -35,6 +37,7 @@ const Lists = () => {
     const [newListEntry, setNewListEntry] = useState("")
     const [listEntryDeleted, setListEntryDeleted] = useState("")
     const [newListAdded, setNewListAdded] = useState("")
+    const [onPath, setOnPath] = useState("")
 
 
     const handleNewListEntry = (payload: RealtimePostgresChangesPayload<Tables<'list_entry'>>) => {
@@ -56,6 +59,8 @@ const Lists = () => {
         }
     }
 
+    const params = useParams()
+
     useEffect(() => {
         supabase.channel('list_entry_insert').on<Tables<'list_entry'>>('postgres_changes', {
             event: 'INSERT',
@@ -76,12 +81,26 @@ const Lists = () => {
         }, handleNewList).subscribe()
 
         getAllLists()
+
+
+        if(params.listName) {
+            setOnPath(params.listName)
+        }
     }, [newListAdded]);
 
 
     useEffect(() => {
+        if(selectedList) {
+           navigate(`/lists/${selectedList?.name}`)
+        }
         albumsOnList()
     }, [selectedList, newListEntry, listEntryDeleted]);
+
+    useEffect(() => {
+        if(onPath) {
+           runListLoad(onPath)
+        }
+    }, [lists]);
 
     const sdk = useSpotify(
         import.meta.env.VITE_SPOTIFY_CLIENT_ID,
