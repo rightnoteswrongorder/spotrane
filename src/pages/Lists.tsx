@@ -37,7 +37,6 @@ const Lists = () => {
     const [newListEntry, setNewListEntry] = useState("")
     const [listEntryDeleted, setListEntryDeleted] = useState("")
     const [newListAdded, setNewListAdded] = useState("")
-    const [onPath, setOnPath] = useState("")
 
 
     const handleNewListEntry = (payload: RealtimePostgresChangesPayload<Tables<'list_entry'>>) => {
@@ -61,7 +60,12 @@ const Lists = () => {
 
     const params = useParams()
 
-    useEffect(() => {
+    useEffect(()  => {
+        (async () => {
+            const listToSet = newListAdded ? newListAdded : params.listName
+            await getAllLists(listToSet)
+        })()
+
         supabase.channel('list_entry_insert').on<Tables<'list_entry'>>('postgres_changes', {
             event: 'INSERT',
             schema: 'public',
@@ -80,27 +84,17 @@ const Lists = () => {
             table: 'lists'
         }, handleNewList).subscribe()
 
-        getAllLists()
-
-
-        if(params.listName) {
-            setOnPath(params.listName)
-        }
     }, [newListAdded]);
 
 
     useEffect(() => {
-        if(selectedList) {
+        console.log("Before - " + selectedList?.name)
+        if(selectedList || newListEntry) {
+            console.log("Before - " + selectedList?.name)
            navigate(`/lists/${selectedList?.name}`)
         }
         albumsOnList()
     }, [selectedList, newListEntry, listEntryDeleted]);
-
-    useEffect(() => {
-        if(onPath) {
-           runListLoad(onPath)
-        }
-    }, [lists]);
 
     const sdk = useSpotify(
         import.meta.env.VITE_SPOTIFY_CLIENT_ID,
@@ -112,7 +106,7 @@ const Lists = () => {
         return async () => selectedList && await SupabaseApi.deleteAlbumFromList(selectedList.id, albumId)
     }
 
-    const getAllLists = async () => {
+    const getAllLists = async (onPath?: string) => {
         const data = await SupabaseApi.getLists()
         const spotraneLists = data && data.map(dbList => {
             return {
@@ -121,11 +115,12 @@ const Lists = () => {
             } as SpotraneList
         })
 
-        if (lists.length != 0) {
-            const res = spotraneLists?.find(list => newList(list.name))
-
+        if (onPath) {
+            const res = spotraneLists?.find(list => list.name == onPath)
             res && setSelectedList(res)
         }
+
+
 
         spotraneLists && setLists(spotraneLists)
 
@@ -226,6 +221,7 @@ const Lists = () => {
 
     const runListLoad = (listName: string) => {
         const list = lists.find(list => list?.name == listName)
+        console.log("list load: " + list?.name)
         list && setSelectedList(list)
     }
 
@@ -234,6 +230,7 @@ const Lists = () => {
     }
 
     const handleClose = () => {
+        console.log(selectedList?.name)
         getAllLists()
         setSelectedList(selectedList)
         setShowSpotifyDialog(false);
