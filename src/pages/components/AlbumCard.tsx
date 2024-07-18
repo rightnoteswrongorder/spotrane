@@ -3,6 +3,7 @@ import {Box, Card, CardContent, CardMedia, Typography} from "@mui/material";
 import AddToListDialog from "./AddToListDialog.tsx";
 import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
 import AlbumCardIcons from "./AlbumCardIcons.tsx";
+import AlbumCardStars from "./AlbumCardStars.tsx";
 
 export type AlbumCardProps = {
     albumCardView: SpotraneAlbumCard
@@ -62,6 +63,7 @@ export const AlbumCard = ({
                     alt="album cover"
                 />
             </Box>
+            <AlbumCardStars album={albumCardView}></AlbumCardStars>
             <AlbumCardIcons albumCardView={albumCardView}
                             listVisible={listVisible}
                             saveAlbum={saveAlbum}

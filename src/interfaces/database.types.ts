@@ -17,6 +17,7 @@ export type Database = {
           image: string | null
           label: string | null
           name: string
+          rating: number | null
           release_date: string | null
           spotify_id: string
           spotify_uri: string | null
@@ -28,6 +29,7 @@ export type Database = {
           image?: string | null
           label?: string | null
           name: string
+          rating?: number | null
           release_date?: string | null
           spotify_id: string
           spotify_uri?: string | null
@@ -39,6 +41,7 @@ export type Database = {
           image?: string | null
           label?: string | null
           name?: string
+          rating?: number | null
           release_date?: string | null
           spotify_id?: string
           spotify_uri?: string | null
@@ -211,6 +214,7 @@ export type Database = {
           list_entry_position: number | null
           list_name: string | null
           name: string | null
+          rating: number | null
           release_date: string | null
           spotify_id: string | null
           spotify_uri: string | null
@@ -226,6 +230,7 @@ export type Database = {
           image: string | null
           label: string | null
           name: string | null
+          rating: number | null
           release_date: string | null
           spotify_id: string | null
           spotify_uri: string | null
@@ -246,6 +251,7 @@ export type Database = {
           image: string | null
           label: string | null
           name: string | null
+          rating: number | null
           release_date: string | null
           spotify_id: string | null
           spotify_uri: string | null

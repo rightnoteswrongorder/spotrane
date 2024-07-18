@@ -46,6 +46,12 @@ export const SupabaseApi = {
             ], {onConflict: 'spotify_id'})
     },
 
+    setRating: async(rating: number, id: string) => {
+        await supabase.from('albums')
+            .update({ rating: rating})
+            .eq('spotify_id', id)
+    },
+
     upsertAlbum: async (albumCardView: SpotraneAlbumCard) => {
         await supabase.from('albums')
             .upsert([

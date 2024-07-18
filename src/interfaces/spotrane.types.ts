@@ -9,6 +9,7 @@ export type SpotraneAlbumCard = {
     artistName: string
     artistGenres: string[]
     isSaved: boolean
+    rating: number
 }
 
 export type SupabaseError = {

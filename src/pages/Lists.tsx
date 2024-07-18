@@ -35,6 +35,7 @@ const Lists = () => {
     const [lists, setLists] = React.useState<SpotraneList[]>([]);
     const [showSearchSpotifyDialog, setShowSpotifyDialog] = useState(false)
     const [newListEntry, setNewListEntry] = useState("")
+    const [albumUpdated, setAlbumUpdated] = useState("")
     const [listEntryDeleted, setListEntryDeleted] = useState("")
     const [newListAdded, setNewListAdded] = useState("")
 
@@ -45,6 +46,10 @@ const Lists = () => {
 
     const handleEntryDeletedFromList = (payload: RealtimePostgresChangesPayload<Tables<'list_entry'>>) => {
         setListEntryDeleted(payload.commit_timestamp)
+    }
+
+    const handleaAlbumUpdate = (payload: RealtimePostgresChangesPayload<Tables<'albums'>>) => {
+        setAlbumUpdated(payload.commit_timestamp)
     }
 
     const handleNewList = (payload: RealtimePostgresChangesPayload<Tables<'lists'>>) => {
@@ -65,6 +70,12 @@ const Lists = () => {
             const listToSet = newListAdded ? newListAdded : params.listName
             await getAllLists(listToSet)
         })()
+
+        supabase.channel('album_update').on<Tables<'albums'>>('postgres_changes', {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'albums' },
+                handleaAlbumUpdate).subscribe()
 
         supabase.channel('list_entry_insert').on<Tables<'list_entry'>>('postgres_changes', {
             event: 'INSERT',
@@ -94,7 +105,7 @@ const Lists = () => {
            navigate(`/lists/${selectedList?.name}`)
         }
         albumsOnList()
-    }, [selectedList, newListEntry, listEntryDeleted]);
+    }, [selectedList, newListEntry, listEntryDeleted, albumUpdated]);
 
     const sdk = useSpotify(
         import.meta.env.VITE_SPOTIFY_CLIENT_ID,
@@ -142,6 +153,7 @@ const Lists = () => {
                             releaseDate: dbAlbum.release_date,
                             imageUri: dbAlbum.image,
                             albumUri: dbAlbum.spotify_uri,
+                            rating: dbAlbum.rating,
                             isSaved: true
                         } as SpotraneAlbumCard
 

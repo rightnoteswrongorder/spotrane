@@ -64,6 +64,7 @@ const SpotifySearchDialog = ({
                 artistId: spotifyAlbum.artistId,
                 artistName: spotifyAlbum.artistName,
                 artistGenres: spotifyAlbum.artistGenres,
+                rating: spotifyAlbum.rating,
                 isSaved: true
             }
             const newResults = searchResults.map(result => result.id == album?.spotify_id ? newAlbum : result)

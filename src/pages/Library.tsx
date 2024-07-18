@@ -55,6 +55,7 @@ const Library = () => {
                 releaseDate: dbAlbum.release_date,
                 imageUri: dbAlbum.image,
                 albumUri: dbAlbum.spotify_uri,
+                rating: dbAlbum.rating,
                 isSaved: true
             } as SpotraneAlbumCard
         })

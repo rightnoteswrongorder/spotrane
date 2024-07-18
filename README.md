@@ -4,6 +4,8 @@ A pet project to make Spotify work for me...
 
 ## TODO:
 
+* Add ratings 
+* Loading spinner for lists (e.g. large lists slow)
 * Stories for main components (and tests?)
 * Handle 401s from supabase when jwt times out - do logout
 * Notes section on album card (post it styled)

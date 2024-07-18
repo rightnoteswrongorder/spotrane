@@ -9,7 +9,8 @@ select
     b.release_date,
     b.label,
     b.image,
-    b.spotify_uri
+    b.spotify_uri,
+    b.rating
 from
     artists a,
     albums b

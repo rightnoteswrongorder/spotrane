@@ -1,18 +1,17 @@
 import type {Preview} from "@storybook/react";
-import {ThemeProvider} from "@emotion/react";
-import theme from "../src/theme/theme";
 import SessionProvider from "../src/stories/config/MockSessionProvider";
+import {ThemeContextProvider} from "../src/providers/ThemeContextProvider";
 
 const preview: Preview = {
     decorators: [
         (Story) => {
             // 👇 Make it configurable by reading the theme value from parameters
             return (
-                <ThemeProvider theme={theme}>
+                <ThemeContextProvider>
                     <SessionProvider>
                         <Story/>
                     </SessionProvider>
-                </ThemeProvider>
+                </ThemeContextProvider>
             );
         },
     ],
