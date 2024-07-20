@@ -15,6 +15,8 @@ import {Scopes} from "@spotify/web-api-ts-sdk";
 import {SpotraneAlbumCard} from "../interfaces/spotrane.types.ts";
 import AlertDialog from "./components/AlertDialog.tsx";
 import {useSpotify} from "../hooks/useSpotfy.ts";
+import supabase from "../api/supaBaseClient.ts";
+import {RealtimePostgresChangesPayload} from "@supabase/supabase-js";
 
 interface IFormInput {
     searchText: string
@@ -36,12 +38,31 @@ const Library = () => {
     const [rowsPerPage, setRowsPerPage] = useState(DEFAULT_PAGE_SIZE);
     const [showSearchSpotifyDialog, setShowSpotifyDialog] = useState(false)
     const [showCannotDeleteMessage, setShowCannotDeleteMessage] = useState("")
+    const [albumUpdated, setAlbumUpdated] = useState("")
+
+    const handleAlbumUpdate = (payload: RealtimePostgresChangesPayload<Tables<'albums'>>) => {
+        setAlbumUpdated(payload.commit_timestamp)
+    }
+
+    useEffect(() => {
+        supabase.channel('album_update').on<Tables<'albums'>>('postgres_changes', {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'albums' },
+            handleAlbumUpdate).subscribe()
+    })
 
     useEffect(() => {
         countAlbums()
         allAlbums(page, rowsPerPage)
     }, [rowsPerPage]);
 
+    useEffect(() => {
+        (async () => {
+            const updated = await SupabaseApi.getAlbumsWithIds(albums.map(alb => alb.id))
+            setAlbums(spotraneAlbum(updated))
+        }) ();
+    }, [albumUpdated]);
 
     const spotraneAlbum = (dbAlbums: Tables<'all_albums_view'>[]): SpotraneAlbumCard[] => {
         return dbAlbums.map(dbAlbum => {
