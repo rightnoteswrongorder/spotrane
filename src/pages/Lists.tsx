@@ -1,10 +1,9 @@
 import Grid from "@mui/material/Grid";
 import {Button, FormControl, InputLabel, MenuItem, Select, Stack,} from "@mui/material";
 import * as React from "react";
-import {ReactElement, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {Tables} from "../interfaces/database.types.ts";
 import {Controller, useForm} from "react-hook-form";
-import {AlbumCard, AlbumCardProps} from "./components/AlbumCard.tsx";
 import {SupabaseApi} from "../api/supabase.ts";
 import SpotifySearchDialog from "./components/SpotifySearchDialog.tsx";
 import {Scopes} from "@spotify/web-api-ts-sdk";
@@ -24,9 +23,10 @@ export type ListEntry = {
     item: SpotraneAlbumCard
     id: number
     position: number
-    render: () => ReactElement<AlbumCardProps>
-
+    addToList:  (listId: number) => void,
+    deleteFromList: () => Promise<void | undefined>
 }
+
 const Lists = () => {
     const navigate = useNavigate()
 
@@ -99,9 +99,7 @@ const Lists = () => {
 
 
     useEffect(() => {
-        console.log("Before - " + selectedList?.name)
         if(selectedList || newListEntry) {
-            console.log("Before - " + selectedList?.name)
            navigate(`/lists/${selectedList?.name}`)
         }
         albumsOnList()
@@ -161,9 +159,8 @@ const Lists = () => {
                             item: album,
                             id: dbAlbum.list_entry_id,
                             position: dbAlbum.list_entry_position,
-                            render: () => <AlbumCard albumCardView={album}
-                                                     addToList={addToList(album)}
-                                                     deleteAlbumFromList={deleteAlbumFromList(album.id)}/>
+                            addToList: addToList(album) ,
+                            deleteFromList: deleteAlbumFromList(album.id)
                         } as ListEntry;
 
                     }).sort((a, b) => a.position > b.position ? 1 : -1))

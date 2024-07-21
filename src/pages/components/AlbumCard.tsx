@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Box, Card, CardContent, CardMedia, Typography} from "@mui/material";
 import AddToListDialog from "./AddToListDialog.tsx";
 import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
@@ -27,6 +27,11 @@ export const AlbumCard = ({
                               addToList
                           }: AlbumCardProps) => {
     const [listDialogOpen, setListDialogOpen] = useState<boolean>(false);
+
+    useEffect(()=> {
+        console.log("album card render")
+
+    },[])
 
     const toggleListDialog = () => {
         setListDialogOpen(!listDialogOpen)

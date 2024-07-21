@@ -100,14 +100,14 @@ const DraggableGrid = ({start, save}: DraggableGridProps) => {
                 <Grid marginBottom={2}>
                     <Grid container justifyContent="center" spacing={3}>
                         {items.map((item) => (
-                            <Grid item key={item.id}><SortableItem renderAlbumCard={item.render} key={item.id}
+                            <Grid item key={item.id}><SortableItem item={item} key={item.id}
                                                                    itemId={item.id}/></Grid>
                         ))}
                     </Grid>
                 </Grid>
             </SortableContext>
             <DragOverlay adjustScale style={{transformOrigin: "0 0 "}}>
-                {activeItem ? <Item renderAlbumCard={activeItem.render} isDragging/> : null}
+                {activeItem ? <Item item={activeItem} isDragging/> : null}
             </DragOverlay>
         </DndContext>
     )

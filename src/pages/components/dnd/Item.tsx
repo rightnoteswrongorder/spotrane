@@ -1,16 +1,18 @@
-import {CSSProperties, forwardRef, HTMLAttributes, ReactElement} from "react"
-import {AlbumCardProps} from "../AlbumCard.tsx";
+import {CSSProperties, forwardRef, HTMLAttributes} from "react"
+import {AlbumCard} from "../AlbumCard.tsx";
 import {Box} from "@mui/material";
+import {ListEntry} from "../../Lists.tsx";
 
 type Props = {
-    renderAlbumCard: () => ReactElement<AlbumCardProps>
+    item: ListEntry
     isOpacityEnabled?: boolean
     isDragging?: boolean
 } & HTMLAttributes<HTMLDivElement>
 
 
 const Item = forwardRef<HTMLDivElement, Props>(
-    ({renderAlbumCard,  isOpacityEnabled, isDragging, ...props}, ref) => {
+
+    ({item,  isOpacityEnabled, isDragging, ...props}, ref) => {
         const styles: CSSProperties = {
             opacity: isOpacityEnabled ? "0.4" : "1",
             cursor: isDragging ? "grabbing" : "grab",
@@ -18,12 +20,12 @@ const Item = forwardRef<HTMLDivElement, Props>(
             transform: isDragging ? "scale(1.05)" : "scale(1)",
         }
 
-        const album = renderAlbumCard()
-
         return (
             <Box ref={ref} sx={styles} {...props}>
                 <Box sx={{boxShadow: isDragging ? 0 : 2}}>
-                    {album}
+                    <AlbumCard albumCardView={item.item}
+                               addToList={item.addToList}
+                               deleteAlbumFromList={item.deleteFromList}/>
                 </Box>
             </Box>
         )
