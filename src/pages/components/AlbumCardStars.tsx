@@ -10,19 +10,23 @@ type AlbumCardStarsProps = {
 const AlbumCardStars = ({album}: AlbumCardStarsProps) => {
 
     const ratingClickHandler = (rating: number) => {
+        album.rating = rating
         SupabaseApi.setRating(rating, album.id);
     }
 
     return (
         <Box sx={{display: 'flex', 'flex-wrap': 'wrap', alignItems: 'center'}}>
             {[...Array(5)].map((_, i) => (
-                <IconButton disableFocusRipple disableRipple disableTouchRipple onClick={ratingClickHandler.bind(this, i+1)}
+                <IconButton disableFocusRipple disableRipple disableTouchRipple
+                            onClick={ratingClickHandler.bind(this, i + 1)}
                             aria-label="">
-                    <StarRateOutlined sx={{fill: album.rating > i ? 'gold' : '', "&:hover": {color: 'gold'}}}></StarRateOutlined>
+                    <StarRateOutlined
+                        sx={{fill: album.rating > i ? 'gold' : '', "&:hover": {color: 'gold'}}}></StarRateOutlined>
                 </IconButton>
             ))}
         </Box>
     )
 }
+
 
 export default AlbumCardStars
