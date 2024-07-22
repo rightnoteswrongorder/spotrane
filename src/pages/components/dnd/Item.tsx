@@ -11,7 +11,6 @@ type Props = {
 
 
 const Item = forwardRef<HTMLDivElement, Props>(
-
     ({item,  isOpacityEnabled, isDragging, ...props}, ref) => {
         const styles: CSSProperties = {
             opacity: isOpacityEnabled ? "0.4" : "1",

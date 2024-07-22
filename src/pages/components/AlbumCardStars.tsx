@@ -7,11 +7,11 @@ type AlbumCardStarsProps = {
     album: SpotraneAlbumCard
 }
 
-const AlbumCardStars = ({album}: AlbumCardStarsProps) => {
+const AlbumCardStars = ({album} : AlbumCardStarsProps) => {
 
-    const ratingClickHandler = (rating: number) => {
-        album.rating = rating
-        SupabaseApi.setRating(rating, album.id);
+    const ratingClickHandler = async (rating: number) => {
+            album.rating = rating
+            await SupabaseApi.setRating(rating, album.id);
     }
 
     return (
