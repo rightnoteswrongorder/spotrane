@@ -1,6 +1,7 @@
 import {Box, IconButton} from "@mui/material";
 import {StarRateOutlined} from "@mui/icons-material";
 import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
+import {useState} from "react";
 
 type AlbumCardStarsProps<T> = {
     updateRating?: (rating: number, albums: T[]) => void
@@ -9,8 +10,18 @@ type AlbumCardStarsProps<T> = {
 }
 
 const AlbumCardStars = <T, >({updateRating, albums, album}: AlbumCardStarsProps<T>) => {
+    const [currentlyHovered, setCurrentlyHovered] = useState<number>(0)
+
     const ratingClickHandler = (rating: number) => {
         updateRating && albums && updateRating(rating, albums)
+    }
+
+   const mouseEnter = (star: number) => {
+        setCurrentlyHovered(star)
+    }
+
+    const mouseLeave = () => {
+        setCurrentlyHovered(0)
     }
 
     return (
@@ -18,10 +29,12 @@ const AlbumCardStars = <T, >({updateRating, albums, album}: AlbumCardStarsProps<
             {[...Array(5)].map((_, i) => (
                 <IconButton disableFocusRipple disableRipple disableTouchRipple
                             onClick={ratingClickHandler.bind(this, i + 1)}
+                            onMouseEnter={mouseEnter.bind(this,i+1)}
+                            onMouseLeave={mouseLeave}
                             key={i}
                             aria-label="">
                     <StarRateOutlined
-                        sx={{fill: album.rating > i ? 'gold' : '', "&:hover": {color: 'gold'}}}></StarRateOutlined>
+                        sx={{fill: album.rating > i || currentlyHovered > i ? 'gold' : ''}}></StarRateOutlined>
                 </IconButton>
             ))}
         </Box>
