@@ -6,10 +6,11 @@ import {ListEntry} from "../../Lists.tsx";
 
 type Props = {
     item: ListEntry
+    albums: ListEntry[]
     itemId: number
 } & HTMLAttributes<HTMLDivElement>
 
-const SortableItem = ({ itemId, item, ...props }: Props) => {
+const SortableItem = ({ albums, itemId, item, ...props }: Props) => {
 
     const { attributes, isDragging, listeners, setNodeRef, transform, transition } = useSortable({
         id: itemId,
@@ -22,6 +23,7 @@ const SortableItem = ({ itemId, item, ...props }: Props) => {
 
     return (
         <Item
+            albums={albums}
             item={item}
             ref={setNodeRef}
             style={styles}

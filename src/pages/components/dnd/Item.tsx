@@ -5,13 +5,14 @@ import {ListEntry} from "../../Lists.tsx";
 
 type Props = {
     item: ListEntry
+    albums: ListEntry[]
     isOpacityEnabled?: boolean
     isDragging?: boolean
 } & HTMLAttributes<HTMLDivElement>
 
 
 const Item = forwardRef<HTMLDivElement, Props>(
-    ({item,  isOpacityEnabled, isDragging, ...props}, ref) => {
+    ({albums, item, isOpacityEnabled, isDragging, ...props}, ref) => {
         const styles: CSSProperties = {
             opacity: isOpacityEnabled ? "0.4" : "1",
             cursor: isDragging ? "grabbing" : "grab",
@@ -23,8 +24,10 @@ const Item = forwardRef<HTMLDivElement, Props>(
             <Box ref={ref} sx={styles} {...props}>
                 <Box sx={{boxShadow: isDragging ? 0 : 2}}>
                     <AlbumCard albumCardView={item.item}
+                               albums={albums}
                                addToList={item.addToList}
-                               deleteAlbumFromList={item.deleteFromList}/>
+                               deleteAlbumFromList={item.deleteFromList}
+                               updateRating={item.updateRating}/>
                 </Box>
             </Box>
         )

@@ -1,11 +1,11 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {Box, Card, CardContent, CardMedia, Typography} from "@mui/material";
 import AddToListDialog from "./AddToListDialog.tsx";
 import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
 import AlbumCardIcons from "./AlbumCardIcons.tsx";
 import AlbumCardStars from "./AlbumCardStars.tsx";
 
-export type AlbumCardProps = {
+export type AlbumCardProps<T> = {
     albumCardView: SpotraneAlbumCard
     addToList: (listId: number) => void
     listVisible?: boolean,
@@ -14,9 +14,11 @@ export type AlbumCardProps = {
     isOnVisibleList?: boolean
     deleteAlbumFromList?: () => void
     addToVisibleList?: () => void
+    updateRating?: (rating: number, albums: T[]) => void
+    albums?: T[]
 }
 
-export const AlbumCard = ({
+export const AlbumCard = <T,>({
                               albumCardView,
                               listVisible,
                               saveAlbum,
@@ -24,14 +26,11 @@ export const AlbumCard = ({
                               isOnVisibleList,
                               deleteAlbumFromList,
                               addToVisibleList,
-                              addToList
-                          }: AlbumCardProps) => {
+                              addToList,
+                              updateRating,
+    albums
+                          }: AlbumCardProps<T>) => {
     const [listDialogOpen, setListDialogOpen] = useState<boolean>(false);
-
-    useEffect(()=> {
-        console.log("album card render")
-
-    },[])
 
     const toggleListDialog = () => {
         setListDialogOpen(!listDialogOpen)
@@ -41,7 +40,7 @@ export const AlbumCard = ({
         setListDialogOpen(false)
     }
 
-    return (<Card sx={{ padding: 0.6, display: 'inline-flex', boxShadow: 0}}>
+    return (<Card sx={{padding: 0.6, display: 'inline-flex', boxShadow: 0}}>
         <Box sx={{display: 'flex', flexDirection: 'column'}}>
             <Box sx={{display: 'flex', flexDirection: 'row'}}>
                 <CardContent sx={{flex: '1 0 auto', padding: 0.5}}>
@@ -68,7 +67,8 @@ export const AlbumCard = ({
                     alt="album cover"
                 />
             </Box>
-            <AlbumCardStars album={albumCardView}></AlbumCardStars>
+            {updateRating && albums && <AlbumCardStars updateRating={updateRating}
+                            albums={albums} album={albumCardView}></AlbumCardStars>}
             <AlbumCardIcons albumCardView={albumCardView}
                             listVisible={listVisible}
                             saveAlbum={saveAlbum}

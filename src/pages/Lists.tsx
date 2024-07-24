@@ -23,9 +23,11 @@ export type ListEntry = {
     item: SpotraneAlbumCard
     id: number
     position: number
-    addToList:  (listId: number) => void,
+    addToList: (listId: number) => void
     deleteFromList: () => Promise<void | undefined>
+    updateRating:  (rating: number, albums: ListEntry[])  => void
 }
+
 
 const Lists = () => {
     const navigate = useNavigate()
@@ -35,10 +37,8 @@ const Lists = () => {
     const [lists, setLists] = React.useState<SpotraneList[]>([]);
     const [showSearchSpotifyDialog, setShowSpotifyDialog] = useState(false)
     const [newListEntry, setNewListEntry] = useState("")
-    const [albumUpdated, setAlbumUpdated] = useState("")
     const [listEntryDeleted, setListEntryDeleted] = useState("")
     const [newListAdded, setNewListAdded] = useState("")
-
 
     const handleNewListEntry = (payload: RealtimePostgresChangesPayload<Tables<'list_entry'>>) => {
         setNewListEntry(payload.commit_timestamp)
@@ -49,7 +49,7 @@ const Lists = () => {
     }
 
     const handleaAlbumUpdate = (payload: RealtimePostgresChangesPayload<Tables<'albums'>>) => {
-        setAlbumUpdated(payload.commit_timestamp)
+       console.log(payload)
     }
 
     const handleNewList = (payload: RealtimePostgresChangesPayload<Tables<'lists'>>) => {
@@ -63,9 +63,10 @@ const Lists = () => {
         }
     }
 
+
     const params = useParams()
 
-    useEffect(()  => {
+    useEffect(() => {
         (async () => {
             const listToSet = newListAdded ? newListAdded : params.listName
             await getAllLists(listToSet)
@@ -74,8 +75,9 @@ const Lists = () => {
         supabase.channel('album_update').on<Tables<'albums'>>('postgres_changes', {
                 event: 'UPDATE',
                 schema: 'public',
-                table: 'albums' },
-                handleaAlbumUpdate).subscribe()
+                table: 'albums'
+            },
+            handleaAlbumUpdate).subscribe()
 
         supabase.channel('list_entry_insert').on<Tables<'list_entry'>>('postgres_changes', {
             event: 'INSERT',
@@ -99,11 +101,11 @@ const Lists = () => {
 
 
     useEffect(() => {
-        if(selectedList || newListEntry) {
-           navigate(`/lists/${selectedList?.name}`)
+        if (selectedList || newListEntry) {
+            navigate(`/lists/${selectedList?.name}`)
         }
         albumsOnList()
-    }, [selectedList, newListEntry, listEntryDeleted, albumUpdated]);
+    }, [selectedList, newListEntry, listEntryDeleted]);
 
     const sdk = useSpotify(
         import.meta.env.VITE_SPOTIFY_CLIENT_ID,
@@ -113,6 +115,22 @@ const Lists = () => {
 
     const deleteAlbumFromList = (albumId: string) => {
         return async () => selectedList && await SupabaseApi.deleteAlbumFromList(selectedList.id, albumId)
+    }
+
+    const updateRating = (card: SpotraneAlbumCard) => {
+        return (rating: number, albums: ListEntry[]) => {
+            const newAlbums = albums.map((album) => {
+                if (album.item.id == card.id) {
+                    album.item.rating = rating;
+                    return album;
+                } else {
+                    return album
+                }
+            })
+            setAlbums(newAlbums)
+
+            SupabaseApi.setRating(rating, card.id);
+        }
     }
 
     const getAllLists = async (onPath?: string) => {
@@ -128,7 +146,6 @@ const Lists = () => {
             const res = spotraneLists?.find(list => list.name == onPath)
             res && setSelectedList(res)
         }
-
 
 
         spotraneLists && setLists(spotraneLists)
@@ -159,8 +176,9 @@ const Lists = () => {
                             item: album,
                             id: dbAlbum.list_entry_id,
                             position: dbAlbum.list_entry_position,
-                            addToList: addToList(album) ,
-                            deleteFromList: deleteAlbumFromList(album.id)
+                            addToList: addToList(album),
+                            deleteFromList: deleteAlbumFromList(album.id),
+                            updateRating: updateRating(album),
                         } as ListEntry;
 
                     }).sort((a, b) => a.position > b.position ? 1 : -1))
@@ -293,7 +311,8 @@ const Lists = () => {
         <>
             <Grid xs={12} item={true}>
                 {selectedList && showSearchSpotifyDialog &&
-                    <SpotifySearchDialog sdk={sdk} albumsOnList={albums} isOpen={showSearchSpotifyDialog} handleClose={handleClose}
+                    <SpotifySearchDialog sdk={sdk} albumsOnList={albums} isOpen={showSearchSpotifyDialog}
+                                         handleClose={handleClose}
                                          listId={selectedList.id} listVisible={true}/>}
                 <form>
                     <Stack sx={{paddingLeft: 5, paddingRight: 5}} spacing={1} marginBottom={2}>
@@ -357,7 +376,7 @@ const Lists = () => {
                     </Stack>
                 </form>
             </Grid>
-            <DraggableGrid start={albums} save={saveListEntry}/>
+            <DraggableGrid  start={albums} save={saveListEntry}/>
         </>
     )
 }

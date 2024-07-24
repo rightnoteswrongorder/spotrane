@@ -38,10 +38,9 @@ const Library = () => {
     const [rowsPerPage, setRowsPerPage] = useState(DEFAULT_PAGE_SIZE);
     const [showSearchSpotifyDialog, setShowSpotifyDialog] = useState(false)
     const [showCannotDeleteMessage, setShowCannotDeleteMessage] = useState("")
-    const [albumUpdated, setAlbumUpdated] = useState("")
 
     const handleAlbumUpdate = (payload: RealtimePostgresChangesPayload<Tables<'albums'>>) => {
-        setAlbumUpdated(payload.commit_timestamp)
+        console.log(payload)
     }
 
     useEffect(() => {
@@ -57,12 +56,23 @@ const Library = () => {
         allAlbums(page, rowsPerPage)
     }, [rowsPerPage]);
 
-    useEffect(() => {
-        (async () => {
-            const updated = await SupabaseApi.getAlbumsWithIds(albums.map(alb => alb.id))
-            setAlbums(spotraneAlbum(updated))
-        }) ();
-    }, [albumUpdated]);
+
+    const updateRating = (card: SpotraneAlbumCard) => {
+        return (rating: number, albums: SpotraneAlbumCard[]) => {
+            const newAlbums = albums.map((album) => {
+                if (album.id == card.id) {
+                    album.rating = rating;
+                    return album;
+                } else {
+                    return album
+                }
+            })
+            setAlbums(newAlbums)
+
+            SupabaseApi.setRating(rating, card.id);
+        }
+    }
+
 
     const spotraneAlbum = (dbAlbums: Tables<'all_albums_view'>[]): SpotraneAlbumCard[] => {
         return dbAlbums.map(dbAlbum => {
@@ -186,6 +196,8 @@ const Library = () => {
                             <Box boxShadow={2}>
                                 <AlbumCard albumCardView={album}
                                            addToList={addToList(album)}
+                                           updateRating={updateRating(album)}
+                                           albums={albums}
                                            deleteAlbumFromLibrary={deleteAlbumFromLibrary(album.id)}/>
                             </Box>
                         </Grid>))}
