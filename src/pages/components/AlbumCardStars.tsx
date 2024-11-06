@@ -4,16 +4,17 @@ import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
 import {useState} from "react";
 
 type AlbumCardStarsProps<T> = {
-    updateRating?: (rating: number, albums: T[]) => void
+    updateRating?: (rating: number) => void
     albums?: T[]
     album: SpotraneAlbumCard
 }
 
-const AlbumCardStars = <T, >({updateRating, albums, album}: AlbumCardStarsProps<T>) => {
+const AlbumCardStars = <T, >({updateRating, album}: AlbumCardStarsProps<T>) => {
     const [currentlyHovered, setCurrentlyHovered] = useState<number>(0)
 
     const ratingClickHandler = (rating: number) => {
-        updateRating && albums && updateRating(rating, albums)
+        album.rating = rating;
+        updateRating && updateRating(rating)
     }
 
    const mouseEnter = (star: number) => {

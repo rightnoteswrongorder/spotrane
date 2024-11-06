@@ -15,8 +15,6 @@ import {Scopes} from "@spotify/web-api-ts-sdk";
 import {SpotraneAlbumCard} from "../interfaces/spotrane.types.ts";
 import AlertDialog from "./components/AlertDialog.tsx";
 import {useSpotify} from "../hooks/useSpotfy.ts";
-import supabase from "../api/supaBaseClient.ts";
-import {RealtimePostgresChangesPayload} from "@supabase/supabase-js";
 
 interface IFormInput {
     searchText: string
@@ -39,17 +37,6 @@ const Library = () => {
     const [showSearchSpotifyDialog, setShowSpotifyDialog] = useState(false)
     const [showCannotDeleteMessage, setShowCannotDeleteMessage] = useState("")
 
-    const handleAlbumUpdate = (payload: RealtimePostgresChangesPayload<Tables<'albums'>>) => {
-        console.log(payload)
-    }
-
-    useEffect(() => {
-        supabase.channel('album_update').on<Tables<'albums'>>('postgres_changes', {
-                event: 'UPDATE',
-                schema: 'public',
-                table: 'albums' },
-            handleAlbumUpdate).subscribe()
-    })
 
     useEffect(() => {
         countAlbums()
@@ -58,17 +45,7 @@ const Library = () => {
 
 
     const updateRating = (card: SpotraneAlbumCard) => {
-        return (rating: number, albums: SpotraneAlbumCard[]) => {
-            const newAlbums = albums.map((album) => {
-                if (album.id == card.id) {
-                    album.rating = rating;
-                    return album;
-                } else {
-                    return album
-                }
-            })
-            setAlbums(newAlbums)
-
+        return (rating: number) => {
             SupabaseApi.setRating(rating, card.id);
         }
     }

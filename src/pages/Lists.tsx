@@ -2,18 +2,14 @@ import Grid from "@mui/material/Grid";
 import {Button, FormControl, InputLabel, MenuItem, Select, Stack,} from "@mui/material";
 import * as React from "react";
 import {useEffect, useState} from "react";
-import {Tables} from "../interfaces/database.types.ts";
 import {Controller, useForm} from "react-hook-form";
 import {SupabaseApi} from "../api/supabase.ts";
 import SpotifySearchDialog from "./components/SpotifySearchDialog.tsx";
 import {Scopes} from "@spotify/web-api-ts-sdk";
 import {useSpotify} from "../hooks/useSpotfy.ts";
-import supabase from "../api/supaBaseClient.ts";
-import {RealtimePostgresChangesPayload} from "@supabase/supabase-js";
 import {SpotraneAlbumCard, SpotraneList} from "../interfaces/spotrane.types.ts";
 import YesNoDialog from "./components/YesNoDialog.tsx";
 import DraggableGrid from "./components/dnd/DraggableGrid.tsx";
-import {useNavigate, useParams} from "react-router-dom";
 
 interface IFormInput {
     listName: string
@@ -25,37 +21,17 @@ export type ListEntry = {
     position: number
     addToList: (listId: number) => void
     deleteFromList: () => Promise<void | undefined>
-    updateRating:  (rating: number, albums: ListEntry[])  => void
+    updateRating: (rating: number) => void
 }
 
 
 const Lists = () => {
-    const navigate = useNavigate()
 
     const [albums, setAlbums] = useState<ListEntry[]>([]);
     const [selectedList, setSelectedList] = useState<SpotraneList>()
     const [lists, setLists] = React.useState<SpotraneList[]>([]);
     const [showSearchSpotifyDialog, setShowSpotifyDialog] = useState(false)
-    const [newListEntry, setNewListEntry] = useState("")
-    const [listEntryDeleted, setListEntryDeleted] = useState("")
-    const [newListAdded, setNewListAdded] = useState("")
 
-    const handleNewListEntry = (payload: RealtimePostgresChangesPayload<Tables<'list_entry'>>) => {
-        setNewListEntry(payload.commit_timestamp)
-    }
-
-    const handleEntryDeletedFromList = (payload: RealtimePostgresChangesPayload<Tables<'list_entry'>>) => {
-        setListEntryDeleted(payload.commit_timestamp)
-    }
-
-    const handleaAlbumUpdate = (payload: RealtimePostgresChangesPayload<Tables<'albums'>>) => {
-       console.log(payload)
-    }
-
-    const handleNewList = (payload: RealtimePostgresChangesPayload<Tables<'lists'>>) => {
-        const list = payload.new as Tables<'lists'>
-        setNewListAdded(list.name ? list.name : "")
-    }
 
     const addToList = (albumCardView: SpotraneAlbumCard) => {
         return (listId: number) => {
@@ -63,49 +39,14 @@ const Lists = () => {
         }
     }
 
-
-    const params = useParams()
+    useEffect(() => {
+        getAllLists()
+    }, [])
 
     useEffect(() => {
-        (async () => {
-            const listToSet = newListAdded ? newListAdded : params.listName
-            await getAllLists(listToSet)
-        })()
-
-        supabase.channel('album_update').on<Tables<'albums'>>('postgres_changes', {
-                event: 'UPDATE',
-                schema: 'public',
-                table: 'albums'
-            },
-            handleaAlbumUpdate).subscribe()
-
-        supabase.channel('list_entry_insert').on<Tables<'list_entry'>>('postgres_changes', {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'list_entry'
-        }, handleNewListEntry).subscribe()
-
-        supabase.channel('list_entry_delete').on<Tables<'list_entry'>>('postgres_changes', {
-            event: 'DELETE',
-            schema: 'public',
-            table: 'list_entry'
-        }, handleEntryDeletedFromList).subscribe()
-
-        supabase.channel('lists').on<Tables<'lists'>>('postgres_changes', {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'lists'
-        }, handleNewList).subscribe()
-
-    }, [newListAdded]);
-
-
-    useEffect(() => {
-        if (selectedList || newListEntry) {
-            navigate(`/lists/${selectedList?.name}`)
-        }
+        console.log("selected list")
         albumsOnList()
-    }, [selectedList, newListEntry, listEntryDeleted]);
+    }, [selectedList])
 
     const sdk = useSpotify(
         import.meta.env.VITE_SPOTIFY_CLIENT_ID,
@@ -114,21 +55,14 @@ const Lists = () => {
     );
 
     const deleteAlbumFromList = (albumId: string) => {
-        return async () => selectedList && await SupabaseApi.deleteAlbumFromList(selectedList.id, albumId)
+        return async () => {
+            selectedList && await SupabaseApi.deleteAlbumFromList(selectedList.id, albumId)
+            albumsOnList()
+        }
     }
 
     const updateRating = (card: SpotraneAlbumCard) => {
-        return (rating: number, albums: ListEntry[]) => {
-            const newAlbums = albums.map((album) => {
-                if (album.item.id == card.id) {
-                    album.item.rating = rating;
-                    return album;
-                } else {
-                    return album
-                }
-            })
-            setAlbums(newAlbums)
-
+        return (rating: number) => {
             SupabaseApi.setRating(rating, card.id);
         }
     }
@@ -149,9 +83,9 @@ const Lists = () => {
 
 
         spotraneLists && setLists(spotraneLists)
+        console.log("updated lists")
 
     }
-
 
     const albumsOnList = () => {
         (async () => {
@@ -248,6 +182,7 @@ const Lists = () => {
 
     const runListLoad = (listName: string) => {
         const list = lists.find(list => list?.name == listName)
+        console.log(lists)
         console.log("list load: " + list?.name)
         list && setSelectedList(list)
     }
@@ -260,12 +195,14 @@ const Lists = () => {
         console.log(selectedList?.name)
         getAllLists()
         setSelectedList(selectedList)
+        albumsOnList()
         setShowSpotifyDialog(false);
     };
 
     const createList = (name: string) => {
         (async () => {
             await SupabaseApi.createList(name)
+            await getAllLists(name)
         })();
     }
 
@@ -291,7 +228,7 @@ const Lists = () => {
             if (selectedList) {
                 await SupabaseApi.renameList(selectedList.id, newName)
             }
-            handleReset()
+            await getAllLists(newName)
         })();
     }
 
@@ -376,7 +313,7 @@ const Lists = () => {
                     </Stack>
                 </form>
             </Grid>
-            <DraggableGrid  start={albums} save={saveListEntry}/>
+            <DraggableGrid start={albums} save={saveListEntry}/>
         </>
     )
 }

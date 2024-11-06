@@ -7,6 +7,7 @@ import WikipediaIcon from "../../static/images/wikipeida.svg?react"
 import EcmIcon from "../../static/images/ecmlogo.svg?react"
 import {PlaylistAdd, PlaylistAddCheck} from "@mui/icons-material";
 import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
+import {useEffect, useState} from "react";
 
 type AlbumCardIconProps = {
     albumCardView: SpotraneAlbumCard
@@ -30,7 +31,16 @@ const AlbumCardIcons = ({
                                    toggleListDialog
                                }: AlbumCardIconProps) => {
 
+    const [saved, setSaved] = useState<boolean>(false)
+
+    useEffect(() => {
+        if(!saved && albumCardView.isSaved) {
+            setSaved(true)
+        }
+    }, []);
+
     const saveClickHandler = () => {
+        setSaved(true)
         saveAlbum && saveAlbum()
     }
 
@@ -38,6 +48,7 @@ const AlbumCardIcons = ({
         if (deleteAlbumFromList) {
             deleteAlbumFromList()
         } else if (deleteAlbumFromLibrary) {
+            setSaved(false)
             deleteAlbumFromLibrary()
         }
     }
@@ -69,14 +80,14 @@ const AlbumCardIcons = ({
     return (
         <Box sx={{display: 'flex', flexWrap: 'wrap', alignItems: 'center'}}>
             {(deleteAlbumFromLibrary || deleteAlbumFromList) &&
-                <IconButton onClick={deleteClickHandler} sx={{color: albumCardView.isSaved ? (theme) => theme.palette.secondary.main : 'gray'}}
+                <IconButton onClick={deleteClickHandler} sx={{color: saved ? (theme) => theme.palette.secondary.main : 'gray'}}
                             aria-label="unfollow">
                     <DeleteIcon></DeleteIcon>
                 </IconButton>}
             {saveAlbum && <IconButton onClick={saveClickHandler}
-                                      disabled={albumCardView.isSaved}
+                                      disabled={saved}
                                       aria-label="save">
-                <SaveIcon sx={{color: albumCardView.isSaved ? (theme) => theme.palette.primary.main : 'white'}}></SaveIcon>
+                <SaveIcon sx={{color: saved ? (theme) => theme.palette.primary.main : 'white'}}></SaveIcon>
             </IconButton>}
             {listVisible && addToVisibleList && <IconButton disabled={isOnVisibleList} onClick={addToListHandler}
                                       aria-label="add-to-list">

@@ -14,9 +14,6 @@ import {SupabaseApi} from "../../api/supabase.ts";
 import * as React from "react";
 import Dialog from "@mui/material/Dialog";
 import PageLoadSpinner from "./PageLoadSpinner.tsx";
-import {RealtimePostgresChangesPayload} from "@supabase/supabase-js";
-import {Tables} from "../../interfaces/database.types.ts";
-import supabase from "../../api/supaBaseClient.ts";
 import {ListEntry} from "../Lists.tsx";
 
 interface IFormInput {
@@ -47,36 +44,6 @@ const SpotifySearchDialog = ({
     const {register, handleSubmit, setValue} = useForm<IFormInput>()
     const [searchLoading, setSearchLoading] = useState(false)
 
-    const [websocketUpdate, setWebSocketUpdate] = useState<Tables<'albums'>>()
-
-    useEffect(() => {
-        const album = websocketUpdate
-        const spotifyAlbum = searchResults.find(result => result.id == album?.spotify_id)
-
-        if (spotifyAlbum) {
-            const newAlbum = {
-                id: spotifyAlbum.id,
-                name: spotifyAlbum.name,
-                releaseDate: spotifyAlbum.releaseDate,
-                imageUri: spotifyAlbum.imageUri,
-                albumUri: spotifyAlbum.albumUri,
-                label: spotifyAlbum.label,
-                artistId: spotifyAlbum.artistId,
-                artistName: spotifyAlbum.artistName,
-                artistGenres: spotifyAlbum.artistGenres,
-                rating: spotifyAlbum.rating,
-                isSaved: true
-            }
-            const newResults = searchResults.map(result => result.id == album?.spotify_id ? newAlbum : result)
-            setSearchResults(newResults)
-        }
-    }, [websocketUpdate]);
-
-    const handleDbChange = (payload: RealtimePostgresChangesPayload<Tables<'albums'>>) => {
-        const album = payload.new as Tables<'albums'>
-        setWebSocketUpdate(album)
-    }
-
     const addToList = (albumCardView: SpotraneAlbumCard) => {
         return (listId: number) => {
             listId && SupabaseApi.addToList(listId, albumCardView)
@@ -105,11 +72,6 @@ const SpotifySearchDialog = ({
     };
 
     useEffect(() => {
-        supabase.channel('albums').on<Tables<'albums'>>('postgres_changes', {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'albums'
-        }, handleDbChange).subscribe()
 
         setOpen(isOpen)
 

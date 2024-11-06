@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Box, Card, CardContent, CardMedia, Typography} from "@mui/material";
 import AddToListDialog from "./AddToListDialog.tsx";
 import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
@@ -14,7 +14,7 @@ export type AlbumCardProps<T> = {
     isOnVisibleList?: boolean
     deleteAlbumFromList?: () => void
     addToVisibleList?: () => void
-    updateRating?: (rating: number, albums: T[]) => void
+    updateRating?: (rating: number) => void
     albums?: T[]
 }
 
@@ -31,11 +31,23 @@ export const AlbumCard = <T,>({
     albums
                           }: AlbumCardProps<T>) => {
     const [listDialogOpen, setListDialogOpen] = useState<boolean>(false);
+    const [onlist, setOnList] = useState<boolean>(false)
+
+    useEffect(() => {
+        if(!onlist && isOnVisibleList) {
+            setOnList(true)
+        }
+    }, []);
 
     const toggleListDialog = () => {
         setListDialogOpen(!listDialogOpen)
     }
 
+    const addToVl = () => {
+        addToVisibleList && addToVisibleList()
+        setOnList(true)
+
+    }
     const handleAddToListDialogClose = () => {
         setListDialogOpen(false)
     }
@@ -74,8 +86,8 @@ export const AlbumCard = <T,>({
                             saveAlbum={saveAlbum}
                             deleteAlbumFromLibrary={deleteAlbumFromLibrary}
                             deleteAlbumFromList={deleteAlbumFromList}
-                            isOnVisibleList={isOnVisibleList}
-                            addToVisibleList={addToVisibleList}
+                            isOnVisibleList={onlist}
+                            addToVisibleList={addToVl}
                             toggleListDialog={toggleListDialog}/>
         </Box>
         {
