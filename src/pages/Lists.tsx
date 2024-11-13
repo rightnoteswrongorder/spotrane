@@ -10,6 +10,7 @@ import {useSpotify} from "../hooks/useSpotfy.ts";
 import {SpotraneAlbumCard, SpotraneList} from "../interfaces/spotrane.types.ts";
 import YesNoDialog from "./components/YesNoDialog.tsx";
 import DraggableGrid from "./components/dnd/DraggableGrid.tsx";
+import {useNavigate, useParams} from "react-router-dom";
 
 interface IFormInput {
     listName: string
@@ -26,6 +27,8 @@ export type ListEntry = {
 
 
 const Lists = () => {
+    const navigate = useNavigate()
+
 
     const [albums, setAlbums] = useState<ListEntry[]>([]);
     const [selectedList, setSelectedList] = useState<SpotraneList>()
@@ -39,12 +42,20 @@ const Lists = () => {
         }
     }
 
-    useEffect(() => {
-        getAllLists()
-    }, [])
+
+    const params = useParams()
 
     useEffect(() => {
-        console.log("selected list")
+        (async () => {
+            if( params.listName) {
+                await getAllLists(params.listName)
+            }
+        })()},[])
+
+    useEffect(() => {
+        if(selectedList) {
+            navigate(`/lists/${selectedList?.name}`)
+        }
         albumsOnList()
     }, [selectedList])
 
@@ -67,7 +78,7 @@ const Lists = () => {
         }
     }
 
-    const getAllLists = async (onPath?: string) => {
+    const getAllLists = async (setList?: string) => {
         const data = await SupabaseApi.getLists()
         const spotraneLists = data && data.map(dbList => {
             return {
@@ -76,8 +87,8 @@ const Lists = () => {
             } as SpotraneList
         })
 
-        if (onPath) {
-            const res = spotraneLists?.find(list => list.name == onPath)
+        if (setList) {
+            const res = spotraneLists?.find(list => list.name == setList)
             res && setSelectedList(res)
         }
 
@@ -182,8 +193,6 @@ const Lists = () => {
 
     const runListLoad = (listName: string) => {
         const list = lists.find(list => list?.name == listName)
-        console.log(lists)
-        console.log("list load: " + list?.name)
         list && setSelectedList(list)
     }
 
