@@ -88,7 +88,7 @@ const Lists = () => {
         })
 
         if (setList) {
-            const res = spotraneLists?.find(list => list.name == setList)
+            const res = spotraneLists?.find(list => list.name.toLowerCase() == setList.toLowerCase())
             res && setSelectedList(res)
         }
 
@@ -142,6 +142,7 @@ const Lists = () => {
         (async () => {
             setAlbums([])
             setSelectedList(undefined)
+            navigate(`/lists`)
             reset()
             await getAllLists()
         })()
