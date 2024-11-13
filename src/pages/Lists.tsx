@@ -47,9 +47,7 @@ const Lists = () => {
 
     useEffect(() => {
         (async () => {
-            if( params.listName) {
-                await getAllLists(params.listName)
-            }
+            params.listName ? await getAllLists(params.listName) : await getAllLists()
         })()},[])
 
     useEffect(() => {
