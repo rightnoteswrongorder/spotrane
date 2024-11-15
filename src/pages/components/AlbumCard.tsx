@@ -4,6 +4,7 @@ import AddToListDialog from "./AddToListDialog.tsx";
 import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
 import AlbumCardIcons from "./AlbumCardIcons.tsx";
 import AlbumCardStars from "./AlbumCardStars.tsx";
+import Image from "mui-image"
 
 export type AlbumCardProps<T> = {
     albumCardView: SpotraneAlbumCard
@@ -69,15 +70,13 @@ export const AlbumCard = <T,>({
                     </Typography>
                     <Typography noWrap sx={{width: '175px'}} marginTop={0.2} variant="body1" color="text.secondary"
                                 component="div">
-                        {albumCardView.artistGenres.length == 0 ? 'Uknown' : `${albumCardView?.artistGenres}`}
+                        {albumCardView.artistGenres.length == 0 ? 'Unknown' : `${albumCardView?.artistGenres}`}
                     </Typography>
                 </CardContent>
-                <CardMedia
-                    component="img"
-                    sx={{width: 80, height: 80, padding: 0.5}}
-                    image={albumCardView?.imageUri}
-                    alt="album cover"
-                />
+                <CardMedia ><Image
+                    width={80}
+                    height={80}
+                    src={albumCardView?.imageUri}/></CardMedia>
             </Box>
             {updateRating && albums && <AlbumCardStars updateRating={updateRating}
                             albums={albums} album={albumCardView}></AlbumCardStars>}

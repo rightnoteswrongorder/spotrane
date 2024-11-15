@@ -42,16 +42,16 @@ const Lists = () => {
         }
     }
 
-
     const params = useParams()
 
     useEffect(() => {
         (async () => {
             params.listName ? await getAllLists(params.listName) : await getAllLists()
-        })()},[])
+        })()
+    }, [])
 
     useEffect(() => {
-        if(selectedList) {
+        if (selectedList) {
             navigate(`/lists/${selectedList?.name}`)
         }
         albumsOnList()
@@ -92,8 +92,6 @@ const Lists = () => {
 
 
         spotraneLists && setLists(spotraneLists)
-        console.log("updated lists")
-
     }
 
     const albumsOnList = () => {
