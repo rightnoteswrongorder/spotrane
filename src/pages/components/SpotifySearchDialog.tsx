@@ -85,10 +85,15 @@ const SpotifySearchDialog = ({
         setSearchLoading(false)
     }, [searchResults]);
 
-    const findById: SubmitHandler<IFormInput> = (data) => {
+    const findByUrl: SubmitHandler<IFormInput> = (data) => {
+        const id = new URL(data.searchText).pathname.split("/")[2]
+        findById(id)
+    }
+
+    const findById  = (id: string) => {
         (async () => {
             setSearchLoading(true)
-            const result = await SpotifyApiProxy.getAlbum(sdk, data.searchText)
+            const result = await SpotifyApiProxy.getAlbum(sdk, id)
             if (result) {
                 const artist = await SpotifyApiProxy.getArtist(sdk, result?.artists[0].id)
                 const album = await SpotifyApiProxy.getAlbum(sdk, result?.id)
@@ -98,6 +103,7 @@ const SpotifySearchDialog = ({
             }
         })();
     }
+
 
     const onSubmit: SubmitHandler<IFormInput> = (data) => {
         (async () => {
@@ -144,8 +150,8 @@ const SpotifySearchDialog = ({
                                 <TextField autoFocus variant='outlined' InputLabelProps={{shrink: true}} margin="dense"
                                            type='text' {...register("searchText", {required: true})} />
                                 <Button type='submit' variant='outlined' color='secondary'>Search</Button>
-                                <Button type='submit' onClick={handleSubmit(findById)} variant='outlined'
-                                        color='secondary'>Find By Id</Button>
+                                <Button type='submit' onClick={handleSubmit(findByUrl)} variant='outlined'
+                                        color='secondary'>Find By Url</Button>
                             </Stack>
                         </form>
                     </Grid>
