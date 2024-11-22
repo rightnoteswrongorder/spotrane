@@ -116,6 +116,14 @@ export const SupabaseApi = {
         return data
     },
 
+    getListsForAlbum: async (albumSpotifyId: string): Promise<Tables<'albums_on_lists'>[] | null> => {
+        const {data} = await supabase
+            .from('albums_on_lists')
+            .select("*")
+            .eq("spotify_id", albumSpotifyId)
+        return data
+    },
+
     getLists: async (): Promise<Tables<'lists'>[] | null> => {
         const {data} = await supabase
             .from('lists')

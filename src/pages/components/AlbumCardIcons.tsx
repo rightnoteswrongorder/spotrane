@@ -1,4 +1,4 @@
-import {Box, IconButton, Link, SvgIcon} from "@mui/material";
+import {Box, IconButton, Link, SvgIcon, Tooltip} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
 import SpotifyIcon from "../../static/images/spotify.svg?react"
@@ -8,6 +8,7 @@ import EcmIcon from "../../static/images/ecmlogo.svg?react"
 import {PlaylistAdd, PlaylistAddCheck} from "@mui/icons-material";
 import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
 import {useEffect, useState} from "react";
+import {SupabaseApi} from "../../api/supabase.ts";
 
 type AlbumCardIconProps = {
     albumCardView: SpotraneAlbumCard
@@ -21,20 +22,25 @@ type AlbumCardIconProps = {
 }
 
 const AlbumCardIcons = ({
-                                   albumCardView,
-                                   listVisible,
-                                   isOnVisibleList,
-                                   saveAlbum,
-                                   deleteAlbumFromLibrary,
-                                   deleteAlbumFromList,
-                                   addToVisibleList,
-                                   toggleListDialog
-                               }: AlbumCardIconProps) => {
+                            albumCardView,
+                            listVisible,
+                            isOnVisibleList,
+                            saveAlbum,
+                            deleteAlbumFromLibrary,
+                            deleteAlbumFromList,
+                            addToVisibleList,
+                            toggleListDialog
+                        }: AlbumCardIconProps) => {
 
     const [saved, setSaved] = useState<boolean>(false)
+    const [lists, setLists] = useState<string | undefined>("")
 
     useEffect(() => {
-        if(!saved && albumCardView.isSaved) {
+        (async () => {
+            const albums = await SupabaseApi.getListsForAlbum(albumCardView.id)
+            setLists("On Lists: " + albums?.map(a => a.list_name).join(","))
+        })()
+        if (!saved && albumCardView.isSaved) {
             setSaved(true)
         }
     }, []);
@@ -73,14 +79,15 @@ const AlbumCardIcons = ({
         return `https://ecmreviews.com/?s=${removeTextInParenthises(albumCardView.name)}`
     }
 
-    const removeTextInParenthises = (dirtyText : string) : string => {
+    const removeTextInParenthises = (dirtyText: string): string => {
         return dirtyText.replace(/ *\([^)]*\) */g, "")
     }
 
     return (
         <Box sx={{display: 'flex', flexWrap: 'wrap', alignItems: 'center'}}>
             {(deleteAlbumFromLibrary || deleteAlbumFromList) &&
-                <IconButton onClick={deleteClickHandler} sx={{color: saved ? (theme) => theme.palette.secondary.main : 'gray'}}
+                <IconButton onClick={deleteClickHandler}
+                            sx={{color: saved ? (theme) => theme.palette.secondary.main : 'gray'}}
                             aria-label="unfollow">
                     <DeleteIcon></DeleteIcon>
                 </IconButton>}
@@ -89,24 +96,28 @@ const AlbumCardIcons = ({
                                       aria-label="save">
                 <SaveIcon sx={{color: saved ? (theme) => theme.palette.primary.main : 'white'}}></SaveIcon>
             </IconButton>}
-            {listVisible && addToVisibleList && <IconButton disabled={isOnVisibleList} onClick={addToListHandler}
-                                      aria-label="add-to-list">
-                <PlaylistAddCheck sx={{color: isOnVisibleList ? (theme) => theme.palette.primary.main : 'white'}}></PlaylistAddCheck>
-            </IconButton>}
-            <IconButton onClick={addToListClickHandler}
-                        aria-label="add-to-list">
-                <PlaylistAdd></PlaylistAdd>
-            </IconButton>
+            {listVisible && addToVisibleList &&
+                <IconButton disabled={isOnVisibleList} onClick={addToListHandler}
+                            aria-label="add-to-list">
+                    <PlaylistAddCheck
+                        sx={{color: isOnVisibleList ? (theme) => theme.palette.primary.main : 'white'}}></PlaylistAddCheck>
+                </IconButton>}
+            <Tooltip title={lists}>
+                <IconButton onClick={addToListClickHandler}
+                            aria-label="add-to-list">
+                    <PlaylistAdd></PlaylistAdd>
+                </IconButton>
+            </Tooltip>
             <IconButton component={Link} href={albumCardView?.albumUri}>
                 <SvgIcon component={SpotifyIcon} inheritViewBox/>
             </IconButton>
             <IconButton component={Link} target="_blank" href={makeDiscogsUrl()}>
                 <SvgIcon component={DiscogsIcon} inheritViewBox/>
             </IconButton>
-            <IconButton  component={Link} target="_blank" href={makeWikipediaUrl()}>
+            <IconButton component={Link} target="_blank" href={makeWikipediaUrl()}>
                 <SvgIcon component={WikipediaIcon} inheritViewBox/>
             </IconButton>
-            {albumCardView.label == "ECM Records" && <IconButton  component={Link} target="_blank" href={makeEcmUrl()}>
+            {albumCardView.label == "ECM Records" && <IconButton component={Link} target="_blank" href={makeEcmUrl()}>
                 <SvgIcon component={EcmIcon} inheritViewBox/>
             </IconButton>}
         </Box>
