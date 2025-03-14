@@ -46,9 +46,9 @@ export const SupabaseApi = {
             ], {onConflict: 'spotify_id'})
     },
 
-    setRating: async(rating: number, id: string) => {
+    setRating: async (rating: number, id: string) => {
         await supabase.from('albums')
-            .update({ rating: rating})
+            .update({rating: rating})
             .eq('spotify_id', id)
     },
 
@@ -70,7 +70,8 @@ export const SupabaseApi = {
     },
 
     searchAllAlbums: async (searchText: string): Promise<Tables<'all_albums_view'>[]> => {
-        const {data, error} = await supabase.rpc('search_all_albums', {keyword: searchText.replace(" ", " | ")})
+        const {data, error} = await supabase.rpc('search_all_albums',
+            {keyword: searchText.replaceAll(" ", " & ")})
         if (error) {
             console.log("Error searching all albums...")
         }
@@ -90,6 +91,13 @@ export const SupabaseApi = {
             .from('all_albums_view')
             .select("*")
             .range(from, to - 1)
+        return data || []
+    },
+
+    getAllArtists: async (): Promise<Tables<'artists'>[]> => {
+        const {data} = await supabase
+            .from('artists')
+            .select("*")
         return data || []
     },
 

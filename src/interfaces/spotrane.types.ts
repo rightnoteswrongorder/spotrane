@@ -12,6 +12,11 @@ export type SpotraneAlbumCard = {
     rating: number
 }
 
+export type SpotraneArtist = {
+    id: number
+    name: string | null
+}
+
 export type SupabaseError = {
     details: string;
     message: string;

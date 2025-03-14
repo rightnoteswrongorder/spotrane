@@ -1,5 +1,6 @@
 import Grid from "@mui/material/Grid";
 import {
+    Autocomplete,
     Box,
     Button,
     Stack,
@@ -7,18 +8,14 @@ import {
 } from "@mui/material";
 import {MouseEvent, ChangeEvent, useEffect, useRef, useState} from "react";
 import {Tables} from "../interfaces/database.types.ts";
-import {SubmitHandler, useForm} from "react-hook-form";
 import {AlbumCard} from "./components/AlbumCard.tsx";
 import {SupabaseApi} from "../api/supabase.ts";
 import SpotifySearchDialog from "./components/SpotifySearchDialog.tsx";
 import {Scopes} from "@spotify/web-api-ts-sdk";
-import {SpotraneAlbumCard} from "../interfaces/spotrane.types.ts";
+import {SpotraneAlbumCard, SpotraneArtist} from "../interfaces/spotrane.types.ts";
 import AlertDialog from "./components/AlertDialog.tsx";
 import {useSpotify} from "../hooks/useSpotfy.ts";
-
-interface IFormInput {
-    searchText: string
-}
+import {debounce} from "lodash";
 
 const Library = () => {
     const sdk = useSpotify(
@@ -29,6 +26,7 @@ const Library = () => {
 
     const DEFAULT_PAGE_SIZE = 5
     const [albums, setAlbums] = useState<SpotraneAlbumCard[]>([]);
+    const [artists, setArtists] = useState<SpotraneArtist[]>([]);
     const [searchTotal, setSearchTotal] = useState<number>(0)
     const [totalAlbums, setTotalAlbums] = useState<number>(0)
     const nextId = useRef(0);
@@ -36,10 +34,12 @@ const Library = () => {
     const [rowsPerPage, setRowsPerPage] = useState(DEFAULT_PAGE_SIZE);
     const [showSearchSpotifyDialog, setShowSpotifyDialog] = useState(false)
     const [showCannotDeleteMessage, setShowCannotDeleteMessage] = useState("")
+    const [searchText, setSearchText] = useState("")
 
 
     useEffect(() => {
         countAlbums()
+        allArtists()
         allAlbums(page, rowsPerPage)
     }, [rowsPerPage]);
 
@@ -88,6 +88,18 @@ const Library = () => {
         });
     }
 
+    const allArtists = () => {
+        (async () => {
+            const artists = await SupabaseApi.getAllArtists()
+            setArtists(artists.map(artist => {
+                return {
+                    id: artist.id,
+                    name: artist.name
+                } as SpotraneArtist
+            }))
+        })();
+    }
+
     const allAlbums = (from: number, to: number) => {
         (async () => {
             const data = await SupabaseApi.getAllAlbums(from, to)
@@ -117,10 +129,8 @@ const Library = () => {
         setPage(0);
     };
 
-    const {register, handleSubmit, reset, getValues} = useForm<IFormInput>()
-
     const onReset = () => {
-        reset();
+        setSearchText("")
         setPage(0)
         setSearchTotal(0)
         setRowsPerPage(DEFAULT_PAGE_SIZE)
@@ -136,10 +146,6 @@ const Library = () => {
         })();
     }
 
-    const onSubmit: SubmitHandler<IFormInput> = (formData) => {
-        runSearch(formData.searchText)
-    }
-
     const onShowSpotifySearch = () => {
         setShowSpotifyDialog(true)
     }
@@ -148,21 +154,45 @@ const Library = () => {
         setShowSpotifyDialog(false);
     };
 
+
+    const onSearchTermChange = useRef(debounce(async (data: string | null, reason: string) => {
+        if (reason === 'clear') {
+            onReset()
+        } else if (data) {
+            setSearchText(data)
+            runSearch(data)
+        }
+    }, 300)).current;
+
+
     return (
         <>
             <Grid xs={12} item={true}>
                 {showSearchSpotifyDialog &&
                     <SpotifySearchDialog isOpen={showSearchSpotifyDialog} sdk={sdk} handleClose={onCloseSpotifySearch}
-                                         startText={getValues("searchText")}/>}
+                                         startText={searchText}/>}
                 <form>
                     <Stack sx={{paddingLeft: 5, paddingRight: 5}} spacing={1}>
-                        <TextField variant='outlined' InputLabelProps={{shrink: true}} margin="dense"
-                                   type='text' {...register("searchText", {required: true})} />
-                        <Button type='submit' onClick={handleSubmit(onSubmit)} variant='outlined'
-                                color='secondary'>Search</Button>
+                        <Autocomplete
+                            componentsProps={{
+                                clearIndicator: {
+                                    onClick: () => {
+                                        onReset()
+                                    }
+                                }
+                            }}
+                            disablePortal
+                            value={searchText}
+                            freeSolo
+                            options={artists.map(a => a.name)}
+                            onInputChange={(_event, newVal, reason) => onSearchTermChange(newVal, reason)}
+                            onChange={(_event, newVal, reason) => {
+                                onSearchTermChange(newVal, reason)
+                            }}
+                            renderInput={(params) => <TextField {...params} label="Search Term"/>}
+                        />
                         <Button variant='outlined' onClick={onShowSpotifySearch} color='secondary'>Search
                             Spotify</Button>
-                        <Button variant='outlined' onClick={onReset} color='secondary'>Reset</Button>
                     </Stack>
                 </form>
             </Grid>
