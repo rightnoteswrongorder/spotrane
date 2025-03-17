@@ -7,9 +7,9 @@ import DialogTitle from '@mui/material/DialogTitle';
 import {InputLabel, MenuItem, Select, SelectChangeEvent} from '@mui/material';
 import {FormControl} from '@mui/material';
 import {Box} from '@mui/material';
-import supabase from "../../api/supaBaseClient.ts";
 import {Tables} from "../../interfaces/database.types.ts";
 import {useEffect} from "react";
+import {SupabaseApi} from "../../api/supabase.ts";
 
 type AddToListDialogProps = {
     isOpen: boolean
@@ -19,19 +19,14 @@ type AddToListDialogProps = {
 
 const AddToListDialog = ({isOpen, handleAddToListDialogClose, addToList}: AddToListDialogProps) => {
 
-    const [lists, setLists] = React.useState<(Tables<'lists'> | null)[]>([]);
+    const [lists, setLists] = React.useState<(Tables<'lists'>[] | null)>([]);
     const [open, setOpen] = React.useState(false);
     const [listName, setListName] = React.useState('');
     const [selectedList, setSelectedList] = React.useState<Tables<'lists'> | undefined | null>();
 
-    const getAllLists = () => {
-        (async () => {
-            const {data} = await supabase
-                .from('lists')
-                .select('*')
-            const f = data as (Tables<'lists'> | null)[]
-            setLists(f)
-        })();
+    const getAllLists = async () => {
+        const data = await SupabaseApi.getLists()
+        setLists(data)
     }
 
 
@@ -48,7 +43,7 @@ const AddToListDialog = ({isOpen, handleAddToListDialogClose, addToList}: AddToL
 
     const handleChange = (event: SelectChangeEvent) => {
         setListName(event.target.value as string);
-        setSelectedList(lists.find(list => list?.name === event.target.value))
+        setSelectedList(lists?.find(list => list?.name === event.target.value))
     };
 
     return (
@@ -79,9 +74,12 @@ const AddToListDialog = ({isOpen, handleAddToListDialogClose, addToList}: AddToL
                                 onChange={handleChange}
                             >
                                 {
-                                    lists.map(item => {
+                                    lists?.sort((a, b) =>
+                                        a.name > b.name ? 1 : -1
+                                    ).map(item => {
                                         if (item && item.name) {
-                                            return <MenuItem key={item.name} value={item.name}>{item.name}</MenuItem>
+                                            return <MenuItem key={item.name}
+                                                             value={item.name}>{item.name}</MenuItem>
                                         }
                                     })
                                 }

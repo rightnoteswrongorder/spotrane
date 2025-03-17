@@ -1,6 +1,12 @@
 import {createTheme} from "@mui/material";
 import {orange} from "@mui/material/colors";
 
+declare module '@mui/material/SvgIcon' {
+    interface SvgIconPropsSizeOverrides {
+        huge: true;
+    }
+}
+
 declare module '@mui/material/styles' {
     interface Theme {
         status: {
@@ -16,6 +22,16 @@ declare module '@mui/material/styles' {
     }
 }
 const baseTheme = createTheme({
+    components: {
+        MuiSvgIcon: {
+            variants:[ {
+               props: { fontSize: 'huge'},
+               style: {
+                   fontSize: '25rem'
+                }
+            }]
+        }
+    },
     typography: {
         fontFamily: ['Nunito', 'serif'].join(','),
     },

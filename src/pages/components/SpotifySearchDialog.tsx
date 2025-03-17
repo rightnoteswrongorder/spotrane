@@ -1,11 +1,9 @@
-import {useEffect, useState} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import {Album, Artist, SpotifyApi} from "@spotify/web-api-ts-sdk";
 import {
-    Button,
     Stack,
     TextField
 } from '@mui/material';
-import {SubmitHandler, useForm} from 'react-hook-form';
 import Grid from "@mui/material/Grid";
 import {AlbumCard} from "./AlbumCard.tsx";
 import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
@@ -15,10 +13,8 @@ import * as React from "react";
 import Dialog from "@mui/material/Dialog";
 import PageLoadSpinner from "./PageLoadSpinner.tsx";
 import {ListEntry} from "../Lists.tsx";
+import {debounce} from "lodash";
 
-interface IFormInput {
-    searchText: string
-}
 
 type SpotifySearchProps = {
     sdk: SpotifyApi | null,
@@ -37,11 +33,9 @@ const SpotifySearchDialog = ({
                                  listId,
                                  listVisible,
                                  albumsOnList,
-                                 startText
                              }: SpotifySearchProps) => {
     const [open, setOpen] = React.useState(false);
     const [searchResults, setSearchResults] = useState<SpotraneAlbumCard[]>([]);
-    const {register, handleSubmit, setValue} = useForm<IFormInput>()
     const [searchLoading, setSearchLoading] = useState(false)
 
     const addToList = (albumCardView: SpotraneAlbumCard) => {
@@ -75,18 +69,18 @@ const SpotifySearchDialog = ({
 
         setOpen(isOpen)
 
-        if (startText && startText != "") {
-            setValue("searchText", startText)
-            handleSubmit(onSubmit)()
-        }
+        // if (startText && startText != "") {
+        //     setValue("searchText", startText)
+        //     handleSubmit(onSubmit)()
+        // }
     }, []);
 
     useEffect(() => {
         setSearchLoading(false)
     }, [searchResults]);
 
-    const findByUrl: SubmitHandler<IFormInput> = (data) => {
-        const id = new URL(data.searchText).pathname.split("/")[2]
+    const findByUrl = (data: string) => {
+        const id = new URL(data).pathname.split("/")[2]
         findById(id)
     }
 
@@ -104,11 +98,14 @@ const SpotifySearchDialog = ({
         })();
     }
 
-
-    const onSubmit: SubmitHandler<IFormInput> = (data) => {
-        (async () => {
+    const onSearchTermChange = useRef(debounce(async (data: string | null) => {
+        if (data?.startsWith("http")) {
+            findByUrl(data)
+        } else if (data === '') {
+           //
+        } else if (data) {
             setSearchLoading(true)
-            const searchResults = await SpotifyApiProxy.searchForAlbum(sdk, data.searchText)
+            const searchResults = await SpotifyApiProxy.searchForAlbum(sdk, data)
             if (searchResults) {
                 const results = await Promise.all(searchResults.albums?.items.map(async (simplifiedAlbum) => {
                     const artist = await SpotifyApiProxy.getArtist(sdk, simplifiedAlbum.artists[0].id)
@@ -118,8 +115,8 @@ const SpotifySearchDialog = ({
                 }))
                 setSearchResults(results)
             }
-        })();
-    }
+        }
+    }, 300)).current;
 
     const spotifyAlbumToSpotraneAlbum = (album: Album | undefined, artist: Artist | undefined, isSaved: boolean): SpotraneAlbumCard => {
         return {
@@ -145,15 +142,11 @@ const SpotifySearchDialog = ({
             >
                 <Grid container spacing={2}>
                     <Grid xs={12} item={true}>
-                        <form onSubmit={handleSubmit(onSubmit)}>
                             <Stack margin={2}>
-                                <TextField autoFocus variant='outlined' InputLabelProps={{shrink: true}} margin="dense"
-                                           type='text' {...register("searchText", {required: true})} />
-                                <Button type='submit' variant='outlined' color='secondary'>Search</Button>
-                                <Button type='submit' onClick={handleSubmit(findByUrl)} variant='outlined'
-                                        color='secondary'>Find By Url</Button>
+                                <TextField autoFocus variant='outlined'  InputLabelProps={{shrink: true}} margin="dense"
+                                           onChange={(event) => onSearchTermChange(event.target.value)}
+                                           type='text'/>
                             </Stack>
-                        </form>
                     </Grid>
                     <Grid xs={12} item={true} margin={2}>
                         <Grid container justifyContent="center" spacing={4}>

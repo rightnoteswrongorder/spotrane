@@ -1,9 +1,10 @@
 import Grid from "@mui/material/Grid";
+import SpotifyIcon from "../static/images/spotify.svg?react"
 import {
     Autocomplete,
     Box,
-    Button,
-    Stack,
+    IconButton,
+    Stack, SvgIcon,
     TablePagination, TextField, Typography,
 } from "@mui/material";
 import {MouseEvent, ChangeEvent, useEffect, useRef, useState} from "react";
@@ -171,30 +172,30 @@ const Library = () => {
                 {showSearchSpotifyDialog &&
                     <SpotifySearchDialog isOpen={showSearchSpotifyDialog} sdk={sdk} handleClose={onCloseSpotifySearch}
                                          startText={searchText}/>}
-                <form>
-                    <Stack sx={{paddingLeft: 5, paddingRight: 5}} spacing={1}>
-                        <Autocomplete
-                            componentsProps={{
-                                clearIndicator: {
-                                    onClick: () => {
-                                        onReset()
-                                    }
+                <Stack sx={{paddingLeft: 5, paddingRight: 5}} alignItems="center" spacing={1}>
+                    <Autocomplete
+                        componentsProps={{
+                            clearIndicator: {
+                                onClick: () => {
+                                    onReset()
                                 }
-                            }}
-                            disablePortal
-                            value={searchText}
-                            freeSolo
-                            options={artists.map(a => a.name)}
-                            onInputChange={(_event, newVal, reason) => onSearchTermChange(newVal, reason)}
-                            onChange={(_event, newVal, reason) => {
-                                onSearchTermChange(newVal, reason)
-                            }}
-                            renderInput={(params) => <TextField {...params} label="Search Term"/>}
-                        />
-                        <Button variant='outlined' onClick={onShowSpotifySearch} color='secondary'>Search
-                            Spotify</Button>
-                    </Stack>
-                </form>
+                            }
+                        }}
+                        sx={{width: '100%'}}
+                        disablePortal
+                        value={searchText}
+                        freeSolo
+                        options={artists.map(a => a.name).sort()}
+                        onInputChange={(_event, newVal, reason) => onSearchTermChange(newVal, reason)}
+                        onChange={(_event, newVal, reason) => {
+                            onSearchTermChange(newVal, reason)
+                        }}
+                        renderInput={(params) => <TextField {...params} label="Search Term"/>}
+                    />
+                    <IconButton sx={{width: '133px', height: '133px'}} onClick={onShowSpotifySearch}>
+                        <SvgIcon sx={{width: '133px', height: '133px'}} component={SpotifyIcon} inheritViewBox/>
+                    </IconButton>
+                </Stack>
             </Grid>
             <Grid xs={12} item={true} marginTop={2}>
                 <Grid container justifyContent="center" spacing={3}>
