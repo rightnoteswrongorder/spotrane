@@ -16,8 +16,6 @@ import PageLoadSpinner from "./PageLoadSpinner.tsx";
 import {ListEntry} from "../Lists.tsx";
 import {debounce} from "lodash";
 import {ContentPaste} from "@mui/icons-material";
-import {Simulate} from "react-dom/test-utils";
-import paste = Simulate.paste;
 
 
 type SpotifySearchProps = {
