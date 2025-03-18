@@ -1,6 +1,7 @@
 import {useEffect, useRef, useState} from 'react'
 import {Album, Artist, SpotifyApi} from "@spotify/web-api-ts-sdk";
 import {
+    IconButton,
     Stack,
     TextField
 } from '@mui/material';
@@ -14,6 +15,9 @@ import Dialog from "@mui/material/Dialog";
 import PageLoadSpinner from "./PageLoadSpinner.tsx";
 import {ListEntry} from "../Lists.tsx";
 import {debounce} from "lodash";
+import {ContentPaste} from "@mui/icons-material";
+import {Simulate} from "react-dom/test-utils";
+import paste = Simulate.paste;
 
 
 type SpotifySearchProps = {
@@ -37,6 +41,7 @@ const SpotifySearchDialog = ({
     const [open, setOpen] = React.useState(false);
     const [searchResults, setSearchResults] = useState<SpotraneAlbumCard[]>([]);
     const [searchLoading, setSearchLoading] = useState(false)
+    const [searchText, setSearchText] = React.useState("");
 
     const addToList = (albumCardView: SpotraneAlbumCard) => {
         return (listId: number) => {
@@ -79,12 +84,16 @@ const SpotifySearchDialog = ({
         setSearchLoading(false)
     }, [searchResults]);
 
+    useEffect(() => {
+        onSearchTermChange(searchText)
+    },[searchText]);
+
     const findByUrl = (data: string) => {
         const id = new URL(data).pathname.split("/")[2]
         findById(id)
     }
 
-    const findById  = (id: string) => {
+    const findById = (id: string) => {
         (async () => {
             setSearchLoading(true)
             const result = await SpotifyApiProxy.getAlbum(sdk, id)
@@ -102,7 +111,7 @@ const SpotifySearchDialog = ({
         if (data?.startsWith("http")) {
             findByUrl(data)
         } else if (data === '') {
-           //
+            //
         } else if (data) {
             setSearchLoading(true)
             const searchResults = await SpotifyApiProxy.searchForAlbum(sdk, data)
@@ -142,13 +151,22 @@ const SpotifySearchDialog = ({
             >
                 <Grid container spacing={2}>
                     <Grid xs={12} item={true}>
-                            <Stack margin={2}>
-                                <TextField autoFocus variant='outlined'  InputLabelProps={{shrink: true}} margin="dense"
-                                           onChange={(event) => onSearchTermChange(event.target.value)}
-                                           type='text'/>
-                            </Stack>
+                        <Stack direction="row" alignItems="center" spacing={2} margin={2}>
+                            <TextField fullWidth autoFocus variant='outlined' InputLabelProps={{shrink: true}}
+                                       margin="dense"
+                                       value={searchText}
+                                       onChange={(event) => setSearchText(event.target.value)}
+                                       type='text'/>
+                            <IconButton onClick={async () => {
+                                const pastedText = await navigator.clipboard.readText()
+                                setSearchText(pastedText) }
+                            }
+                            >
+                                <ContentPaste/>
+                            </IconButton>
+                        </Stack>
                     </Grid>
-                    <Grid xs={12} item={true} margin={2}>
+                    <Grid xs={12} item={true} margin={1}>
                         <Grid container justifyContent="center" spacing={4}>
                             {searchLoading ? <PageLoadSpinner/> :
                                 searchResults.map((album) => (
