@@ -1,5 +1,5 @@
 import Grid from "@mui/material/Grid";
-import {Button, FormControl, InputLabel, MenuItem, Select, Stack,} from "@mui/material";
+import {Autocomplete, Button, FormControl, Stack, TextField,} from "@mui/material";
 import * as React from "react";
 import {useEffect, useState} from "react";
 import {Controller, useForm} from "react-hook-form";
@@ -264,34 +264,38 @@ const Lists = () => {
                             name="listName"
                             render={({field: {onChange}}) => (
                                 <FormControl fullWidth>
-                                    <InputLabel id="demo-simple-select-label">List</InputLabel>
-                                    <Select
-                                        labelId="demo-simple-select-label"
-                                        id="demo-simple-select"
-                                        type="submit"
-                                        value={selectedList ? selectedList.name : ""}
-                                        onChange={(e) => {
-                                            onChange(e)
-                                            runListLoad(e.target.value)
-                                        }}
-                                        label="List"
-                                    >
-                                        {
-                                            lists.sort((a, b) =>
-                                                a.name > b.name ? 1 : -1
-                                            ).map(item => {
-                                                if (item && item.name) {
-                                                    return <MenuItem key={item.name}
-                                                                     value={item.name}>{item.name}</MenuItem>
+                                    <Autocomplete
+                                        componentsProps={{
+                                            clearIndicator: {
+                                                onClick: () => {
+                                                    resetMe()
                                                 }
-                                            })
-                                        }
-                                    </Select>
+                                            }
+                                        }}
+                                        sx={{width: '100%'}}
+                                        disablePortal
+                                        value={selectedList ? selectedList.name : ""}
+                                        options=
+                                            {
+                                                lists.sort((a, b) =>
+                                                    a.name > b.name ? 1 : -1
+                                                ).map(item => {
+                                                    if (item && item.name) {
+                                                        return item.name
+                                                    }
+                                                })
+                                            }
+                                        onInputChange={(_event, newVal) => {
+                                            if(newVal) {
+                                                onChange(newVal)
+                                                runListLoad(newVal)
+                                            }
+                                        }}
+                                        renderInput={(params) => <TextField {...params} label="Search Term"/>}
+                                    />
                                 </FormControl>
                             )}
                         />
-                        <Button variant='outlined' disabled={!selectedList} onClick={resetMe}
-                                color='secondary'>Reset</Button>
                         <Button variant='outlined' onClick={handleCreateList} color='secondary'>Create New
                             List</Button>
                         <Button variant='outlined' disabled={!selectedList} onClick={handleDeleteList}
