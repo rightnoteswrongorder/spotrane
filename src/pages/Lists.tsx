@@ -1,5 +1,6 @@
 import Grid from "@mui/material/Grid";
-import {Autocomplete, Button, FormControl, Stack, TextField,} from "@mui/material";
+import SpotifyIcon from "../static/images/spotify.svg?react"
+import {Autocomplete, FormControl, IconButton, Stack, SvgIcon, TextField,} from "@mui/material";
 import * as React from "react";
 import {useEffect, useState} from "react";
 import {Controller, useForm} from "react-hook-form";
@@ -11,6 +12,7 @@ import {SpotraneAlbumCard, SpotraneList} from "../interfaces/spotrane.types.ts";
 import YesNoDialog from "./components/YesNoDialog.tsx";
 import DraggableGrid from "./components/dnd/DraggableGrid.tsx";
 import {useNavigate, useParams} from "react-router-dom";
+import {PlaylistAdd, PlaylistAddCheck, PlaylistRemove} from "@mui/icons-material";
 
 interface IFormInput {
     listName: string
@@ -296,15 +298,20 @@ const Lists = () => {
                                 </FormControl>
                             )}
                         />
-                        <Button variant='outlined' onClick={handleCreateList} color='secondary'>Create New
-                            List</Button>
-                        <Button variant='outlined' disabled={!selectedList} onClick={handleDeleteList}
-                                color='secondary'>Delete List</Button>
-                        <Button variant='outlined' disabled={!selectedList} onClick={handleRenameList}
-                                color='secondary'>Rename List</Button>
-                        <Button variant='outlined' disabled={!selectedList} onClick={onShowSpotifySearch}
-                                color='secondary'>Search
-                            Spotify</Button>
+                        <Stack direction="row" justifyContent="center" alignItems="center" spacing={2} margin={2}>
+                            <IconButton onClick={handleCreateList}>
+                                <PlaylistAdd/>
+                            </IconButton>
+                            <IconButton disabled={!selectedList} onClick={handleDeleteList}>
+                                <PlaylistRemove/>
+                            </IconButton>
+                            <IconButton disabled={!selectedList} onClick={handleRenameList}>
+                                <PlaylistAddCheck/>
+                            </IconButton>
+                            <IconButton disabled={!selectedList} onClick={onShowSpotifySearch}>
+                                <SvgIcon component={SpotifyIcon} inheritViewBox/>
+                            </IconButton>
+                        </Stack>
                         {listDialogOpen &&
                             <YesNoDialog title={createListDialogTitle} label={"List name"} confirmButtonLabel={"Create"}
                                          confirmEnabled={createListSubmitEnabled}

@@ -192,8 +192,8 @@ const Library = () => {
                         }}
                         renderInput={(params) => <TextField {...params} label="Search Term"/>}
                     />
-                    <IconButton sx={{width: '133px', height: '133px'}} onClick={onShowSpotifySearch}>
-                        <SvgIcon sx={{width: '133px', height: '133px'}} component={SpotifyIcon} inheritViewBox/>
+                    <IconButton onClick={onShowSpotifySearch}>
+                        <SvgIcon component={SpotifyIcon} inheritViewBox/>
                     </IconButton>
                 </Stack>
             </Grid>
