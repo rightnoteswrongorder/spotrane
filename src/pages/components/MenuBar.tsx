@@ -1,9 +1,7 @@
 import {
     AppBar,
     Box,
-    Button,
     IconButton,
-    Link,
     Menu,
     MenuItem,
     Toolbar,
@@ -11,11 +9,13 @@ import {
     Typography,
     useTheme
 } from "@mui/material";
-import MenuIcon from '@mui/icons-material/Menu';
 import {AccountCircle, DarkModeOutlined, LightModeOutlined} from "@mui/icons-material";
+import ListIcon from '@mui/icons-material/List';
+import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
 import React, {useContext, useMemo} from "react";
 import {useSession} from "../../providers/SessionProvider.tsx";
 import {ThemeContext} from "../../providers/ThemeContextProvider.tsx";
+import loginForm from "../LoginForm.tsx";
 
 type MenuBarProps = {
     logout: () => void
@@ -40,6 +40,11 @@ const MenuBar = ({logout}: MenuBarProps) => {
         setAnchorEl(null);
     };
 
+    const handleLogin = () => {
+        loginForm()
+        setAnchorEl(null);
+    };
+
     const theme = useTheme();
     const {switchColorMode} = useContext(ThemeContext);
     const activateName = useMemo(
@@ -51,29 +56,6 @@ const MenuBar = ({logout}: MenuBarProps) => {
         <Box sx={{flexGrow: 1}}>
             <AppBar position="static">
                 <Toolbar>
-                    <IconButton
-                        size="large"
-                        edge="start"
-                        color="inherit"
-                        aria-label="menu"
-                        sx={{mr: 2}}
-                        onClick={handleClick}
-                    >
-                        <MenuIcon/>
-                    </IconButton>
-                    <Menu
-                        id="basic-menu"
-                        anchorEl={anchorEl}
-                        open={open}
-                        onClose={handleClose}
-                        MenuListProps={{
-                            'aria-labelledby': 'basic-button',
-                        }}
-                    >
-                        <MenuItem component={Link} href='#'>Home</MenuItem>
-                        <MenuItem component={Link} href='#lists'>My Lists</MenuItem>
-                        <MenuItem onClick={handleLogout}>Logout</MenuItem>
-                    </Menu>
                     <Typography component="a" href='#' variant="h6" sx={{
                         flexGrow: 1,
                         fontWeight: 700,
@@ -82,6 +64,26 @@ const MenuBar = ({logout}: MenuBarProps) => {
                     }}>
                         spotrane
                     </Typography>
+                    <Box sx={{mt: 1}}>
+                        <Tooltip title={`Activate ${activateName} Mode`}>
+                            <IconButton
+                                color="inherit"
+                                href="#"
+                            >
+                                <LocalLibraryIcon/>
+                            </IconButton>
+                        </Tooltip>
+                    </Box>
+                    <Box sx={{mt: 1}}>
+                        <Tooltip title={`Activate ${activateName} Mode`}>
+                            <IconButton
+                                color="inherit"
+                                href="#lists"
+                            >
+                                    <ListIcon/>
+                            </IconButton>
+                        </Tooltip>
+                    </Box>
                     <Box sx={{mt: 1}}>
                         <Tooltip title={`Activate ${activateName} Mode`}>
                             <IconButton
@@ -96,10 +98,27 @@ const MenuBar = ({logout}: MenuBarProps) => {
                             </IconButton>
                         </Tooltip>
                     </Box>
-                    {session ?
-                        <Box sx={{mt: 1}}><Tooltip title={session.user.email}><span><IconButton disabled><AccountCircle
-                            sx={{color: theme.palette.mode === 'dark' ? 'white' : 'black'}}/></IconButton></span></Tooltip></Box> :
-                        <Button color="inherit">Login</Button>}
+                    <Box sx={{mt: 1, ml: 1}}>
+                        <IconButton
+                            size="large"
+                            edge="start"
+                            color="inherit"
+                            aria-label="menu"
+                            sx={{mr: 2}}
+                            onClick={handleClick}
+                        ><AccountCircle color={session ? "success" : "warning"}/></IconButton>
+                        <Menu
+                            id="basic-menu"
+                            open={open}
+                            anchorEl={anchorEl}
+                            onClose={handleClose}
+                            MenuListProps={{
+                                'aria-labelledby': 'basic-button',
+                            }}
+                        >
+                            <MenuItem onClick={session ? handleLogout : handleLogin}>{session ? "Logout" : "Login"}</MenuItem>
+                        </Menu>
+                    </Box>
                 </Toolbar>
             </AppBar>
         </Box>

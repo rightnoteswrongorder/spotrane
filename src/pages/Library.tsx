@@ -25,14 +25,13 @@ const Library = () => {
         Scopes.all
     );
 
-    const DEFAULT_PAGE_SIZE = 5
     const [albums, setAlbums] = useState<SpotraneAlbumCard[]>([]);
     const [artists, setArtists] = useState<SpotraneArtist[]>([]);
     const [searchTotal, setSearchTotal] = useState<number>(0)
     const [totalAlbums, setTotalAlbums] = useState<number>(0)
     const nextId = useRef(0);
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(DEFAULT_PAGE_SIZE);
+    const [rowsPerPage, setRowsPerPage] = useState(0);
     const [showSearchSpotifyDialog, setShowSpotifyDialog] = useState(false)
     const [showCannotDeleteMessage, setShowCannotDeleteMessage] = useState("")
     const [searchText, setSearchText] = useState("")
@@ -134,7 +133,7 @@ const Library = () => {
         setSearchText("")
         setPage(0)
         setSearchTotal(0)
-        setRowsPerPage(DEFAULT_PAGE_SIZE)
+        setRowsPerPage(0)
         allAlbums(page, rowsPerPage)
     }
 
@@ -212,7 +211,7 @@ const Library = () => {
                 </Grid>
             </Grid>
             <Grid container justifyContent="right" spacing={2} marginTop={2}>
-                <Grid marginRight={5} item={true}>{searchTotal == 0 ? <TablePagination component='div'
+                {albums.length > 0 && <Grid marginRight={5} item={true}>{searchTotal == 0 ? <TablePagination component='div'
                                                                                        labelRowsPerPage="Results: "
                                                                                        rowsPerPageOptions={[5, 10, 15, 20, 50, 100, 200, 300, 400]}
                                                                                        count={totalAlbums}
@@ -220,7 +219,7 @@ const Library = () => {
                                                                                        rowsPerPage={rowsPerPage}
                                                                                        onPageChange={handleChangePage}
                                                                                        onRowsPerPageChange={handleChangeRowsPerPage}/> :
-                    <Typography>Search Results: {searchTotal}</Typography>}</Grid>
+                    <Typography>Search Results: {searchTotal}</Typography>}</Grid>}
             </Grid>
             {showCannotDeleteMessage != "" && <AlertDialog message={showCannotDeleteMessage}/>}
         </>
