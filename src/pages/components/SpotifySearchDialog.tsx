@@ -123,7 +123,7 @@ const SpotifySearchDialog = ({
                 setSearchResults(results)
             }
         }
-    }, 300)).current;
+    }, 1000)).current;
 
     const spotifyAlbumToSpotraneAlbum = (album: Album | undefined, artist: Artist | undefined, isSaved: boolean): SpotraneAlbumCard => {
         return {
