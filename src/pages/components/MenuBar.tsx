@@ -3,7 +3,7 @@ import {
     Box,
     IconButton,
     Menu,
-    MenuItem,
+    MenuItem, SvgIcon,
     Toolbar,
     Tooltip,
     Typography,
@@ -13,6 +13,7 @@ import {AccountCircle, DarkModeOutlined, LightModeOutlined} from "@mui/icons-mat
 import ListIcon from '@mui/icons-material/List';
 import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
 import React, {useContext, useMemo} from "react";
+import DiscogsIcon from "../../static/images/discogs.svg?react"
 import {useSession} from "../../providers/SessionProvider.tsx";
 import {ThemeContext} from "../../providers/ThemeContextProvider.tsx";
 import loginForm from "../LoginForm.tsx";
@@ -65,7 +66,7 @@ const MenuBar = ({logout}: MenuBarProps) => {
                         spotrane
                     </Typography>
                     <Box sx={{mt: 1}}>
-                        <Tooltip title={`Activate ${activateName} Mode`}>
+                        <Tooltip title='Library'>
                             <IconButton
                                 color="inherit"
                                 href="#"
@@ -75,12 +76,22 @@ const MenuBar = ({logout}: MenuBarProps) => {
                         </Tooltip>
                     </Box>
                     <Box sx={{mt: 1}}>
-                        <Tooltip title={`Activate ${activateName} Mode`}>
+                        <Tooltip title='Lists'>
                             <IconButton
                                 color="inherit"
                                 href="#lists"
                             >
                                     <ListIcon/>
+                            </IconButton>
+                        </Tooltip>
+                    </Box>
+                    <Box sx={{mt: 1}}>
+                        <Tooltip title='Discogs Search'>
+                            <IconButton
+                                color="inherit"
+                                href="#discogs"
+                            >
+                                <SvgIcon component={DiscogsIcon} inheritViewBox/>
                             </IconButton>
                         </Tooltip>
                     </Box>

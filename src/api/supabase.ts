@@ -180,5 +180,32 @@ export const SupabaseApi = {
             .from('list_entry')
             .update({'position': newPosition})
             .eq('id', listEntryId)
+    },
+
+    getRvgSeventiesBlueNotes: async (): Promise<Tables<'bluenote_rvg_seventies'>[]> => {
+        const {data} = await supabase
+            .from('bluenote_rvg_seventies')
+            .select('*')
+            .order('artist')
+            .order('title')
+        return data || []
+    },
+
+    getRvgImpulse: async (): Promise<Tables<'impulse_rvg'>[]> => {
+        const {data} = await supabase
+            .from('impulse_rvg')
+            .select('*')
+            .order('artist')
+            .order('title')
+        return data || []
+    },
+
+    getCtiImpulse: async (): Promise<Tables<'cti_rvg'>[]> => {
+        const {data} = await supabase
+            .from('cti_rvg')
+            .select('*')
+            .order('artist')
+            .order('title')
+        return data || []
     }
 }
