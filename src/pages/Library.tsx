@@ -1,10 +1,10 @@
 import Grid from "@mui/material/Grid";
-import SpotifyIcon from "../static/images/spotify.svg?react"
 import {
     Autocomplete,
+    Avatar,
     Box,
     IconButton,
-    Stack, SvgIcon,
+    Stack,
     TablePagination, TextField, Typography,
 } from "@mui/material";
 import {MouseEvent, ChangeEvent, useEffect, useRef, useState} from "react";
@@ -192,7 +192,7 @@ const Library = () => {
                         renderInput={(params) => <TextField {...params} label="Search Term"/>}
                     />
                     <IconButton onClick={onShowSpotifySearch}>
-                        <SvgIcon component={SpotifyIcon} inheritViewBox/>
+                        <Avatar>S</Avatar>
                     </IconButton>
                 </Stack>
             </Grid>

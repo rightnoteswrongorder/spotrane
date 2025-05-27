@@ -1,6 +1,6 @@
 import Grid from "@mui/material/Grid";
 import SpotifyIcon from "../static/images/spotify.svg?react"
-import {Autocomplete, FormControl, IconButton, Stack, SvgIcon, TextField,} from "@mui/material";
+import {Autocomplete, Box, CircularProgress, FormControl, IconButton, Stack, SvgIcon, TextField,} from "@mui/material";
 import * as React from "react";
 import {useEffect, useState} from "react";
 import {Controller, useForm} from "react-hook-form";
@@ -10,9 +10,9 @@ import {Scopes} from "@spotify/web-api-ts-sdk";
 import {useSpotify} from "../hooks/useSpotfy.ts";
 import {SpotraneAlbumCard, SpotraneList} from "../interfaces/spotrane.types.ts";
 import YesNoDialog from "./components/YesNoDialog.tsx";
-import DraggableGrid from "./components/dnd/DraggableGrid.tsx";
 import {useNavigate, useParams} from "react-router-dom";
 import {PlaylistAdd, PlaylistAddCheck, PlaylistRemove} from "@mui/icons-material";
+import {AlbumCard} from "./components/AlbumCard.tsx";
 
 interface IFormInput {
     listName: string
@@ -37,6 +37,24 @@ const Lists = () => {
     const [lists, setLists] = React.useState<SpotraneList[]>([]);
     const [showSearchSpotifyDialog, setShowSpotifyDialog] = useState(false)
 
+    const [loading, setLoading] = useState(true);
+    const [_imagesLoaded, setImagesLoaded] = useState(0);
+
+    useEffect(() => {
+        if (albums.length > 0) {
+            setImagesLoaded(0); // reset count
+        }
+    }, [albums]);
+
+    const handleImageLoad = () => {
+        setImagesLoaded((prev) => {
+            const newCount = prev + 1;
+            if (newCount === albums.length) {
+                setLoading(false); // all images loaded
+            }
+            return newCount;
+        });
+    };
 
     const addToList = (albumCardView: SpotraneAlbumCard) => {
         return (listId: number) => {
@@ -54,9 +72,10 @@ const Lists = () => {
 
     useEffect(() => {
         if (selectedList) {
+            setLoading(true)
             navigate(`/lists/${selectedList?.name}`)
+            albumsOnList()
         }
-        albumsOnList()
     }, [selectedList])
 
     const sdk = useSpotify(
@@ -112,6 +131,7 @@ const Lists = () => {
                             imageUri: dbAlbum.image,
                             albumUri: dbAlbum.spotify_uri,
                             rating: dbAlbum.rating,
+                            appearsOn: dbAlbum.appears_on,
                             isSaved: true
                         } as SpotraneAlbumCard
 
@@ -166,9 +186,11 @@ const Lists = () => {
         return !!(selectedList && data == selectedList?.name)
     }
 
+
     const handleDeleteListDialogClose = () => {
         setDeleteListDialogOpen(false)
     }
+
 
     const handleCreateListDialogClose = () => {
         setListDialogOpen(false)
@@ -200,12 +222,12 @@ const Lists = () => {
     }
 
     const handleClose = () => {
-        console.log(selectedList?.name)
         getAllLists()
         setSelectedList(selectedList)
         albumsOnList()
         setShowSpotifyDialog(false);
     };
+
 
     const createList = (name: string) => {
         (async () => {
@@ -244,17 +266,9 @@ const Lists = () => {
 
     const renameListDialogSubTitle = "Enter a unique new name..."
 
-
-    const saveListEntry = (entryId: number, position: number) => {
-        return async () => {
-            await SupabaseApi.updateListEntryPriority(entryId, position)
-        }
-
-    }
-
     return (
-        <>
-            <Grid xs={12} item={true}>
+     <>
+          <Grid xs={12} item={true}>
                 {selectedList && showSearchSpotifyDialog &&
                     <SpotifySearchDialog sdk={sdk} albumsOnList={albums} isOpen={showSearchSpotifyDialog}
                                          handleClose={handleClose}
@@ -330,8 +344,31 @@ const Lists = () => {
                     </Stack>
                 </form>
             </Grid>
-            <DraggableGrid start={albums} save={saveListEntry}/>
-        </>
+         {loading && (
+             <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
+                 <CircularProgress />
+             </Box>
+         )}
+         <Box sx={{opacity: loading ? 0 : 1,
+             transition: 'opacity 0.5s ease-in',}}>
+            <Grid marginBottom={2}>
+                <Grid container justifyContent="center" spacing={3}>
+                    {albums.map((item) => (
+                        <Grid item key={item.id}>
+                            <AlbumCard albumCardView={item.item}
+                                       albums={albums}
+                                       addToList={item.addToList}
+                                       deleteAlbumFromList={item.deleteFromList}
+                                       onImageLoad={handleImageLoad}
+                                       position={item.position}
+                                       listEntryId={item.id}
+                                       updateRating={item.updateRating}/>
+                        </Grid>
+                    ))}
+                </Grid>
+            </Grid>
+</Box>
+</>
     )
 }
 

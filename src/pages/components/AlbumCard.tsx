@@ -1,10 +1,10 @@
 import {useEffect, useState} from "react";
-import {Box, Card, CardContent, CardMedia, Typography} from "@mui/material";
+import { Box, Card, CardContent, CardMedia, Typography} from "@mui/material";
 import AddToListDialog from "./AddToListDialog.tsx";
 import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
 import AlbumCardIcons from "./AlbumCardIcons.tsx";
 import AlbumCardStars from "./AlbumCardStars.tsx";
-import Image from "mui-image"
+import ListPositionDialog from "./ListPositionDialog.tsx";
 
 export type AlbumCardProps<T> = {
     albumCardView: SpotraneAlbumCard
@@ -16,6 +16,10 @@ export type AlbumCardProps<T> = {
     deleteAlbumFromList?: () => void
     addToVisibleList?: () => void
     updateRating?: (rating: number) => void
+    onImageLoad?: () => void
+    setPosition?: () => void
+    listEntryId?: number
+    position?: number
     albums?: T[]
 }
 
@@ -28,10 +32,14 @@ export const AlbumCard = <T,>({
                               deleteAlbumFromList,
                               addToVisibleList,
                               addToList,
+                              onImageLoad,
+                              listEntryId,
+                              position,
                               updateRating,
-    albums
+                              albums
                           }: AlbumCardProps<T>) => {
     const [listDialogOpen, setListDialogOpen] = useState<boolean>(false);
+    const [positionDialogOpen, setPositionDialogOpen] = useState<boolean>(false);
     const [onlist, setOnList] = useState<boolean>(false)
 
     useEffect(() => {
@@ -44,6 +52,10 @@ export const AlbumCard = <T,>({
         setListDialogOpen(!listDialogOpen)
     }
 
+    const togglePositionDialog = () => {
+        setPositionDialogOpen(!positionDialogOpen)
+    }
+
     const addToVl = () => {
         addToVisibleList && addToVisibleList()
         setOnList(true)
@@ -51,6 +63,10 @@ export const AlbumCard = <T,>({
     }
     const handleAddToListDialogClose = () => {
         setListDialogOpen(false)
+    }
+
+    const handleListPositionDialogClose = () => {
+        setPositionDialogOpen(false)
     }
 
     return (<Card sx={{padding: 0.6, display: 'inline-flex', boxShadow: 0}}>
@@ -73,9 +89,11 @@ export const AlbumCard = <T,>({
                         {albumCardView.artistGenres.length == 0 ? 'Unknown' : `${albumCardView?.artistGenres}`}
                     </Typography>
                 </CardContent>
-                <CardMedia ><Image
+                <CardMedia ><img
+                    alt={`${albumCardView.name}-image`}
                     width={80}
                     height={80}
+                    onLoad={onImageLoad}
                     src={albumCardView?.imageUri}/></CardMedia>
             </Box>
             {updateRating && albums && <AlbumCardStars updateRating={updateRating}
@@ -87,12 +105,20 @@ export const AlbumCard = <T,>({
                             deleteAlbumFromList={deleteAlbumFromList}
                             isOnVisibleList={onlist}
                             addToVisibleList={addToVl}
-                            toggleListDialog={toggleListDialog}/>
+                            position={position}
+                            listLength={albums?.length}
+                            toggleListDialog={toggleListDialog}
+                            togglePositionDialog={togglePositionDialog}
+            />
         </Box>
         {
             listDialogOpen &&
             <AddToListDialog isOpen={true} handleAddToListDialogClose={handleAddToListDialogClose}
                              addToList={addToList}/>
+        }
+        {
+            positionDialogOpen && listEntryId && position &&
+            <ListPositionDialog isOpen={true} listEntryId={listEntryId} currentPosition={position} handleListPositionClose={handleListPositionDialogClose} />
         }
     </Card>)
 }

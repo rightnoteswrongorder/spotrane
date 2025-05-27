@@ -1,14 +1,9 @@
-import {Box, IconButton, Link, SvgIcon, Tooltip} from "@mui/material";
+import {Avatar, Box, IconButton, Link,  Tooltip} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
-import SpotifyIcon from "../../static/images/spotify.svg?react"
-import DiscogsIcon from "../../static/images/discogs.svg?react"
-import WikipediaIcon from "../../static/images/wikipeida.svg?react"
-import EcmIcon from "../../static/images/ecmlogo.svg?react"
-import {PlaylistAdd, PlaylistAddCheck} from "@mui/icons-material";
+import {PlaylistAdd, PlaylistAddCheck, Settings} from "@mui/icons-material";
 import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
 import {useEffect, useState} from "react";
-import {SupabaseApi} from "../../api/supabase.ts";
 
 type AlbumCardIconProps = {
     albumCardView: SpotraneAlbumCard
@@ -19,6 +14,9 @@ type AlbumCardIconProps = {
     deleteAlbumFromList?: () => void
     addToVisibleList?: () => void
     toggleListDialog: () => void
+    togglePositionDialog: () => void
+    position?: number
+    listLength?: number
 }
 
 const AlbumCardIcons = ({
@@ -29,17 +27,13 @@ const AlbumCardIcons = ({
                             deleteAlbumFromLibrary,
                             deleteAlbumFromList,
                             addToVisibleList,
-                            toggleListDialog
+                            toggleListDialog,
+                            togglePositionDialog,
                         }: AlbumCardIconProps) => {
 
     const [saved, setSaved] = useState<boolean>(false)
-    const [lists, setLists] = useState<string | undefined>("")
 
     useEffect(() => {
-        (async () => {
-            const albums = await SupabaseApi.getListsForAlbum(albumCardView.id)
-            setLists("On Lists: " + albums?.map(a => a.list_name).join(","))
-        })()
         if (!saved && albumCardView.isSaved) {
             setSaved(true)
         }
@@ -59,8 +53,20 @@ const AlbumCardIcons = ({
         }
     }
 
+    // const setPosition = (name: string) => {
+    //     (async () => {
+    //         // await SupabaseApi.updateListEntryPriority(id, position)
+    //         console.log(name)
+    //         await getAllLists(name)
+    //     })();
+    // }
+
     const addToListClickHandler = () => {
         toggleListDialog()
+    }
+
+    const settingsClickHandler = () => {
+        togglePositionDialog()
     }
 
     const addToListHandler = () => {
@@ -102,24 +108,27 @@ const AlbumCardIcons = ({
                     <PlaylistAddCheck
                         sx={{color: isOnVisibleList ? (theme) => theme.palette.primary.main : 'white'}}></PlaylistAddCheck>
                 </IconButton>}
-            <Tooltip title={lists}>
+            <Tooltip title={albumCardView.appearsOn}>
                 <IconButton onClick={addToListClickHandler}
                             aria-label="add-to-list">
                     <PlaylistAdd></PlaylistAdd>
                 </IconButton>
             </Tooltip>
             <IconButton component={Link} href={albumCardView?.albumUri}>
-                <SvgIcon component={SpotifyIcon} inheritViewBox/>
+                <Avatar>S</Avatar>
             </IconButton>
             <IconButton component={Link} target="_blank" href={makeDiscogsUrl()}>
-                <SvgIcon component={DiscogsIcon} inheritViewBox/>
+                <Avatar>D</Avatar>
             </IconButton>
             <IconButton component={Link} target="_blank" href={makeWikipediaUrl()}>
-                <SvgIcon component={WikipediaIcon} inheritViewBox/>
+                <Avatar>W</Avatar>
             </IconButton>
             {albumCardView.label == "ECM Records" && <IconButton component={Link} target="_blank" href={makeEcmUrl()}>
-                <SvgIcon component={EcmIcon} inheritViewBox/>
+                <Avatar>E</Avatar>
             </IconButton>}
+            <IconButton component={Link} onClick={settingsClickHandler}>
+                <Settings></Settings>
+            </IconButton>
         </Box>
     )
 }

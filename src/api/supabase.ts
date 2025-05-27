@@ -116,9 +116,9 @@ export const SupabaseApi = {
         return !!(data && data.length > 0)
     },
 
-    getAlbumsOnList: async (listName: string): Promise<Tables<'albums_on_lists'>[] | null> => {
+    getAlbumsOnList: async (listName: string): Promise<Tables<'mother_list'>[] | null> => {
         const {data} = await supabase
-            .from('albums_on_lists')
+            .from('mother_list')
             .select("*")
             .eq("list_name", listName)
         return data

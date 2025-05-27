@@ -1,9 +1,10 @@
 import {
     AppBar,
+    Avatar,
     Box,
     IconButton,
     Menu,
-    MenuItem, SvgIcon,
+    MenuItem,
     Toolbar,
     Tooltip,
     Typography,
@@ -13,7 +14,6 @@ import {AccountCircle, DarkModeOutlined, LightModeOutlined} from "@mui/icons-mat
 import ListIcon from '@mui/icons-material/List';
 import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
 import React, {useContext, useMemo} from "react";
-import DiscogsIcon from "../../static/images/discogs.svg?react"
 import {useSession} from "../../providers/SessionProvider.tsx";
 import {ThemeContext} from "../../providers/ThemeContextProvider.tsx";
 import loginForm from "../LoginForm.tsx";
@@ -91,7 +91,7 @@ const MenuBar = ({logout}: MenuBarProps) => {
                                 color="inherit"
                                 href="#discogs"
                             >
-                                <SvgIcon component={DiscogsIcon} inheritViewBox/>
+                                <Avatar>D</Avatar>
                             </IconButton>
                         </Tooltip>
                     </Box>
