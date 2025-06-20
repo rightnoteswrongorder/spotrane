@@ -36,6 +36,7 @@ const Lists = () => {
     const [selectedList, setSelectedList] = useState<SpotraneList>()
     const [lists, setLists] = React.useState<SpotraneList[]>([]);
     const [showSearchSpotifyDialog, setShowSpotifyDialog] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
 
 
 
@@ -50,7 +51,9 @@ const Lists = () => {
 
     useEffect(() => {
         (async () => {
+            setIsLoading(true);
             params.listName ? await getAllLists(params.listName) : await getAllLists()
+            setIsLoading(false);
         })()
     }, [])
 
@@ -100,33 +103,40 @@ const Lists = () => {
 
     const albumsOnList = () => {
         (async () => {
-                if (selectedList && selectedList.name) {
-                    const albums = await SupabaseApi.getAlbumsOnList(selectedList?.name)
-                    albums && setAlbums(albums.map((dbAlbum) => {
-                        const album = {
-                            id: dbAlbum.spotify_id,
-                            name: dbAlbum.name,
-                            artistId: dbAlbum.artist_spotify_id,
-                            artistName: dbAlbum.artist,
-                            artistGenres: dbAlbum.artist_genres,
-                            label: dbAlbum.label,
-                            releaseDate: dbAlbum.release_date,
-                            imageUri: dbAlbum.image,
-                            albumUri: dbAlbum.spotify_uri,
-                            rating: dbAlbum.rating,
-                            isSaved: true
-                        } as SpotraneAlbumCard
+                setIsLoading(true);
+                try {
+                    if (selectedList && selectedList.name) {
+                        const albums = await SupabaseApi.getAlbumsOnList(selectedList?.name)
+                        albums && setAlbums(albums.map((dbAlbum) => {
+                            const album = {
+                                id: dbAlbum.spotify_id,
+                                name: dbAlbum.name,
+                                artistId: dbAlbum.artist_spotify_id,
+                                artistName: dbAlbum.artist,
+                                artistGenres: dbAlbum.artist_genres,
+                                label: dbAlbum.label,
+                                releaseDate: dbAlbum.release_date,
+                                imageUri: dbAlbum.image,
+                                albumUri: dbAlbum.spotify_uri,
+                                rating: dbAlbum.rating,
+                                isSaved: true
+                            } as SpotraneAlbumCard
 
-                        return {
-                            item: album,
-                            id: dbAlbum.list_entry_id,
-                            position: dbAlbum.list_entry_position,
-                            addToList: addToList(album),
-                            deleteFromList: deleteAlbumFromList(album.id),
-                            updateRating: updateRating(album),
-                        } as ListEntry;
+                            return {
+                                item: album,
+                                id: dbAlbum.list_entry_id,
+                                position: dbAlbum.list_entry_position,
+                                addToList: addToList(album),
+                                deleteFromList: deleteAlbumFromList(album.id),
+                                updateRating: updateRating(album),
+                            } as ListEntry;
 
-                    }).sort((a, b) => a.position > b.position ? 1 : -1))
+                        }).sort((a, b) => a.position > b.position ? 1 : -1))
+                    }
+                } catch (error) {
+                    console.error('Error loading albums:', error);
+                } finally {
+                    setIsLoading(false);
                 }
             }
         )();
@@ -140,11 +150,13 @@ const Lists = () => {
 
     const handleReset = () => {
         (async () => {
+            setIsLoading(true);
             setAlbums([])
             setSelectedList(undefined)
             navigate(`/lists`)
             reset()
             await getAllLists()
+            setIsLoading(false);
         })()
     }
 
@@ -331,9 +343,15 @@ const Lists = () => {
                     </Stack>
                 </form>
             </Grid>
-            <Box>
-            <DraggableGrid start={albums} save={saveListEntry}/>
-            </Box>
+            {isLoading ? (
+                <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
+                    <CircularProgress />
+                </Box>
+            ) : (
+                <Box>
+                    <DraggableGrid start={albums} save={saveListEntry}/>
+                </Box>
+            )}
         </>
     )
 }
