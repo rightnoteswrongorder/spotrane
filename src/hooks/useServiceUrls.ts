@@ -16,6 +16,7 @@ type ServiceUrls = {
  * @param artistName - The name of the artist
  * @param spotifyUri - Optional Spotify URI for the album
  * @returns An object containing properly formatted URLs for various music services
+ * @throws Error if required inputs are empty
  */
 export function useServiceUrls(
   albumName: string,
@@ -23,11 +24,19 @@ export function useServiceUrls(
   spotifyUri?: string
 ): ServiceUrls {
   return useMemo(() => {
-    const serviceUrls = generateMusicServiceUrls(albumName, artistName);
+    if (!albumName.trim() || !artistName.trim()) {
+      throw new Error('Album name and artist name are required');
+    }
 
-    return {
-      ...serviceUrls,
+    const serviceUrls = generateMusicServiceUrls(albumName, artistName);
+    const urls: ServiceUrls = {
+      discogs: serviceUrls.discogs,
+      wikipedia: serviceUrls.wikipedia,
+      ecm: serviceUrls.ecm,
+      allmusic: serviceUrls.allmusic,
       spotify: spotifyUri
     };
+
+    return urls;
   }, [albumName, artistName, spotifyUri]);
 }

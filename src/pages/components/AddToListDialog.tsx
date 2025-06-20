@@ -90,8 +90,13 @@ const AddToListDialog = ({isOpen = false, handleAddToListDialogClose, addToList}
                                 value={listName}
                                 label="List"
                                 onChange={handleChange}
+                                disabled={isLoading}
                             >
-                                {
+                                {isLoading ? (
+                                    <MenuItem disabled>Loading lists...</MenuItem>
+                                ) : error ? (
+                                    <MenuItem disabled>{error}</MenuItem>
+                                ) : (
                                     lists?.sort((a, b) =>
                                         a.name > b.name ? 1 : -1
                                     ).map(item => {
@@ -100,14 +105,14 @@ const AddToListDialog = ({isOpen = false, handleAddToListDialogClose, addToList}
                                                              value={item.name}>{item.name}</MenuItem>
                                         }
                                     })
-                                }
+                                )}
                             </Select>
                         </FormControl>
                     </Box>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Cancel</Button>
-                    <Button type="submit">Add</Button>
+                    <Button type="submit" disabled={isLoading || !!error}>Add</Button>
                 </DialogActions>
             </Dialog>
         </React.Fragment>
