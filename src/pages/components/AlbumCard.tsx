@@ -14,7 +14,6 @@ export type AlbumCardProps<T> = {
     deleteAlbumFromLibrary?: () => Promise<void>
     isOnVisibleList?: boolean
     deleteAlbumFromList?: () => void
-    onImageLoad?: () => void
     addToVisibleList?: () => void
     updateRating?: (rating: number) => void
     albums?: T[]
@@ -26,7 +25,6 @@ const AlbumCardComponent = <T,>({
                               saveAlbum,
                               deleteAlbumFromLibrary,
                               isOnVisibleList,
-                              onImageLoad,
                               deleteAlbumFromList,
                               addToVisibleList,
                               addToList,
@@ -78,7 +76,6 @@ const AlbumCardComponent = <T,>({
                 <CardMedia ><Image
                     width={80}
                     height={80}
-                    onLoad={onImageLoad}
                     src={albumCardView?.imageUri}/></CardMedia>
             </Box>
             {updateRating && albums && <AlbumCardStars updateRating={updateRating}

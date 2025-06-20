@@ -69,8 +69,8 @@ export const SupabaseApi = {
             .select()
     },
 
-    searchAllAlbums: async (searchText: string): Promise<Tables<'mother_list'>[]> => {
-        const {data, error} = await supabase.rpc('mother_list',
+    searchAllAlbums: async (searchText: string): Promise<Tables<'all_albums_view'>[]> => {
+        const {data, error} = await supabase.rpc('search_all_albums',
             {keyword: searchText.replaceAll(" ", " & ")})
         if (error) {
             console.log("Error searching all albums...")

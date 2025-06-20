@@ -30,7 +30,6 @@ const Item = forwardRef<HTMLDivElement, Props>(
                     <AlbumCard albumCardView={item.item}
                                albums={albums}
                                addToList={item.addToList}
-                               onImageLoad={item.onImageLoad}
                                deleteAlbumFromList={item.deleteFromList}
                                updateRating={item.updateRating}/>
                 </Box>
