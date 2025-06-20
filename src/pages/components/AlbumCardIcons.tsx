@@ -1,6 +1,7 @@
-import {Avatar, Box, IconButton, Link, SvgIcon, Tooltip} from "@mui/material";
+import { Box, IconButton, Link, SvgIcon, Tooltip} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
+import WikipediaIcon from "../../static/images/wikipedia.svg?react"
 import SpotifyIcon from "../../static/images/spotify.svg?react"
 import DiscogsIcon from "../../static/images/discogs.svg?react"
 import EcmIcon from "../../static/images/ecmlogo.svg?react"
@@ -107,9 +108,7 @@ const AlbumCardIcons = ({
                 <SvgIcon component={DiscogsIcon} inheritViewBox/>
             </IconButton>
             <IconButton component={Link} target="_blank" href={urls.wikipedia}>
-                <Avatar sx={{ backgroundColor: 'white', height: '1em', width: '1em', fontFamily: '"Linux Libertine", "Georgia", serif', }}>
-                    W
-                </Avatar>
+                <SvgIcon component={WikipediaIcon} inheritViewBox/>
             </IconButton>
             {albumCardView.label === "ECM Records" && <IconButton component={Link} target="_blank" href={urls.ecm}>
                 <SvgIcon component={EcmIcon} inheritViewBox/>
