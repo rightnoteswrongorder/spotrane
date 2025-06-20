@@ -12,12 +12,15 @@ type Props = {
 
 
 const Item = forwardRef<HTMLDivElement, Props>(
-    ({albums, item, isOpacityEnabled, isDragging, ...props}, ref) => {
+    ({albums, item, isOpacityEnabled = false, isDragging = false, ...props}, ref) => {
+        // More type-safe approach with defaults for undefined values
         const styles = useMemo<CSSProperties>(() => ({
             opacity: isOpacityEnabled ? "0.4" : "1",
             cursor: isDragging ? "grabbing" : "grab",
             lineHeight: "0.5",
             transform: isDragging ? "scale(1.05)" : "scale(1)",
+            // Add transition for smoother visual feedback
+            transition: 'transform 0.2s, opacity 0.2s'
         }), [isOpacityEnabled, isDragging]);
 
         const boxShadowStyle = useMemo(() => ({

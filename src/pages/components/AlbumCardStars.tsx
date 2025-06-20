@@ -3,19 +3,38 @@ import {StarRateOutlined} from "@mui/icons-material";
 import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
 import React, {useCallback, useState} from "react";
 
-type AlbumCardStarsProps<T> = {
+type AlbumCardStarsProps = {
     updateRating?: (rating: number) => void
-    albums?: T[]
     album: SpotraneAlbumCard
 }
 
-const AlbumCardStars = <T, >({updateRating, album}: AlbumCardStarsProps<T>) => {
-    const [currentlyHovered, setCurrentlyHovered] = useState<number>(0)
+const AlbumCardStars = ({updateRating = undefined, album}: AlbumCardStarsProps) => {
+    const [currentlyHovered, setCurrentlyHovered] = useState<number>(0);
+    // Track if a rating update is in progress to prevent multiple rapid clicks
+    const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
     const ratingClickHandler = useCallback((rating: number) => {
+        if (isUpdating) return; // Prevent multiple rapid clicks
+
+        setIsUpdating(true);
+        // Update local state immediately for responsive UI
+        const previousRating = album.rating;
         album.rating = rating;
-        updateRating && updateRating(rating)
-    }, [album, updateRating]);
+
+        // Update backend
+        if (updateRating) {
+            Promise.resolve(updateRating(rating))
+                .catch(() => {
+                    // Revert on error
+                    album.rating = previousRating;
+                })
+                .finally(() => {
+                    setIsUpdating(false);
+                });
+        } else {
+            setIsUpdating(false);
+        }
+    }, [album, updateRating, isUpdating]);
 
     const mouseEnter = useCallback((star: number) => {
         setCurrentlyHovered(star)
@@ -27,9 +46,14 @@ const AlbumCardStars = <T, >({updateRating, album}: AlbumCardStarsProps<T>) => {
 
     // Use memoized handlers for each star to avoid bind calls
     const starButtons = React.useMemo(() => {
-        return [...Array(5)].map((_, i) => {
-            const handleClick = () => ratingClickHandler(i + 1);
-            const handleMouseEnter = () => mouseEnter(i + 1);
+        // Create an array of exactly 5 elements
+        const stars = Array(5).fill(null);
+
+        return stars.map((_, i) => {
+            const starIndex = i; // Use a local constant to avoid closure issues
+            const handleClick = () => ratingClickHandler(starIndex + 1);
+            const handleMouseEnter = () => mouseEnter(starIndex + 1);
+            const isFilled = (album.rating ?? 0) > starIndex || currentlyHovered > starIndex;
 
             return (
                 <IconButton 
@@ -39,10 +63,11 @@ const AlbumCardStars = <T, >({updateRating, album}: AlbumCardStarsProps<T>) => {
                     onClick={handleClick}
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={mouseLeave}
-                    key={i}
-                    aria-label="rate-star">
+                    key={starIndex}
+                    size="small"
+                    aria-label={`Rate ${starIndex + 1} star`}>
                     <StarRateOutlined
-                        sx={{fill: album.rating > i || currentlyHovered > i ? 'gold' : ''}}
+                        sx={{fill: isFilled ? 'gold' : ''}}
                     />
                 </IconButton>
             );
@@ -56,4 +81,4 @@ const AlbumCardStars = <T, >({updateRating, album}: AlbumCardStarsProps<T>) => {
     )
 }
 
-export default React.memo(AlbumCardStars)
+export default React.memo(AlbumCardStars);

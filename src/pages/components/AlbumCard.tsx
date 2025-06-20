@@ -4,7 +4,7 @@ import AddToListDialog from "./AddToListDialog.tsx";
 import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
 import AlbumCardIcons from "./AlbumCardIcons.tsx";
 import AlbumCardStars from "./AlbumCardStars.tsx";
-import Image from "mui-image"
+import ImageWrapper from "../../components/common/ImageWrapper.tsx";
 
 export type AlbumCardProps<T> = {
     albumCardView: SpotraneAlbumCard
@@ -21,15 +21,14 @@ export type AlbumCardProps<T> = {
 
 const AlbumCardComponent = <T,>({
                               albumCardView,
-                              listVisible,
+                              listVisible = false,
                               saveAlbum,
                               deleteAlbumFromLibrary,
-                              isOnVisibleList,
+                              isOnVisibleList = false,
                               deleteAlbumFromList,
                               addToVisibleList,
                               addToList,
                               updateRating,
-    albums
                           }: AlbumCardProps<T>) => {
     const [listDialogOpen, setListDialogOpen] = useState<boolean>(false);
     const [onlist, setOnList] = useState<boolean>(false)
@@ -58,28 +57,36 @@ const AlbumCardComponent = <T,>({
             <Box sx={{display: 'flex', flexDirection: 'row'}}>
                 <CardContent sx={{flex: '1 0 auto', padding: 0.5}}>
                     <Typography noWrap sx={{width: '175px'}} component="div" variant="h6">
-                        {`${albumCardView.name}`}
+                        {albumCardView.name}
                     </Typography>
                     <Typography noWrap sx={{width: '175px'}} marginTop={0.2} variant="body1" color="text.secondary"
                                 component="div">
-                        {`${albumCardView.artistName}`}
+                        {albumCardView.artistName}
                     </Typography>
                     <Typography noWrap sx={{width: '175px'}} marginTop={0.2} variant="body1" color="text.secondary"
                                 component="div">
-                        {`${albumCardView?.releaseDate?.substr(0, 4)} ${albumCardView?.label}`}
+                        {`${albumCardView.releaseDate?.substr(0, 4) ?? ''} ${albumCardView.label ?? ''}`}
                     </Typography>
                     <Typography noWrap sx={{width: '175px'}} marginTop={0.2} variant="body1" color="text.secondary"
                                 component="div">
-                        {albumCardView.artistGenres.length == 0 ? 'Unknown' : `${albumCardView?.artistGenres}`}
+                        {!albumCardView.artistGenres || albumCardView.artistGenres.length === 0 ? 'Unknown' : albumCardView.artistGenres}
                     </Typography>
                 </CardContent>
-                <CardMedia ><Image
-                    width={80}
-                    height={80}
-                    src={albumCardView?.imageUri}/></CardMedia>
+                                    <CardMedia>
+                      <ImageWrapper
+                        width={80}
+                        height={80}
+                        showLoading={false}
+                        errorIcon={null}
+                        src={albumCardView.imageUri || '/static/images/placeholder-album.svg'}
+                        fit="contain"
+                        duration={500}
+                        alt={`Album cover for ${albumCardView.name}`}
+                                      />
+                                    </CardMedia>
             </Box>
-            {updateRating && albums && <AlbumCardStars updateRating={updateRating}
-                            albums={albums} album={albumCardView}></AlbumCardStars>}
+                                         {updateRating && <AlbumCardStars updateRating={updateRating}
+                             album={albumCardView}></AlbumCardStars>}
             <AlbumCardIcons albumCardView={albumCardView}
                             listVisible={listVisible}
                             saveAlbum={saveAlbum}
@@ -96,5 +103,7 @@ const AlbumCardComponent = <T,>({
         }
     </Card>)
 }
+
+// We're now using the ImageWrapper component from src/components/common/ImageWrapper.tsx
 
 export const AlbumCard = React.memo(AlbumCardComponent);

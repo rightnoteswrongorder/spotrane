@@ -10,7 +10,7 @@ type Props = {
     itemId: number
 } & HTMLAttributes<HTMLDivElement>
 
-const SortableItem = ({ albums, itemId, item, ...props }: Props) => {
+const SortableItem = ({ albums = [], itemId, item, ...props }: Props) => {
     const { attributes, isDragging, listeners, setNodeRef, transform, transition } = useSortable({
         id: itemId,
     })

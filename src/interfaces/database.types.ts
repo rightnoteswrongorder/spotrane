@@ -349,12 +349,16 @@ export type Database = {
       search_all_albums: {
         Args: { keyword: string }
         Returns: {
+          appears_on: string | null
           artist: string | null
           artist_genres: string[] | null
           artist_genres_searchable: string | null
           artist_spotify_id: string | null
           image: string | null
           label: string | null
+          list_entry_id: number | null
+          list_entry_position: number | null
+          list_name: string | null
           name: string | null
           rating: number | null
           release_date: string | null

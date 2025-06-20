@@ -8,6 +8,7 @@ import EcmIcon from "../../static/images/ecmlogo.svg?react"
 import {PlaylistAdd, PlaylistAddCheck} from "@mui/icons-material";
 import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
 import React, {useCallback, useEffect, useMemo, useState} from "react";
+import { generateMusicServiceUrls } from "../../utils/URLHelpers";
 
 type AlbumCardIconProps = {
     albumCardView: SpotraneAlbumCard
@@ -22,8 +23,8 @@ type AlbumCardIconProps = {
 
 const AlbumCardIcons = ({
                             albumCardView,
-                            listVisible,
-                            isOnVisibleList,
+                            listVisible = false,
+                            isOnVisibleList = false,
                             saveAlbum,
                             deleteAlbumFromLibrary,
                             deleteAlbumFromList,
@@ -34,6 +35,7 @@ const AlbumCardIcons = ({
     const [saved, setSaved] = useState<boolean>(false)
 
     useEffect(() => {
+        console.log(albumCardView)
         if (!saved && albumCardView.isSaved) {
             setSaved(true)
         }
@@ -45,11 +47,15 @@ const AlbumCardIcons = ({
     }, [saveAlbum]);
 
     const deleteClickHandler = useCallback(() => {
+        // Use early return pattern for clearer logic flow
         if (deleteAlbumFromList) {
-            deleteAlbumFromList()
-        } else if (deleteAlbumFromLibrary) {
-            setSaved(false)
-            deleteAlbumFromLibrary()
+            deleteAlbumFromList();
+            return;
+        }
+
+        if (deleteAlbumFromLibrary) {
+            setSaved(false);
+            deleteAlbumFromLibrary();
         }
     }, [deleteAlbumFromList, deleteAlbumFromLibrary]);
 
@@ -61,20 +67,10 @@ const AlbumCardIcons = ({
         addToVisibleList && addToVisibleList()
     }, [addToVisibleList]);
 
-    // Memoize URL generation functions and their results
-    const removeTextInParenthises = useCallback((dirtyText: string): string => {
-        return dirtyText.replace(/ *\([^)]*\) */g, "")
-    }, []);
-
-    const urls = useMemo(() => {
-        const cleanAlbumName = removeTextInParenthises(albumCardView.name);
-
-        return {
-            discogs: `https://www.discogs.com/search/?q=${cleanAlbumName}&type=master&format=album`,
-            wikipedia: `https://en.wikipedia.org/w/index.php?search=${cleanAlbumName} ${albumCardView.artistName}`,
-            ecm: `https://ecmreviews.com/?s=${cleanAlbumName}`
-        };
-    }, [albumCardView.name, albumCardView.artistName, removeTextInParenthises]);
+    // Use the utility function for URL generation
+    const urls = useMemo(() => 
+        generateMusicServiceUrls(albumCardView.name, albumCardView.artistName),
+    [albumCardView.name, albumCardView.artistName]);
 
     return (
         <Box sx={{display: 'flex', flexWrap: 'wrap', alignItems: 'center'}}>
@@ -95,7 +91,7 @@ const AlbumCardIcons = ({
                     <PlaylistAddCheck
                         sx={{color: isOnVisibleList ? (theme) => theme.palette.primary.main : 'white'}}></PlaylistAddCheck>
                 </IconButton>}
-            <Tooltip title={albumCardView?.appearsOn}>
+            <Tooltip title={`On lists: ${albumCardView?.appearsOn}`}>
                 <IconButton onClick={addToListClickHandler}
                             aria-label="add-to-list">
                     <PlaylistAdd></PlaylistAdd>

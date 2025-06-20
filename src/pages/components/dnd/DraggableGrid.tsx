@@ -25,7 +25,7 @@ type DraggableGridProps = {
     save: (entryId: number, position: number) => () => void
 }
 
-const DraggableGrid = ({start, save}: DraggableGridProps) => {
+const DraggableGrid = ({start = [], save}: DraggableGridProps) => {
     // Initialize with empty array but use start if available
     const [items, setItems] = useState<ListEntry[]>(start || [])
     const [activeItem, setActiveItem] = useState<ListEntry | undefined>(undefined)
@@ -82,7 +82,10 @@ const DraggableGrid = ({start, save}: DraggableGridProps) => {
     const handleDragStart = useCallback((event: DragStartEvent) => {
         const {active} = event
         if (items.length > 0) {
-            setActiveItem(items.find((item) => item.id === active.id))
+            const foundItem = items.find((item) => item.id === active.id);
+            if (foundItem) {
+                setActiveItem(foundItem);
+            }
         }
     }, [items]);
 
@@ -90,20 +93,19 @@ const DraggableGrid = ({start, save}: DraggableGridProps) => {
         const {active, over} = event
         if (!over || items.length === 0) return
 
-        const activeItem = items.find((item) => item.id === active.id)
-        const overItem = items.find((item) => item.id === over.id)
+        try {
+            const activeIndex = items.findIndex((item) => item.id === active.id);
+            const overIndex = items.findIndex((item) => item.id === over.id);
 
-        if (!activeItem || !overItem) {
-            return
+            // Check all conditions at once for better readability
+            if (activeIndex !== overIndex && activeIndex >= 0 && overIndex >= 0) {
+                setItems((prev) => arrayMove<ListEntry>(prev, activeIndex, overIndex));
+            }
+        } catch (error) {
+            console.error('Error during drag end operation:', error);
+        } finally {
+            setActiveItem(undefined);
         }
-
-        const activeIndex = items.findIndex((item) => item.id === active.id)
-        const overIndex = items.findIndex((item) => item.id === over.id)
-
-        if (activeIndex !== overIndex && activeIndex >= 0 && overIndex >= 0) {
-            setItems((prev) => arrayMove<ListEntry>(prev, activeIndex, overIndex))
-        }
-        setActiveItem(undefined)
     }, [items]);
 
     const handleDragCancel = useCallback(() => {

@@ -115,11 +115,13 @@ const Lists = () => {
                                 artistName: dbAlbum.artist,
                                 artistGenres: dbAlbum.artist_genres,
                                 label: dbAlbum.label,
+                                appearsOn: dbAlbum.appears_on,
                                 releaseDate: dbAlbum.release_date,
                                 imageUri: dbAlbum.image,
                                 albumUri: dbAlbum.spotify_uri,
                                 rating: dbAlbum.rating,
                                 isSaved: true
+
                             } as SpotraneAlbumCard
 
                             return {
@@ -292,13 +294,12 @@ const Lists = () => {
                                         value={selectedList ? selectedList.name : ""}
                                         options=
                                             {
-                                                lists.sort((a, b) =>
-                                                    a.name > b.name ? 1 : -1
-                                                ).map(item => {
-                                                    if (item && item.name) {
-                                                        return item.name
-                                                    }
-                                                })
+                                                lists
+                                                    .filter(item => item && item.name)
+                                                    .sort((a, b) =>
+                                                        a.name.localeCompare(b.name)
+                                                    )
+                                                    .map(item => item.name)
                                             }
                                         onInputChange={(_event, newVal) => {
                                             if(newVal) {

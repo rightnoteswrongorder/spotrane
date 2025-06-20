@@ -17,22 +17,40 @@ type AddToListDialogProps = {
     addToList: (listId: number) => void
 }
 
-const AddToListDialog = ({isOpen, handleAddToListDialogClose, addToList}: AddToListDialogProps) => {
+const AddToListDialog = ({isOpen = false, handleAddToListDialogClose, addToList}: AddToListDialogProps) => {
 
     const [lists, setLists] = React.useState<(Tables<'lists'>[] | null)>([]);
     const [open, setOpen] = React.useState(false);
     const [listName, setListName] = React.useState('');
     const [selectedList, setSelectedList] = React.useState<Tables<'lists'> | undefined | null>();
+    const [isLoading, setIsLoading] = React.useState(false);
+    const [error, setError] = React.useState<string | null>(null);
 
     const getAllLists = async () => {
-        const data = await SupabaseApi.getLists()
-        setLists(data)
+        setIsLoading(true);
+        setError(null);
+        try {
+            const data = await SupabaseApi.getLists();
+            if (data) {
+                setLists(data);
+            } else {
+                setError('Unable to load lists');
+            }
+        } catch (err) {
+            setError('Error loading lists');
+            console.error('Failed to load lists:', err);
+        } finally {
+            setIsLoading(false);
+        }
     }
 
-
     useEffect(() => {
-        getAllLists()
-        setOpen(isOpen)
+        if (isOpen) {
+            getAllLists();
+            setOpen(true);
+        } else {
+            setOpen(false);
+        }
     }, [isOpen]);
 
 

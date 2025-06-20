@@ -9,7 +9,7 @@ export const SupabaseApi = {
 
     countAlbums: async (): Promise<number> => {
         const {count} = await supabase
-            .from('all_albums_view')
+            .from('mother_list')
             .select("*", {count: 'exact', head: true})
         return count || 0
     },
@@ -46,10 +46,22 @@ export const SupabaseApi = {
             ], {onConflict: 'spotify_id'})
     },
 
-    setRating: async (rating: number, id: string) => {
-        await supabase.from('albums')
-            .update({rating: rating})
-            .eq('spotify_id', id)
+    setRating: async (rating: number, id: string): Promise<boolean> => {
+        try {
+            const { error } = await supabase.from('albums')
+                .update({ rating: rating })
+                .eq('spotify_id', id);
+
+            if (error) {
+                console.error('Error updating rating:', error.message);
+                return false;
+            }
+
+            return true;
+        } catch (e) {
+            console.error('Exception in setRating:', e);
+            return false;
+        }
     },
 
     upsertAlbum: async (albumCardView: SpotraneAlbumCard) => {
@@ -69,7 +81,7 @@ export const SupabaseApi = {
             .select()
     },
 
-    searchAllAlbums: async (searchText: string): Promise<Tables<'all_albums_view'>[]> => {
+    searchAllAlbums: async (searchText: string): Promise<Tables<'mother_list'>[]> => {
         const {data, error} = await supabase.rpc('search_all_albums',
             {keyword: searchText.replaceAll(" ", " & ")})
         if (error) {
@@ -78,13 +90,6 @@ export const SupabaseApi = {
         return data
     },
 
-    getAlbumsWithIds: async (ids: Array<string>): Promise<Tables<'all_albums_view'>[]> => {
-        const {data} = await supabase
-            .from('all_albums_view')
-            .select("*")
-            .in('spotify_id', ids)
-        return data || []
-    },
 
     getAllAlbums: async (from: number, to: number): Promise<Tables<'mother_list'>[]> => {
         const {data} = await supabase
@@ -126,10 +131,21 @@ export const SupabaseApi = {
 
 
     getLists: async (): Promise<Tables<'lists'>[] | null> => {
-        const {data} = await supabase
-            .from('lists')
-            .select('*')
-        return data
+        try {
+            const {data, error} = await supabase
+                .from('lists')
+                .select('*')
+
+            if (error) {
+                console.error('Error fetching lists:', error.message);
+                return null;
+            }
+
+            return data;
+        } catch (e) {
+            console.error('Exception in getLists:', e);
+            return null;
+        }
     },
 
     addToList: (listId: number, albumCardView: SpotraneAlbumCard) => {
