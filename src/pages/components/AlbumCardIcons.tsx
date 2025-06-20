@@ -1,14 +1,12 @@
-import {Box, IconButton, Link, SvgIcon, Tooltip} from "@mui/material";
+import {Avatar, Box, IconButton, Link, SvgIcon, Tooltip} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
 import SpotifyIcon from "../../static/images/spotify.svg?react"
 import DiscogsIcon from "../../static/images/discogs.svg?react"
-import WikipediaIcon from "../../static/images/wikipeida.svg?react"
 import EcmIcon from "../../static/images/ecmlogo.svg?react"
 import {PlaylistAdd, PlaylistAddCheck} from "@mui/icons-material";
 import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
 import {useEffect, useState} from "react";
-import {SupabaseApi} from "../../api/supabase.ts";
 
 type AlbumCardIconProps = {
     albumCardView: SpotraneAlbumCard
@@ -33,13 +31,8 @@ const AlbumCardIcons = ({
                         }: AlbumCardIconProps) => {
 
     const [saved, setSaved] = useState<boolean>(false)
-    const [lists, setLists] = useState<string | undefined>("")
 
     useEffect(() => {
-        (async () => {
-            const albums = await SupabaseApi.getListsForAlbum(albumCardView.id)
-            setLists("On Lists: " + albums?.map(a => a.list_name).join(","))
-        })()
         if (!saved && albumCardView.isSaved) {
             setSaved(true)
         }
@@ -102,7 +95,7 @@ const AlbumCardIcons = ({
                     <PlaylistAddCheck
                         sx={{color: isOnVisibleList ? (theme) => theme.palette.primary.main : 'white'}}></PlaylistAddCheck>
                 </IconButton>}
-            <Tooltip title={lists}>
+            <Tooltip title={albumCardView?.appearsOn}>
                 <IconButton onClick={addToListClickHandler}
                             aria-label="add-to-list">
                     <PlaylistAdd></PlaylistAdd>
@@ -115,7 +108,9 @@ const AlbumCardIcons = ({
                 <SvgIcon component={DiscogsIcon} inheritViewBox/>
             </IconButton>
             <IconButton component={Link} target="_blank" href={makeWikipediaUrl()}>
-                <SvgIcon component={WikipediaIcon} inheritViewBox/>
+                <Avatar sx={{ backgroundColor: 'white', height: '1em', width: '1em', fontFamily: '"Linux Libertine", "Georgia", serif', }}>
+                    W
+                </Avatar>
             </IconButton>
             {albumCardView.label == "ECM Records" && <IconButton component={Link} target="_blank" href={makeEcmUrl()}>
                 <SvgIcon component={EcmIcon} inheritViewBox/>

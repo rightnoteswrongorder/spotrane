@@ -69,8 +69,8 @@ export const SupabaseApi = {
             .select()
     },
 
-    searchAllAlbums: async (searchText: string): Promise<Tables<'all_albums_view'>[]> => {
-        const {data, error} = await supabase.rpc('search_all_albums',
+    searchAllAlbums: async (searchText: string): Promise<Tables<'mother_list'>[]> => {
+        const {data, error} = await supabase.rpc('mother_list',
             {keyword: searchText.replaceAll(" ", " & ")})
         if (error) {
             console.log("Error searching all albums...")
@@ -86,9 +86,9 @@ export const SupabaseApi = {
         return data || []
     },
 
-    getAllAlbums: async (from: number, to: number): Promise<Tables<'all_albums_view'>[]> => {
+    getAllAlbums: async (from: number, to: number): Promise<Tables<'mother_list'>[]> => {
         const {data} = await supabase
-            .from('all_albums_view')
+            .from('mother_list')
             .select("*")
             .range(from, to - 1)
         return data || []
@@ -116,21 +116,14 @@ export const SupabaseApi = {
         return !!(data && data.length > 0)
     },
 
-    getAlbumsOnList: async (listName: string): Promise<Tables<'albums_on_lists'>[] | null> => {
+    getAlbumsOnList: async (listName: string): Promise<Tables<'mother_list'>[] | null> => {
         const {data} = await supabase
-            .from('albums_on_lists')
+            .from('mother_list')
             .select("*")
             .eq("list_name", listName)
         return data
     },
 
-    getListsForAlbum: async (albumSpotifyId: string): Promise<Tables<'albums_on_lists'>[] | null> => {
-        const {data} = await supabase
-            .from('albums_on_lists')
-            .select("*")
-            .eq("spotify_id", albumSpotifyId)
-        return data
-    },
 
     getLists: async (): Promise<Tables<'lists'>[] | null> => {
         const {data} = await supabase

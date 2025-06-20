@@ -1,6 +1,6 @@
 import Grid from "@mui/material/Grid";
 import SpotifyIcon from "../static/images/spotify.svg?react"
-import {Autocomplete, FormControl, IconButton, Stack, SvgIcon, TextField,} from "@mui/material";
+import {Autocomplete, Box, CircularProgress, FormControl, IconButton, Stack, SvgIcon, TextField,} from "@mui/material";
 import * as React from "react";
 import {useEffect, useState} from "react";
 import {Controller, useForm} from "react-hook-form";
@@ -22,6 +22,7 @@ export type ListEntry = {
     item: SpotraneAlbumCard
     id: number
     position: number
+    onImageLoad: () => void
     addToList: (listId: number) => void
     deleteFromList: () => Promise<void | undefined>
     updateRating: (rating: number) => void
@@ -36,6 +37,26 @@ const Lists = () => {
     const [selectedList, setSelectedList] = useState<SpotraneList>()
     const [lists, setLists] = React.useState<SpotraneList[]>([]);
     const [showSearchSpotifyDialog, setShowSpotifyDialog] = useState(false)
+
+    const [loading, setLoading] = useState(true);
+    const [_imagesLoaded, setImagesLoaded] = useState(0);
+
+    useEffect(() => {
+        console.log(_imagesLoaded)
+        if(albums.length==_imagesLoaded) {
+            setLoading(false)
+        }
+        if (albums.length > 0) {
+            setImagesLoaded(0); // reset count
+        }
+    }, [_imagesLoaded]);
+
+    const handleImageLoad = () => {
+        setImagesLoaded((prev) => {
+            console.log('sil')
+            return prev + 1;
+        });
+    };
 
 
     const addToList = (albumCardView: SpotraneAlbumCard) => {
@@ -54,9 +75,10 @@ const Lists = () => {
 
     useEffect(() => {
         if (selectedList) {
+            setLoading(true)
             navigate(`/lists/${selectedList?.name}`)
+            albumsOnList()
         }
-        albumsOnList()
     }, [selectedList])
 
     const sdk = useSpotify(
@@ -121,6 +143,7 @@ const Lists = () => {
                             position: dbAlbum.list_entry_position,
                             addToList: addToList(album),
                             deleteFromList: deleteAlbumFromList(album.id),
+                            onImageLoad: handleImageLoad,
                             updateRating: updateRating(album),
                         } as ListEntry;
 
@@ -200,7 +223,6 @@ const Lists = () => {
     }
 
     const handleClose = () => {
-        console.log(selectedList?.name)
         getAllLists()
         setSelectedList(selectedList)
         albumsOnList()
@@ -330,7 +352,15 @@ const Lists = () => {
                     </Stack>
                 </form>
             </Grid>
+            {loading && (
+                <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
+                    <CircularProgress />
+                </Box>
+            )}
+            <Box sx={{opacity: loading ? 0 : 1,
+                transition: 'opacity 0.5s ease-in',}}>
             <DraggableGrid start={albums} save={saveListEntry}/>
+            </Box>
         </>
     )
 }

@@ -68,6 +68,13 @@ export type Database = {
             referencedRelation: "artists"
             referencedColumns: ["spotify_id"]
           },
+          {
+            foreignKeyName: "albums_artist_fkey"
+            columns: ["artist"]
+            isOneToOne: false
+            referencedRelation: "mother_list"
+            referencedColumns: ["artist_spotify_id"]
+          },
         ]
       }
       artists: {
@@ -220,6 +227,13 @@ export type Database = {
             referencedColumns: ["spotify_id"]
           },
           {
+            foreignKeyName: "list_entry_album_id_fkey"
+            columns: ["album_id"]
+            isOneToOne: false
+            referencedRelation: "mother_list"
+            referencedColumns: ["spotify_id"]
+          },
+          {
             foreignKeyName: "list_entry_list_id_fkey"
             columns: ["list_id"]
             isOneToOne: false
@@ -302,6 +316,26 @@ export type Database = {
           artist_spotify_id: string | null
           image: string | null
           label: string | null
+          name: string | null
+          rating: number | null
+          release_date: string | null
+          spotify_id: string | null
+          spotify_uri: string | null
+        }
+        Relationships: []
+      }
+      mother_list: {
+        Row: {
+          appears_on: string | null
+          artist: string | null
+          artist_genres: string[] | null
+          artist_genres_searchable: string | null
+          artist_spotify_id: string | null
+          image: string | null
+          label: string | null
+          list_entry_id: number | null
+          list_entry_position: number | null
+          list_name: string | null
           name: string | null
           rating: number | null
           release_date: string | null

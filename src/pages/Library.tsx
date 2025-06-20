@@ -51,7 +51,7 @@ const Library = () => {
     }
 
 
-    const spotraneAlbum = (dbAlbums: Tables<'all_albums_view'>[]): SpotraneAlbumCard[] => {
+    const spotraneAlbum = (dbAlbums: Tables<'mother_list'>[]): SpotraneAlbumCard[] => {
         return dbAlbums.map(dbAlbum => {
             return {
                 id: dbAlbum.spotify_id,
@@ -64,6 +64,7 @@ const Library = () => {
                 imageUri: dbAlbum.image,
                 albumUri: dbAlbum.spotify_uri,
                 rating: dbAlbum.rating,
+                appearsOn: dbAlbum.appears_on,
                 isSaved: true
             } as SpotraneAlbumCard
         })
