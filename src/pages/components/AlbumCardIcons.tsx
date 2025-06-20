@@ -6,7 +6,7 @@ import DiscogsIcon from "../../static/images/discogs.svg?react"
 import EcmIcon from "../../static/images/ecmlogo.svg?react"
 import {PlaylistAdd, PlaylistAddCheck} from "@mui/icons-material";
 import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
-import {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useState} from "react";
 
 type AlbumCardIconProps = {
     albumCardView: SpotraneAlbumCard
@@ -36,45 +36,44 @@ const AlbumCardIcons = ({
         if (!saved && albumCardView.isSaved) {
             setSaved(true)
         }
-    }, []);
+    }, [albumCardView.isSaved, saved]);
 
-    const saveClickHandler = () => {
+    const saveClickHandler = useCallback(() => {
         setSaved(true)
         saveAlbum && saveAlbum()
-    }
+    }, [saveAlbum]);
 
-    const deleteClickHandler = () => {
+    const deleteClickHandler = useCallback(() => {
         if (deleteAlbumFromList) {
             deleteAlbumFromList()
         } else if (deleteAlbumFromLibrary) {
             setSaved(false)
             deleteAlbumFromLibrary()
         }
-    }
+    }, [deleteAlbumFromList, deleteAlbumFromLibrary]);
 
-    const addToListClickHandler = () => {
+    const addToListClickHandler = useCallback(() => {
         toggleListDialog()
-    }
+    }, [toggleListDialog]);
 
-    const addToListHandler = () => {
+    const addToListHandler = useCallback(() => {
         addToVisibleList && addToVisibleList()
-    }
+    }, [addToVisibleList]);
 
-    const makeDiscogsUrl = () => {
-        return `https://www.discogs.com/search/?q=${removeTextInParenthises(albumCardView.name)}&type=master&format=album`
-    }
-
-    const makeWikipediaUrl = () => {
-        return `https://en.wikipedia.org/w/index.php?search=${removeTextInParenthises(albumCardView.name)} ${albumCardView.artistName}`
-    }
-
-    const makeEcmUrl = () => {
-        return `https://ecmreviews.com/?s=${removeTextInParenthises(albumCardView.name)}`
-    }
-
-    const removeTextInParenthises = (dirtyText: string): string => {
+    // Memoize URL generation functions and their results
+    const removeTextInParenthises = useCallback((dirtyText: string): string => {
         return dirtyText.replace(/ *\([^)]*\) */g, "")
-    }
+    }, []);
+
+    const urls = useMemo(() => {
+        const cleanAlbumName = removeTextInParenthises(albumCardView.name);
+
+        return {
+            discogs: `https://www.discogs.com/search/?q=${cleanAlbumName}&type=master&format=album`,
+            wikipedia: `https://en.wikipedia.org/w/index.php?search=${cleanAlbumName} ${albumCardView.artistName}`,
+            ecm: `https://ecmreviews.com/?s=${cleanAlbumName}`
+        };
+    }, [albumCardView.name, albumCardView.artistName, removeTextInParenthises]);
 
     return (
         <Box sx={{display: 'flex', flexWrap: 'wrap', alignItems: 'center'}}>
@@ -104,19 +103,19 @@ const AlbumCardIcons = ({
             <IconButton component={Link} href={albumCardView?.albumUri}>
                 <SvgIcon component={SpotifyIcon} inheritViewBox/>
             </IconButton>
-            <IconButton component={Link} target="_blank" href={makeDiscogsUrl()}>
+            <IconButton component={Link} target="_blank" href={urls.discogs}>
                 <SvgIcon component={DiscogsIcon} inheritViewBox/>
             </IconButton>
-            <IconButton component={Link} target="_blank" href={makeWikipediaUrl()}>
+            <IconButton component={Link} target="_blank" href={urls.wikipedia}>
                 <Avatar sx={{ backgroundColor: 'white', height: '1em', width: '1em', fontFamily: '"Linux Libertine", "Georgia", serif', }}>
                     W
                 </Avatar>
             </IconButton>
-            {albumCardView.label == "ECM Records" && <IconButton component={Link} target="_blank" href={makeEcmUrl()}>
+            {albumCardView.label === "ECM Records" && <IconButton component={Link} target="_blank" href={urls.ecm}>
                 <SvgIcon component={EcmIcon} inheritViewBox/>
             </IconButton>}
         </Box>
     )
 }
 
-export default AlbumCardIcons
+export default React.memo(AlbumCardIcons)

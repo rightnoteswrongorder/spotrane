@@ -1,4 +1,4 @@
-import {CSSProperties, forwardRef, HTMLAttributes} from "react"
+import React, {CSSProperties, forwardRef, HTMLAttributes, useMemo} from "react"
 import {AlbumCard} from "../AlbumCard.tsx";
 import {Box} from "@mui/material";
 import {ListEntry} from "../../Lists.tsx";
@@ -13,16 +13,20 @@ type Props = {
 
 const Item = forwardRef<HTMLDivElement, Props>(
     ({albums, item, isOpacityEnabled, isDragging, ...props}, ref) => {
-        const styles: CSSProperties = {
+        const styles = useMemo<CSSProperties>(() => ({
             opacity: isOpacityEnabled ? "0.4" : "1",
             cursor: isDragging ? "grabbing" : "grab",
             lineHeight: "0.5",
             transform: isDragging ? "scale(1.05)" : "scale(1)",
-        }
+        }), [isOpacityEnabled, isDragging]);
+
+        const boxShadowStyle = useMemo(() => ({
+            boxShadow: isDragging ? 0 : 2
+        }), [isDragging]);
 
         return (
             <Box ref={ref} sx={styles} {...props}>
-                <Box sx={{boxShadow: isDragging ? 0 : 2}}>
+                <Box sx={boxShadowStyle}>
                     <AlbumCard albumCardView={item.item}
                                albums={albums}
                                addToList={item.addToList}
@@ -35,4 +39,4 @@ const Item = forwardRef<HTMLDivElement, Props>(
     }
 )
 
-export default Item
+export default React.memo(Item)

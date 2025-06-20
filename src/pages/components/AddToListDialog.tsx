@@ -33,7 +33,7 @@ const AddToListDialog = ({isOpen, handleAddToListDialogClose, addToList}: AddToL
     useEffect(() => {
         getAllLists()
         setOpen(isOpen)
-    }, []);
+    }, [isOpen]);
 
 
     const handleClose = () => {

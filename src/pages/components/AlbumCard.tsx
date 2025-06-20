@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {Box, Card, CardContent, CardMedia, Typography} from "@mui/material";
 import AddToListDialog from "./AddToListDialog.tsx";
 import {SpotraneAlbumCard} from "../../interfaces/spotrane.types.ts";
@@ -20,7 +20,7 @@ export type AlbumCardProps<T> = {
     albums?: T[]
 }
 
-export const AlbumCard = <T,>({
+const AlbumCardComponent = <T,>({
                               albumCardView,
                               listVisible,
                               saveAlbum,
@@ -40,20 +40,20 @@ export const AlbumCard = <T,>({
         if(!onlist && isOnVisibleList) {
             setOnList(true)
         }
+    }, [isOnVisibleList, onlist]);
+
+    const toggleListDialog = useCallback(() => {
+        setListDialogOpen(prev => !prev)
     }, []);
 
-    const toggleListDialog = () => {
-        setListDialogOpen(!listDialogOpen)
-    }
-
-    const addToVl = () => {
+    const addToVl = useCallback(() => {
         addToVisibleList && addToVisibleList()
         setOnList(true)
+    }, [addToVisibleList]);
 
-    }
-    const handleAddToListDialogClose = () => {
+    const handleAddToListDialogClose = useCallback(() => {
         setListDialogOpen(false)
-    }
+    }, []);
 
     return (<Card sx={{padding: 0.6, display: 'inline-flex', boxShadow: 0}}>
         <Box sx={{display: 'flex', flexDirection: 'column'}}>
@@ -99,3 +99,5 @@ export const AlbumCard = <T,>({
         }
     </Card>)
 }
+
+export const AlbumCard = React.memo(AlbumCardComponent);

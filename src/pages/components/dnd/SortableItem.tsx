@@ -1,7 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import Item from "./Item"
-import {HTMLAttributes} from "react"
+import React, {HTMLAttributes, useMemo} from "react"
 import {ListEntry} from "../../Lists.tsx";
 
 type Props = {
@@ -11,15 +11,14 @@ type Props = {
 } & HTMLAttributes<HTMLDivElement>
 
 const SortableItem = ({ albums, itemId, item, ...props }: Props) => {
-
     const { attributes, isDragging, listeners, setNodeRef, transform, transition } = useSortable({
         id: itemId,
     })
 
-    const styles = {
+    const styles = useMemo(() => ({
         transform: CSS.Transform.toString(transform),
         transition: transition || undefined,
-    }
+    }), [transform, transition]);
 
     return (
         <Item
@@ -35,4 +34,4 @@ const SortableItem = ({ albums, itemId, item, ...props }: Props) => {
     )
 }
 
-export default SortableItem
+export default React.memo(SortableItem)

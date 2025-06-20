@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react"
+import React, {useCallback, useEffect, useMemo, useState} from "react"
 import {
     DndContext,
     DragOverlay,
@@ -26,43 +26,69 @@ type DraggableGridProps = {
 }
 
 const DraggableGrid = ({start, save}: DraggableGridProps) => {
-    const [items, setItems] = useState<ListEntry[]>([])
+    // Initialize with empty array but use start if available
+    const [items, setItems] = useState<ListEntry[]>(start || [])
+    const [activeItem, setActiveItem] = useState<ListEntry | undefined>(undefined)
 
-    useEffect(() => {
-        setItems(start)
-    }, [start]);
-
-    useEffect(() => {
-        saveOrder()
-    }, [items]);
-
-    // for drag overlay
-    const [activeItem, setActiveItem] = useState<ListEntry>()
-
-    // for input methods detection
-    const sensors = useSensors(useSensor(PointerSensor, {
+    // Create sensors directly in the component (at the top level)
+    const pointerSensor = useSensor(PointerSensor, {
         activationConstraint: {
             delay: 300,
             tolerance: 5
         }
-    }), useSensor(TouchSensor, {
-            activationConstraint: {
-                delay: 300,
-                tolerance: 5
-            }
+    });
+
+    const touchSensor = useSensor(TouchSensor, {
+        activationConstraint: {
+            delay: 300,
+            tolerance: 5
         }
-    ))
+    });
 
-    // triggered when dragging starts
-    const handleDragStart = (event: DragStartEvent) => {
+    const sensors = useSensors(pointerSensor, touchSensor);
+
+    // Use a ref to track if items have been initialized
+    const initializedRef = React.useRef(false);
+
+    // Update items when start prop changes
+    useEffect(() => {
+        if (start && start.length > 0) {
+            setItems(start);
+        }
+    }, [start]);
+
+    // Memoize save order function to prevent unnecessary re-renders
+    const saveOrder = useCallback(() => {
+        // Only save order if items have been initialized and are not empty
+        if (items.length > 0) {
+            items.forEach((item, index) => {
+                save(item.id, index + 1)();
+            });
+        }
+    }, [items, save]);
+
+    useEffect(() => {
+        // Only run saveOrder if items have changed after initialization
+        if (initializedRef.current) {
+            saveOrder();
+        } else if (items.length > 0) {
+            initializedRef.current = true;
+        }
+    }, [items, saveOrder]);
+
+    // Sensors created at the top level of the component
+
+    // Memoize drag handlers to prevent recreation on each render
+    const handleDragStart = useCallback((event: DragStartEvent) => {
         const {active} = event
-        setActiveItem(items.find((item) => item.id === active.id))
-    }
+        if (items.length > 0) {
+            setActiveItem(items.find((item) => item.id === active.id))
+        }
+    }, [items]);
 
-    // triggered when dragging ends
-    const handleDragEnd = (event: DragEndEvent) => {
+    const handleDragEnd = useCallback((event: DragEndEvent) => {
         const {active, over} = event
-        if (!over) return
+        if (!over || items.length === 0) return
 
         const activeItem = items.find((item) => item.id === active.id)
         const overItem = items.find((item) => item.id === over.id)
@@ -74,19 +100,33 @@ const DraggableGrid = ({start, save}: DraggableGridProps) => {
         const activeIndex = items.findIndex((item) => item.id === active.id)
         const overIndex = items.findIndex((item) => item.id === over.id)
 
-        if (activeIndex !== overIndex) {
+        if (activeIndex !== overIndex && activeIndex >= 0 && overIndex >= 0) {
             setItems((prev) => arrayMove<ListEntry>(prev, activeIndex, overIndex))
         }
         setActiveItem(undefined)
-    }
+    }, [items]);
 
-    const handleDragCancel = () => {
+    const handleDragCancel = useCallback(() => {
         setActiveItem(undefined)
-    }
+    }, []);
 
-    const saveOrder = () => {
-        items.map((item, index) => save(item.id, index + 1)())
-    }
+    // Memoize grid items to prevent unnecessary re-renders
+    const gridItems = useMemo(() => {
+        if (!items || items.length === 0) return [];
+
+        return items.map((item) => (
+            <Grid item key={item.id}>
+                <SortableItem 
+                    albums={start} 
+                    item={item} 
+                    itemId={item.id}
+                />
+            </Grid>
+        ));
+    }, [items, start]);
+
+    // Safe check for items before rendering
+    const safeItems = items || [];
 
     return (
         <DndContext
@@ -96,18 +136,21 @@ const DraggableGrid = ({start, save}: DraggableGridProps) => {
             onDragEnd={handleDragEnd}
             onDragCancel={handleDragCancel}
         >
-            <SortableContext items={items} strategy={rectSortingStrategy}>
+            <SortableContext items={safeItems} strategy={rectSortingStrategy}>
                 <Grid marginBottom={2}>
                     <Grid container justifyContent="center" spacing={3}>
-                        {items.map((item) => (
-                            <Grid item key={item.id}><SortableItem albums={start}  item={item} key={item.id}
-                                                                   itemId={item.id}/></Grid>
-                        ))}
+                        {gridItems}
                     </Grid>
                 </Grid>
             </SortableContext>
             <DragOverlay adjustScale style={{transformOrigin: "0 0 "}}>
-                {activeItem ? <Item albums={start} item={activeItem} isDragging/> : null}
+                {activeItem && start ? (
+                    <Item 
+                        albums={start} 
+                        item={activeItem} 
+                        isDragging
+                    />
+                ) : null}
             </DragOverlay>
         </DndContext>
     )

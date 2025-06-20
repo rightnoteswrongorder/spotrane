@@ -11,13 +11,13 @@ type alertProps = {
     onClose?: () => void
 }
 
-export default function AlertDialog({message, onClose}: alertProps) {
+function AlertDialog({message, onClose}: alertProps) {
     const [open, setOpen] = React.useState(true);
 
-    const handleClose = () => {
+    const handleClose = React.useCallback(() => {
         setOpen(false);
         onClose && onClose();
-    };
+    }, [onClose]);
 
     return (
         <Dialog
@@ -42,3 +42,5 @@ export default function AlertDialog({message, onClose}: alertProps) {
         </Dialog>
     );
 }
+
+export default React.memo(AlertDialog);
