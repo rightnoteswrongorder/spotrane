@@ -33,15 +33,13 @@ const DraggableGrid = ({start = [], save}: DraggableGridProps) => {
     // Create sensors directly in the component (at the top level)
     const pointerSensor = useSensor(PointerSensor, {
         activationConstraint: {
-            delay: 300,
-            tolerance: 5
-        }
+            distance: 10
+        },
     });
 
     const touchSensor = useSensor(TouchSensor, {
         activationConstraint: {
-            delay: 300,
-            tolerance: 5
+            distance:10
         }
     });
 

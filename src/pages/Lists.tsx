@@ -73,7 +73,7 @@ const Lists = () => {
     const deleteAlbumFromList = (albumId: string) => {
         return async () => {
             selectedList && await SupabaseApi.deleteAlbumFromList(selectedList.id, albumId)
-            albumsOnList()
+            albumsOnList(false)
         }
     }
 
@@ -101,9 +101,9 @@ const Lists = () => {
         spotraneLists && setLists(spotraneLists)
     }
 
-    const albumsOnList = () => {
+    const albumsOnList = (loadingSpinners : boolean = true) => {
         (async () => {
-                setIsLoading(true);
+                setIsLoading(loadingSpinners);
                 try {
                     if (selectedList && selectedList.name) {
                         const albums = await SupabaseApi.getAlbumsOnList(selectedList?.name)
@@ -218,7 +218,7 @@ const Lists = () => {
     const handleClose = () => {
         getAllLists()
         setSelectedList(selectedList)
-        albumsOnList()
+        albumsOnList(false)
         setShowSpotifyDialog(false);
     };
 

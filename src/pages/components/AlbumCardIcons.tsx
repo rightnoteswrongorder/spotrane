@@ -35,7 +35,6 @@ const AlbumCardIcons = ({
     const [saved, setSaved] = useState<boolean>(false)
 
     useEffect(() => {
-        console.log(albumCardView)
         if (!saved && albumCardView.isSaved) {
             setSaved(true)
         }
