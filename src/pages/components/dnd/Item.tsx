@@ -15,6 +15,7 @@ const Item = forwardRef<HTMLDivElement, Props>(
     ({albums, item, isOpacityEnabled = false, isDragging = false, handleProps, ...props}, ref) => {
         const styles = useMemo<CSSProperties>(() => ({
             opacity: isOpacityEnabled ? "0.4" : "1",
+            cursor: isDragging ? "grabbing" : "grab",
             position: 'relative',
             lineHeight: "0.5",
             transform: isDragging ? "scale(1.05)" : "scale(1)",
@@ -36,9 +37,6 @@ const Item = forwardRef<HTMLDivElement, Props>(
 
         return (
             <Box ref={ref} sx={styles} {...props}>
-                <div {...handleProps}>
-                    <DragHandle />
-                </div>
                 <Box sx={boxShadowStyle}>
                     <AlbumCard albumCardView={item.item}
                               albums={albums}
