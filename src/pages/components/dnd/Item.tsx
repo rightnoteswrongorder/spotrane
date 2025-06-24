@@ -2,7 +2,6 @@ import React, {CSSProperties, forwardRef, HTMLAttributes, useMemo} from "react"
 import {AlbumCard} from "../AlbumCard.tsx";
 import {Box} from "@mui/material";
 import {ListEntry} from "../../Lists.tsx";
-import {DragHandle} from "./DragHandle";
 
 type Props = {
     item: ListEntry
