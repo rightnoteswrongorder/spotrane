@@ -24,7 +24,7 @@ const Item = forwardRef<HTMLDivElement, Props>(
             WebkitUserSelect: 'none',
             userSelect: 'none',
             WebkitTouchCallout: 'none',
-            touchAction: 'manipulation' // Improves touch handling
+            touchAction: 'none' // Improves touch handling
         }), [isOpacityEnabled, isDragging]);
 
         const boxShadowStyle = useMemo(() => ({
